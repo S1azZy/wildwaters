@@ -1,3 +1,3 @@
 RSpec.configure do |config|
-  config.include Pundit::Matchers
+  config.include Pundit::RSpec::Matchers
 end

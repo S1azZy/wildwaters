@@ -12,3 +12,5 @@
 - Synced the bootstrap/tooling layer closer to gymapp: dev Docker image, Make targets, RuboCop/RSpec setup, git hooks, editor config, and GitHub workflow/pull request templates.
 - Added bootstrap integration for Pundit and FactoryBot without introducing domain-specific policies or factories.
 - Added Shoulda Matchers to the RSpec/Rails bootstrap setup.
+- Added `yabi` as the canonical interactor foundation and introduced app-level base interactor/contract classes for upcoming auth work.
+- Added an adapted project `AGENTS.md`, enabled bilingual `ru` / `en` groundwork, and aligned project rules around `yabi`, ERB, `structure.sql`, and preferred `uuidv7()` primary keys for user-facing tables.

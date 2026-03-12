@@ -29,6 +29,7 @@ Sessions and transport:
 - Proper SameSite configuration
 - Production HTTPS (`force_ssl`) and proxy SSL handling
 - CSRF protection enabled for web flows
+- Rotate session identifiers on successful sign in
 
 Secrets and logging:
 - No secrets in git
@@ -50,7 +51,7 @@ Default stance:
 
 Required spec layers:
 - `spec/models`
-- `spec/interactors` or `spec/services`
+- `spec/interactors`
 - `spec/policies`
 - `spec/requests`
 - `spec/system`
@@ -78,14 +79,16 @@ Performance guardrails:
 ## CI and merge gates
 Required checks:
 - RuboCop
+- ERB lint
 - RSpec
 - Brakeman
 - bundler-audit
 
 Before merge:
 - All checks green
+- i18n keys added for `ru` / `en` when user-facing text is introduced
 - Authorization coverage exists for new protected flows
-- New business logic uses the canonical service/interactor style
+- New business logic uses the canonical `yabi` interactor style
 - New migrations include required constraints and indexes
 - Geospatial changes are tested against real PostGIS behavior
 - `CHANGES.md` updated with a short dated summary
