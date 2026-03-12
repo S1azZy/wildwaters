@@ -32,6 +32,10 @@ Product:
 - PostgreSQL `18` + PostGIS
 - Hotwire (`Turbo + Stimulus`)
 - Tailwind CSS
+- ERB views
+- `yabi` interactors
+- Pundit
+- I18n (`ru` / `en`)
 - Active Storage
 - Active Job + Solid Queue
 - Docker + docker-compose
@@ -79,6 +83,7 @@ It intentionally does not yet contain:
 ## Notes
 
 - The app is configured for PostgreSQL/PostGIS from the start.
+- User-facing and primary domain tables should prefer PostgreSQL `uuidv7()` primary keys; internal tables may use `bigint` where simpler.
 - Local Docker and CI use `postgis/postgis`, which is based on the official `postgres` image and preinstalls the required PostGIS extensions.
 - For PostgreSQL `18`, the container volume path is `/var/lib/postgresql`, not the older `/var/lib/postgresql/data`.
 - MVP behavior remains waterfall-only even though the domain will later expand through `Spot`.
