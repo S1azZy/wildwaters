@@ -1,0 +1,149 @@
+# Foundations
+
+## Product priorities
+Decision order:
+1. Product value
+2. Maintainability and consistency
+3. Delivery speed
+4. Future extensibility without MVP bloat
+
+Wild Waters is a production-minded, mobile-first discovery platform for natural water places, starting with waterfalls.
+
+## MVP scope
+Must-have:
+- Email/password auth
+- Regions hierarchy
+- Waterfall catalog
+- Map with waterfall markers
+- Waterfall detail pages
+- Photos upload
+- Reviews
+- Check-ins with photo
+- User profiles
+- Follow relationships
+- Basic activity feed
+- Nearby waterfalls search
+- Achievement groundwork
+- JSON API structure for future mobile clients
+
+Explicitly out of MVP:
+- Non-waterfall spot types in user-facing behavior
+- Native mobile apps
+- Hiking route planner
+- Generic outdoor platform features
+- Real-time features unless clearly needed
+- Overbuilt abstractions for unsupported spot types
+
+## Stack
+Mandatory:
+- Ruby on Rails `8.x`
+- PostgreSQL `18`
+- PostGIS
+- Hotwire (`Turbo + Stimulus`)
+- Tailwind CSS
+- Active Storage
+- Active Job + Solid Queue
+- JSON API
+- Docker + docker-compose
+- Kamal
+- S3-compatible object storage
+- RSpec
+- RuboCop
+- Brakeman
+- bundler-audit
+
+## Architecture
+- Rails monolith powering web app, JSON API, admin tools, and background jobs
+- Server-rendered web UI with strong mobile-first UX
+- Thin controllers for HTTP orchestration only
+- Thin models for persistence and local invariants
+- Business orchestration in a consistent service/interactor layer
+- Authorization must stay explicit and centralized
+- API and web should share the same domain and use-case layer
+- Action Cable is deferred until a concrete real-time use case appears
+
+Bounded areas:
+- Identity
+- Regions
+- Spots
+- Media
+- Reviews
+- Social
+- Activity
+- Achievements
+- Admin
+- Public API
+
+Hard boundaries:
+- MVP behavior is waterfall-only even if schema is extensible
+- `Spot` is the root place entity; waterfall is the only active `type` at launch
+- Geographic search lives in database-backed queries/services, not in controllers
+- Upload lifecycle and image processing are infrastructure concerns, not domain logic
+- Feed and achievement calculation must be asynchronous where possible
+- Do not mix architectural styles across features
+
+## Domain skeleton
+Core entities:
+- `User`
+- `Region`
+- `Spot`
+- `CheckIn`
+- `Photo`
+- `Review`
+- `Follow`
+- `Achievement`
+
+Recommended root entity:
+- `Spot`
+
+MVP active spot type:
+- `waterfall`
+
+Future spot types:
+- `natural_pool`
+- `lake`
+- `hot_spring`
+- `river`
+- `cenote`
+
+Suggested `spots` fields:
+- `name`
+- `slug`
+- `type`
+- `description`
+- `region_id`
+- `location`
+- `metadata` (`jsonb`)
+- `swimmable`
+
+Waterfall-oriented metadata examples:
+- `height`
+- `river`
+- `access_difficulty`
+- `seasonality_notes`
+
+## Data and geospatial rules
+- PostGIS is a first-class dependency, not an optional add-on
+- Store canonical spot coordinates in a geospatial column suitable for nearby queries
+- Keep region hierarchy explicit (`parent_id`) and queryable
+- Use `jsonb` only for attributes that are genuinely subtype-specific or import-oriented
+- Do not move core searchable/filterable fields into `metadata`
+- Nearby search must be index-backed and implemented at the database/query layer
+- Slugs must be stable and unique within the intended public namespace
+
+## Database and migration rules
+- Prefer SQL-forward migrations inside Rails migration wrappers
+- Use explicit `up` / `down`
+- Canonical dump: `structure.sql`
+- Every table must have explicit primary keys, foreign keys, indexes, and `NOT NULL` constraints where appropriate
+- Add geospatial indexes for location-based lookups
+- `CHECK` constraints are allowed only for true storage-level invariants
+- Business validation belongs to the app layer
+- Keep naming consistent and within PostgreSQL identifier limits
+
+## Consistency contract
+- Do not mix multiple interactor/service styles
+- Do not mix multiple API response styles
+- Keep naming and placement conventions uniform
+- Keep web and API behavior aligned through shared domain/application flows
+- Prefer explicit, boring code over speculative generic abstractions

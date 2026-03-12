@@ -1,0 +1,24 @@
+service: wildwaters
+image: wildwaters
+
+servers:
+  web:
+    - 127.0.0.1
+
+proxy:
+  ssl: true
+  host: wildwaters.example.com
+
+registry:
+  username: <%= ENV["KAMAL_REGISTRY_USERNAME"] %>
+  password: <%= ENV["KAMAL_REGISTRY_PASSWORD"] %>
+
+builder:
+  arch: amd64
+
+env:
+  clear:
+    RAILS_ENV: production
+  secret:
+    - RAILS_MASTER_KEY
+    - WILDWATERS_DATABASE_PASSWORD
