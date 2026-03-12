@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 ARG RUBY_VERSION=3.4.4
+ARG RUBYGEMS_VERSION=4.0.8
 FROM ruby:${RUBY_VERSION}-slim
 
 WORKDIR /app
@@ -22,6 +23,8 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
   pkg-config \
   postgresql-client-18 \
   && rm -rf /var/lib/apt/lists/*
+
+RUN gem update --system ${RUBYGEMS_VERSION}
 
 ENV BUNDLE_PATH=/usr/local/bundle \
     BUNDLE_JOBS=4 \
