@@ -15,7 +15,7 @@ class RegistrationsController < ApplicationController
       redirect_to dashboard_path, notice: t("auth.registrations.create.success")
     else
       @errors = result.failure[:errors]
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 

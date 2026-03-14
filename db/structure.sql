@@ -83,7 +83,9 @@ CREATE TABLE public.user_identities (
     password_digest text,
     metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    password_reset_token_digest text,
+    password_reset_sent_at timestamp with time zone
 );
 
 
@@ -180,6 +182,13 @@ CREATE INDEX index_sessions_on_user_identity_id ON public.sessions USING btree (
 
 
 --
+-- Name: index_user_identities_on_password_reset_token_digest; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_user_identities_on_password_reset_token_digest ON public.user_identities USING btree (password_reset_token_digest) WHERE (password_reset_token_digest IS NOT NULL);
+
+
+--
 -- Name: index_user_identities_on_provider_and_provider_uid; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -238,6 +247,7 @@ ALTER TABLE ONLY public.user_identities
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260314234833'),
 ('20260314143000'),
 ('20260314142000'),
 ('20260314093000');

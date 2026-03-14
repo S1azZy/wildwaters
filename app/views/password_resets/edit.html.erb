@@ -1,0 +1,20 @@
+<% content_for :title, t("auth.password_resets.edit.title") %>
+
+<div class="mx-auto w-full max-w-md">
+  <h1 class="text-2xl font-semibold"><%= t("auth.password_resets.edit.heading") %></h1>
+  <p class="mt-2 text-sm text-slate-600"><%= t("auth.password_resets.edit.subheading") %></p>
+
+  <%= form_with url: password_reset_token_path(@token), scope: :password_reset, method: :patch, class: "mt-8 space-y-4" do |form| %>
+    <div>
+      <%= form.label :password, t("auth.fields.password"), class: "mb-1 block text-sm font-medium" %>
+      <%= form.password_field :password, autocomplete: "new-password", class: "w-full rounded border px-3 py-2" %>
+    </div>
+
+    <div>
+      <%= form.label :password_confirmation, t("auth.fields.password_confirmation"), class: "mb-1 block text-sm font-medium" %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "w-full rounded border px-3 py-2" %>
+    </div>
+
+    <%= form.submit t("auth.password_resets.edit.submit"), class: "w-full rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white" %>
+  <% end %>
+</div>

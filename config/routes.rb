@@ -11,6 +11,9 @@ Rails.application.routes.draw do
 
   resource :registration, only: %i[new create]
   resource :session, only: %i[new create destroy]
+  resource :password_reset, only: %i[new create], path: "password-reset"
+  get "password-reset/:token" => "password_resets#edit", as: :edit_password_reset_token
+  patch "password-reset/:token" => "password_resets#update", as: :password_reset_token
 
   get "dashboard" => "dashboard#show", as: :dashboard
 
