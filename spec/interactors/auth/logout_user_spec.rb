@@ -8,8 +8,11 @@ RSpec.describe Auth::LogoutUser, type: :interactor do
 
   around { |example| freeze_time(&example) }
 
+  it "returns success" do
+    expect(result).to be_success
+  end
+
   it "revokes the session" do
     expect { result }.to change { session_record.reload.revoked_at }.from(nil).to(Time.current)
-    expect(result).to be_success
   end
 end

@@ -15,11 +15,16 @@ RSpec.describe Auth::RegisterUser, type: :interactor do
   let(:password_confirmation) { "Password123!" }
   let(:locale) { "ru" }
 
+  it "returns success" do
+    expect(result).to be_success
+  end
+
   it "creates a user and password identity" do
     expect { result }.to change(User, :count).by(1)
       .and change(UserIdentity, :count).by(1)
+  end
 
-    expect(result).to be_success
+  it "returns the created records" do
     expect(result.value!).to include(
       user: have_attributes(primary_email: "user@example.com", locale: "ru"),
       user_identity: have_attributes(provider: Auth::Constants::PASSWORD)
