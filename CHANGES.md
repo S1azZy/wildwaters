@@ -14,3 +14,8 @@
 - Added Shoulda Matchers to the RSpec/Rails bootstrap setup.
 - Added `yabi` as the canonical interactor foundation and introduced app-level base interactor/contract classes for upcoming auth work.
 - Added an adapted project `AGENTS.md`, enabled bilingual `ru` / `en` groundwork, and aligned project rules around `yabi`, ERB, `structure.sql`, and preferred `uuidv7()` primary keys for user-facing tables.
+- Added Stage 1 auth foundation with `users`, `user_identities`, and `sessions` models/migration to support password auth now and multi-provider auth later.
+- Relaxed auth database constraints so provider-specific and other business rules stay in models/interactors unless a `CHECK` is clearly necessary at the storage level.
+- Updated auth model normalization to use Rails `normalizes` and formalized the rule to prefer current default framework/library conventions unless the project explicitly decides otherwise.
+- Consolidated shared auth provider constants under a small auth namespace and aligned locale validation with the application-level I18n configuration.
+- Refined auth provider constants to expose both a canonical list and named values for clearer, safer model logic and specs.

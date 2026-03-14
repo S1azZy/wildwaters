@@ -9,6 +9,8 @@ Decision order:
 
 Wild Waters is a production-minded, mobile-first discovery platform for natural water places, starting with waterfalls.
 
+Prefer the current default code style and built-in conventions of the active library or framework, especially Rails, unless this project has explicitly chosen otherwise.
+
 ## MVP scope
 Must-have:
 - Email/password auth
@@ -144,7 +146,7 @@ Waterfall-oriented metadata examples:
 - Foreign keys should match the primary key type of the referenced table
 - Every table must have explicit primary keys, foreign keys, indexes, and `NOT NULL` constraints where appropriate
 - Add geospatial indexes for location-based lookups
-- `CHECK` constraints are allowed only for true storage-level invariants
+- `CHECK` constraints are allowed only for clearly necessary storage-level invariants; when in doubt, keep business rules in models/interactors
 - Business validation belongs to the app layer
 - Keep naming consistent and within PostgreSQL identifier limits
 
