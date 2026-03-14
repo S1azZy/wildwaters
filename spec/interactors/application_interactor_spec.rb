@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe ApplicationInteractor do
-  subject(:result) { interactor_class.call(email:) }
+  subject(:result) { interactor_class.call(input: { email: }) }
 
   let(:email) { "user@example.com" }
   let(:contract_class) do
@@ -19,10 +19,10 @@ RSpec.describe ApplicationInteractor do
   end
   let(:interactor_class) do
     interactor = Class.new(ApplicationInteractor) do
-      option :email
+      option :input
 
       def call
-        Success(email:)
+        Success(email: input[:email])
       end
     end
 

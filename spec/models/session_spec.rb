@@ -29,6 +29,7 @@ RSpec.describe Session, type: :model do
   describe "validations" do
     it { is_expected.to validate_presence_of(:authentication_method) }
     it { is_expected.to validate_inclusion_of(:authentication_method).in_array(Auth::Constants::PROVIDERS) }
+    it { is_expected.to validate_presence_of(:token_digest) }
     it { is_expected.to validate_presence_of(:last_seen_at) }
     it { is_expected.to validate_presence_of(:expires_at) }
   end
@@ -56,6 +57,7 @@ RSpec.describe Session, type: :model do
       user:,
       user_identity:,
       authentication_method: Auth::Constants::PASSWORD,
+      token_digest: Session.digest_token(SecureRandom.urlsafe_base64(48)),
       last_seen_at: Time.current,
       expires_at:,
       revoked_at:

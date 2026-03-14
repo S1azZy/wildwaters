@@ -28,4 +28,39 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  auth:
+    fields:
+      email: "Email"
+      locale: "Language"
+      password: "Password"
+      password_confirmation: "Confirm password"
+    registrations:
+      create:
+        success: "Welcome to Wild Waters."
+      new:
+        heading: "Create your account"
+        sign_in_link: "Sign in"
+        sign_in_prompt: "Already have an account?"
+        submit: "Create account"
+        subheading: "Start saving waterfalls, reviews, and future adventures."
+        title: "Sign up"
+    sessions:
+      create:
+        failure: "Invalid email or password."
+        success: "Signed in successfully."
+      destroy:
+        success: "Signed out successfully."
+      new:
+        heading: "Sign in"
+        sign_up_link: "Create an account"
+        sign_up_prompt: "Need an account?"
+        submit: "Sign in"
+        subheading: "Continue your Wild Waters journey."
+        title: "Sign in"
+      require_authentication: "Please sign in to continue."
+  dashboard:
+    show:
+      heading: "Dashboard"
+      sign_out: "Sign out"
+      signed_in_as: "Signed in as %{email}"
+      title: "Dashboard"

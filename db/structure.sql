@@ -65,7 +65,7 @@ CREATE TABLE public.sessions (
     revoked_at timestamp with time zone,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT sessions_authentication_method_check CHECK ((authentication_method = ANY (ARRAY['password'::text, 'google'::text, 'apple'::text, 'email_code'::text])))
+    token_digest text NOT NULL
 );
 
 
@@ -83,9 +83,7 @@ CREATE TABLE public.user_identities (
     password_digest text,
     metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT user_identities_password_provider_check CHECK ((((provider = 'password'::text) AND (password_digest IS NOT NULL)) OR (provider <> 'password'::text))),
-    CONSTRAINT user_identities_provider_check CHECK ((provider = ANY (ARRAY['password'::text, 'google'::text, 'apple'::text, 'email_code'::text])))
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -102,10 +100,7 @@ CREATE TABLE public.users (
     display_name text,
     locale text DEFAULT 'en'::text NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT users_locale_check CHECK ((locale = ANY (ARRAY['en'::text, 'ru'::text]))),
-    CONSTRAINT users_role_check CHECK ((role = ANY (ARRAY['member'::text, 'admin'::text]))),
-    CONSTRAINT users_status_check CHECK ((status = ANY (ARRAY['active'::text, 'suspended'::text])))
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -161,6 +156,13 @@ CREATE INDEX index_sessions_on_expires_at ON public.sessions USING btree (expire
 --
 
 CREATE INDEX index_sessions_on_revoked_at ON public.sessions USING btree (revoked_at);
+
+
+--
+-- Name: index_sessions_on_token_digest; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_sessions_on_token_digest ON public.sessions USING btree (token_digest);
 
 
 --
@@ -236,5 +238,7 @@ ALTER TABLE ONLY public.user_identities
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260314143000'),
+('20260314142000'),
 ('20260314093000');
 

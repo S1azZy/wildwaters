@@ -11,4 +11,8 @@ class User < ApplicationRecord
   validates :role, presence: true, inclusion: { in: ROLES }
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :locale, presence: true, inclusion: { in: I18n.available_locales.map(&:to_s) }
+
+  def suspended?
+    status == "suspended"
+  end
 end

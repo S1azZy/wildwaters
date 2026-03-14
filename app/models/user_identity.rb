@@ -8,6 +8,8 @@ class UserIdentity < ApplicationRecord
   normalizes :provider, with: ->(value) { value.to_s.strip.downcase.presence }
 
   validates :provider, presence: true, inclusion: { in: Auth::Constants::PROVIDERS }
+  validates :password, confirmation: true, if: :password_provider_with_password?
+  validates :password_confirmation, presence: true, if: :password_provider_with_password?
   validates :provider_uid, uniqueness: { scope: :provider }, allow_nil: true
   validate :password_identity_requires_password_digest
   validate :external_identity_requires_provider_uid
@@ -28,5 +30,9 @@ class UserIdentity < ApplicationRecord
     return if provider_uid.present?
 
     errors.add(:provider_uid, :blank)
+  end
+
+  def password_provider_with_password?
+    provider == Auth::Constants::PASSWORD && password.present?
   end
 end

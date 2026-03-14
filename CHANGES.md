@@ -19,3 +19,4 @@
 - Updated auth model normalization to use Rails `normalizes` and formalized the rule to prefer current default framework/library conventions unless the project explicitly decides otherwise.
 - Consolidated shared auth provider constants under a small auth namespace and aligned locale validation with the application-level I18n configuration.
 - Refined auth provider constants to expose both a canonical list and named values for clearer, safer model logic and specs.
+- Added Stage 2 web auth with password sign up/sign in/sign out, persisted session tokens, `Current`-based request authentication, protected dashboard flow, and request/interactor coverage.
