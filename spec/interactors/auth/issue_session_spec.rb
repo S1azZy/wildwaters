@@ -16,18 +16,18 @@ RSpec.describe Auth::IssueSession, type: :interactor do
   around { |example| freeze_time(&example) }
 
   describe "#call" do
-    it "returns success" do
+    it "creates a persisted session" do
+      expect { result }.to change(Session, :count).by(1)
       expect(result).to be_success
     end
 
     it "returns a raw token that matches the stored digest" do
-      expect(result).to be_success
-      payload = result.value!
-
-      expect(payload[:session].token_digest).to eq(Session.digest_token(payload[:token]))
+      expect { result }.to change(Session, :count).by(1)
+      expect(result.value![:session].token_digest).to eq(Session.digest_token(result.value![:token]))
     end
 
-    it "creates a persisted session with the expected attributes" do
+    it "persists the expected attributes" do
+      expect { result }.to change(Session, :count).by(1)
       expect(result.value![:session]).to have_attributes(
         user: user_identity.user,
         user_identity:,

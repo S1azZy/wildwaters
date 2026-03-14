@@ -41,7 +41,7 @@ RSpec.describe "Authentication", type: :request do
       let(:locale) { "en" }
 
       it "renders the form with an error status" do
-        expect { perform_request }.not_to change(User, :count)
+        expect { perform_request }.not_to change { [ User.count, UserIdentity.count ] }
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
@@ -99,10 +99,8 @@ RSpec.describe "Authentication", type: :request do
     end
 
     it "revokes the current session and redirects to sign in" do
-      perform_request
-
+      expect { perform_request }.to change { Session.order(:created_at).last.reload.revoked_at }.from(nil)
       expect(response).to redirect_to(new_session_path)
-      expect(Session.order(:created_at).last).to be_revoked
     end
 
     it "stops authenticating revoked sessions" do
