@@ -61,6 +61,7 @@ group :development, :test do
   gem "better_html", require: false
   gem "rubocop-rspec", require: false
   gem "factory_bot_rails"
+  gem "faker"
   gem "rspec-rails"
   gem "shoulda-matchers"
   gem "simplecov", require: false
