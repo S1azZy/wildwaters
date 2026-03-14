@@ -1,2 +1,37 @@
 ru:
-  hello: "Привет, мир"
+  auth:
+    fields:
+      email: "Email"
+      locale: "Язык"
+      password: "Пароль"
+      password_confirmation: "Подтверждение пароля"
+    registrations:
+      create:
+        success: "Добро пожаловать в Wild Waters."
+      new:
+        heading: "Создайте аккаунт"
+        sign_in_link: "Войти"
+        sign_in_prompt: "Уже есть аккаунт?"
+        submit: "Создать аккаунт"
+        subheading: "Сохраняйте водопады, отзывы и будущие приключения."
+        title: "Регистрация"
+    sessions:
+      create:
+        failure: "Неверный email или пароль."
+        success: "Вы успешно вошли."
+      destroy:
+        success: "Вы вышли из аккаунта."
+      new:
+        heading: "Вход"
+        sign_up_link: "Создать аккаунт"
+        sign_up_prompt: "Нет аккаунта?"
+        submit: "Войти"
+        subheading: "Продолжайте путешествие по Wild Waters."
+        title: "Вход"
+      require_authentication: "Войдите, чтобы продолжить."
+  dashboard:
+    show:
+      heading: "Кабинет"
+      sign_out: "Выйти"
+      signed_in_as: "Вы вошли как %{email}"
+      title: "Кабинет"

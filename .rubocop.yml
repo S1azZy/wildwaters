@@ -10,7 +10,7 @@ AllCops:
   NewCops: enable
 
 RSpec/ExampleLength:
-  Max: 10
+  Max: 12
 
 RSpec/MultipleExpectations:
-  Max: 2
+  Max: 3

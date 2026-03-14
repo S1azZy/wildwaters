@@ -24,7 +24,17 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <main class="container mx-auto mt-20 px-5">
+      <% if flash.any? %>
+        <div class="mx-auto mb-6 w-full max-w-2xl space-y-2">
+          <% flash.each do |type, message| %>
+            <div class="rounded border px-4 py-3 text-sm <%= type.to_s == "alert" ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700" %>">
+              <%= message %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
       <%= yield %>
     </main>
   </body>

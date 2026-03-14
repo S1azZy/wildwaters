@@ -9,6 +9,10 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  resource :registration, only: %i[new create]
+  resource :session, only: %i[new create destroy]
+
+  get "dashboard" => "dashboard#show", as: :dashboard
+
+  root "dashboard#show"
 end
