@@ -2,6 +2,7 @@
 
 ## 2026-03-15
 - Simplified the README badges to keep only CI status and coverage, and switched CI to the native GitHub Actions badge.
+- Added the first public waterfall catalog with a published-only index, detail pages resolved by `public_id + slug`, and demo seed data for local product walkthroughs.
 
 ## 2026-03-12
 - Added initial project documentation pack for Wild Waters.
