@@ -5,17 +5,8 @@ module Nanoid
 
   def self.generate(size: 21, alphabet: SAFE_ALPHABET, non_secure: false)
     return non_secure_generate(size:, alphabet:) if non_secure
-    return simple_generate(size:) if alphabet == SAFE_ALPHABET && SAFE_ALPHABET.size == 64
 
     complex_generate(size:, alphabet:)
-  end
-
-  private_class_method def self.simple_generate(size:)
-    bytes = random_bytes(size)
-
-    (0...size).reduce(+"") do |id, idx|
-      id << SAFE_ALPHABET[bytes[idx] & 63]
-    end
   end
 
   private_class_method def self.complex_generate(size:, alphabet:)
