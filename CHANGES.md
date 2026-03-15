@@ -2,6 +2,7 @@
 
 ## 2026-03-15
 - Replaced the README CI badge with the native GitHub Actions badge to avoid external badge lookup failures.
+- Normalized README badge sizing so the native CI badge and static stack badges render at a consistent height.
 
 ## 2026-03-12
 - Added initial project documentation pack for Wild Waters.
