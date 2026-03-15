@@ -81,6 +81,7 @@ Preferred:
 - Prefer SQL-forward migrations in Rails wrappers.
 - Use explicit `up` / `down`.
 - Use `structure.sql`, not `schema.rb`.
+- Do not edit `db/structure.sql` by hand; it may change only as a generated artifact of migrations/schema dump.
 - Default to `NOT NULL`, `FOREIGN KEY`, and indexes where justified.
 - Use `CHECK` only for true storage-level invariants.
 - Do not add triggers or stored procedures unless explicitly approved.
