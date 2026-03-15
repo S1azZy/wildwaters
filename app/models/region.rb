@@ -17,6 +17,7 @@ class Region < ApplicationRecord
   belongs_to :parent, class_name: "Region", optional: true, inverse_of: :children
 
   has_many :children, class_name: "Region", foreign_key: :parent_id, inverse_of: :parent, dependent: :nullify
+  has_many :spots, dependent: :restrict_with_exception
   has_many :ancestor_closures, class_name: "RegionClosure", foreign_key: :descendant_id, inverse_of: :descendant, dependent: :destroy
   has_many :descendant_closures, class_name: "RegionClosure", foreign_key: :ancestor_id, inverse_of: :ancestor, dependent: :destroy
 

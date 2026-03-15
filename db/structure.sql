@@ -24,6 +24,20 @@ CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;
 COMMENT ON EXTENSION citext IS 'data type for case-insensitive character strings';
 
 
+--
+-- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types and functions';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -103,6 +117,27 @@ CREATE TABLE public.sessions (
 
 
 --
+-- Name: spots; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.spots (
+    id uuid DEFAULT uuidv7() NOT NULL,
+    public_id text NOT NULL,
+    region_id uuid NOT NULL,
+    spot_type text NOT NULL,
+    name text NOT NULL,
+    slug text NOT NULL,
+    summary text,
+    description text,
+    status text DEFAULT 'draft'::text NOT NULL,
+    published_at timestamp with time zone,
+    location public.geography(Point,4326) NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: user_identities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -134,6 +169,22 @@ CREATE TABLE public.users (
     status text DEFAULT 'active'::text NOT NULL,
     display_name text,
     locale text DEFAULT 'en'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: waterfalls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.waterfalls (
+    id uuid DEFAULT uuidv7() NOT NULL,
+    spot_id uuid NOT NULL,
+    height_meters numeric(6,2),
+    plunge_pool boolean,
+    flow_seasonality text,
+    approach_difficulty text,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -180,6 +231,14 @@ ALTER TABLE ONLY public.sessions
 
 
 --
+-- Name: spots spots_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.spots
+    ADD CONSTRAINT spots_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_identities user_identities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -193,6 +252,14 @@ ALTER TABLE ONLY public.user_identities
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: waterfalls waterfalls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.waterfalls
+    ADD CONSTRAINT waterfalls_pkey PRIMARY KEY (id);
 
 
 --
@@ -287,6 +354,48 @@ CREATE INDEX index_sessions_on_user_identity_id ON public.sessions USING btree (
 
 
 --
+-- Name: index_spots_on_location; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_spots_on_location ON public.spots USING gist (location);
+
+
+--
+-- Name: index_spots_on_public_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_spots_on_public_id ON public.spots USING btree (public_id);
+
+
+--
+-- Name: index_spots_on_region_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_spots_on_region_id ON public.spots USING btree (region_id);
+
+
+--
+-- Name: index_spots_on_region_id_and_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_spots_on_region_id_and_slug ON public.spots USING btree (region_id, slug);
+
+
+--
+-- Name: index_spots_on_spot_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_spots_on_spot_type ON public.spots USING btree (spot_type);
+
+
+--
+-- Name: index_spots_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_spots_on_status ON public.spots USING btree (status);
+
+
+--
 -- Name: index_user_identities_on_password_reset_token_digest; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -319,6 +428,13 @@ CREATE UNIQUE INDEX index_user_identities_on_user_id_and_provider_for_password O
 --
 
 CREATE UNIQUE INDEX index_users_on_primary_email ON public.users USING btree (primary_email);
+
+
+--
+-- Name: index_waterfalls_on_spot_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_waterfalls_on_spot_id ON public.waterfalls USING btree (spot_id);
 
 
 --
@@ -362,11 +478,27 @@ ALTER TABLE ONLY public.sessions
 
 
 --
+-- Name: spots spots_region_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.spots
+    ADD CONSTRAINT spots_region_id_fkey FOREIGN KEY (region_id) REFERENCES public.regions(id) ON DELETE RESTRICT;
+
+
+--
 -- Name: user_identities user_identities_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_identities
     ADD CONSTRAINT user_identities_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: waterfalls waterfalls_spot_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.waterfalls
+    ADD CONSTRAINT waterfalls_spot_id_fkey FOREIGN KEY (spot_id) REFERENCES public.spots(id) ON DELETE CASCADE;
 
 
 --
@@ -376,6 +508,7 @@ ALTER TABLE ONLY public.user_identities
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260315222004'),
 ('20260315213827'),
 ('20260314234833'),
 ('20260314143000'),
