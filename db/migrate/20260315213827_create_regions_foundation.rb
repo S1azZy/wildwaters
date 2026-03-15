@@ -49,13 +49,24 @@ class CreateRegionsFoundation < ActiveRecord::Migration[8.1]
 
     execute <<~SQL
       CREATE TABLE region_closures (
+        id uuid PRIMARY KEY DEFAULT uuidv7(),
         ancestor_id uuid NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
         descendant_id uuid NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
         depth integer NOT NULL,
         created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (ancestor_id, descendant_id)
+        updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
+    SQL
+
+    execute <<~SQL
+      CREATE UNIQUE INDEX index_region_closures_on_ancestor_id_and_descendant_id
+        ON region_closures (ancestor_id, descendant_id);
+    SQL
+
+    execute <<~SQL
+      ALTER TABLE region_closures
+        ADD CONSTRAINT region_closures_ancestor_descendant_unique
+        UNIQUE USING INDEX index_region_closures_on_ancestor_id_and_descendant_id;
     SQL
 
     execute <<~SQL

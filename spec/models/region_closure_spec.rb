@@ -10,5 +10,6 @@ RSpec.describe RegionClosure, type: :model do
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:depth) }
+    it { is_expected.to validate_uniqueness_of(:ancestor_id).scoped_to(:descendant_id).ignoring_case_sensitivity }
   end
 end
