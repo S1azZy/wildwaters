@@ -1,14 +1,7 @@
 # Wild Waters
 
-[![CI](https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml)
-![Coverage](https://img.shields.io/badge/Coverage-SimpleCov-0ea5e9?style=for-the-badge)
-![Ruby](https://img.shields.io/badge/Ruby-3.4.4-cc342d?style=for-the-badge&logo=ruby&logoColor=white)
-![Rails](https://img.shields.io/badge/Rails-8.1.x-d30001?style=for-the-badge&logo=rubyonrails&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-336791?style=for-the-badge&logo=postgresql&logoColor=white)
-![PostGIS](https://img.shields.io/badge/PostGIS-enabled-2f855a?style=for-the-badge)
-![Hotwire](https://img.shields.io/badge/Hotwire-Turbo%20%2B%20Stimulus-ef4444?style=for-the-badge)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06b6d4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-ready-2496ed?style=for-the-badge&logo=docker&logoColor=white)
+<a href="https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml/badge.svg?branch=main" height="28"></a>
+<img alt="Coverage" src="https://img.shields.io/badge/Coverage-SimpleCov-0ea5e9?style=for-the-badge" height="28">
 
 Wild Waters is a Rails monolith for discovering natural water places, starting with waterfalls.
 
