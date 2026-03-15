@@ -15,9 +15,6 @@ class Spot < ApplicationRecord
   enum :spot_type, SPOT_TYPES, prefix: true
   enum :status, STATUSES, prefix: true
 
-  scope :published, -> { where(status: STATUSES[:published]) }
-  scope :waterfalls, -> { where(spot_type: SPOT_TYPES[:waterfall]) }
-
   normalizes :name, with: ->(value) { value.to_s.squish.presence }
   normalizes :slug, with: ->(value) { value.to_s.parameterize.presence }
 
