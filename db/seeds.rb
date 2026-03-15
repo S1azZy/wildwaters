@@ -1,3 +1,5 @@
+return if Rails.env.production?
+
 def find_or_create_region(name:, region_type:, external_ref:, parent_id: nil)
   existing_region = Region.find_by(external_ref:)
   return existing_region if existing_region

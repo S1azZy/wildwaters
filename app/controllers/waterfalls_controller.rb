@@ -16,7 +16,7 @@ class WaterfallsController < ApplicationController
   private
 
   def extracted_public_id
-    params.fetch(:slugged_public_id).to_s.split("-", 2).first
+    params.fetch(:slugged_public_id).to_s.split(".", 2).first
   end
 
   def published_spot_order

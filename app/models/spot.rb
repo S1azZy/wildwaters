@@ -31,7 +31,7 @@ class Spot < ApplicationRecord
   before_validation :ensure_public_id, on: :create
 
   def to_param
-    "#{public_id}-#{slug}"
+    "#{public_id}.#{slug}"
   end
 
   def self.spatial_factory
