@@ -29,3 +29,4 @@
 - Extracted a shared `EmailNormalizer` so account and auth flows use one canonical email normalization rule.
 - Vendored a local `Nanoid` module in `lib/` to own short public identifier generation without adding a gem dependency.
 - Added Region Foundation with hierarchical `regions`, closure-table traversal, and an ingestion-friendly `Regions::CreateRegion` interactor.
+- Added Spot Domain Foundation with `spots`, `waterfalls`, and a transactional `Spots::CreateWaterfall` interactor built on top of existing regions.
