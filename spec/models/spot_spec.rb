@@ -39,6 +39,12 @@ RSpec.describe Spot, type: :model do
     expect(spot.slug).to eq("sekumpul-waterfall")
   end
 
+  it "builds a public param with a double dash separator" do
+    spot = build(:spot, public_id: "Ab3k9Lm2Qx7P", slug: "sekumpul-waterfall")
+
+    expect(spot.to_param).to eq("Ab3k9Lm2Qx7P--sekumpul-waterfall")
+  end
+
   it "allows the same slug in different regions" do
     create(:spot, region: create(:region, slug: "bali"), slug: "sekumpul-waterfall")
 

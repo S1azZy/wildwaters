@@ -10,7 +10,7 @@ class WaterfallsController < ApplicationController
   private
 
   def extracted_public_id
-    waterfall_params.fetch(:slugged_public_id).to_s.split(".", 2).first
+    waterfall_params.fetch(:slugged_public_id).to_s.split("--", 2).first
   end
 
   def waterfall_params

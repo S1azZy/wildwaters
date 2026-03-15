@@ -14,6 +14,10 @@ RSpec.describe Nanoid do
       expect(id).to match(/\A[#{Regexp.escape(described_class::SAFE_ALPHABET)}]+\z/)
     end
 
+    it "does not include underscore or dash in the default alphabet" do
+      expect(described_class::SAFE_ALPHABET).not_to include("_", "-")
+    end
+
     context "when a custom size is provided" do
       let(:options) { { size: 12 } }
 

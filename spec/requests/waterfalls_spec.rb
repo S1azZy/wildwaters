@@ -69,7 +69,7 @@ RSpec.describe "Waterfalls", type: :request do
         )
       )
     end
-    let(:slugged_public_id) { "#{waterfall.spot.public_id}.wrong-slug" }
+    let(:slugged_public_id) { "#{waterfall.spot.public_id}--wrong-slug" }
 
     it "resolves the waterfall by public id" do
       perform_request
@@ -88,7 +88,7 @@ RSpec.describe "Waterfalls", type: :request do
     end
 
     context "when the waterfall does not exist" do
-      let(:slugged_public_id) { "missing.wrong-slug" }
+      let(:slugged_public_id) { "missing--wrong-slug" }
 
       it "returns not found" do
         perform_request
