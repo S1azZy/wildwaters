@@ -2,13 +2,6 @@
 
 <a href="https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml/badge.svg?branch=main" height="28"></a>
 <img alt="Coverage" src="https://img.shields.io/badge/Coverage-SimpleCov-0ea5e9?style=for-the-badge" height="28">
-<img alt="Ruby" src="https://img.shields.io/badge/Ruby-3.4.4-cc342d?style=for-the-badge&logo=ruby&logoColor=white" height="28">
-<img alt="Rails" src="https://img.shields.io/badge/Rails-8.1.x-d30001?style=for-the-badge&logo=rubyonrails&logoColor=white" height="28">
-<img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-18-336791?style=for-the-badge&logo=postgresql&logoColor=white" height="28">
-<img alt="PostGIS" src="https://img.shields.io/badge/PostGIS-enabled-2f855a?style=for-the-badge" height="28">
-<img alt="Hotwire" src="https://img.shields.io/badge/Hotwire-Turbo%20%2B%20Stimulus-ef4444?style=for-the-badge" height="28">
-<img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4.x-06b6d4?style=for-the-badge&logo=tailwindcss&logoColor=white" height="28">
-<img alt="Docker" src="https://img.shields.io/badge/Docker-ready-2496ed?style=for-the-badge&logo=docker&logoColor=white" height="28">
 
 Wild Waters is a Rails monolith for discovering natural water places, starting with waterfalls.
 
