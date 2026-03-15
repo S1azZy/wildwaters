@@ -27,6 +27,10 @@ class Spot < ApplicationRecord
 
   before_validation :ensure_public_id, on: :create
 
+  def to_param
+    "#{public_id}.#{slug}"
+  end
+
   def self.spatial_factory
     @spatial_factory ||= RGeo::Geographic.spherical_factory(srid: 4326)
   end

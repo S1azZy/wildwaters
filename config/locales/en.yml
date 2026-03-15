@@ -89,3 +89,19 @@ en:
       sign_out: "Sign out"
       signed_in_as: "Signed in as %{email}"
       title: "Dashboard"
+  waterfalls:
+    shared:
+      height: "%{value} m"
+    index:
+      eyebrow: "Waterfall catalog"
+      heading: "Find your next waterfall"
+      subheading: "A growing collection of remarkable cascades, trail approaches, and natural swimming spots."
+      title: "Waterfalls"
+    show:
+      approach_difficulty_label: "Approach"
+      back: "Back to all waterfalls"
+      flow_seasonality_label: "Flow seasonality"
+      height_label: "Height"
+      plunge_pool_label: "Plunge pool"
+      plunge_pool_no: "No"
+      plunge_pool_yes: "Yes"

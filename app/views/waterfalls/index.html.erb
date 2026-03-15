@@ -1,0 +1,36 @@
+<% content_for :title, t("waterfalls.index.title") %>
+
+<div class="mx-auto flex w-full max-w-4xl flex-col gap-6">
+  <header class="space-y-2">
+    <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500"><%= t("waterfalls.index.eyebrow") %></p>
+    <h1 class="text-3xl font-semibold text-slate-900"><%= t("waterfalls.index.heading") %></h1>
+    <p class="max-w-2xl text-sm text-slate-600"><%= t("waterfalls.index.subheading") %></p>
+  </header>
+
+  <div class="grid gap-4">
+    <% @waterfalls.each do |waterfall| %>
+      <% spot = waterfall.spot %>
+
+      <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="space-y-2">
+            <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500"><%= spot.region.name %></p>
+            <h2 class="text-xl font-semibold text-slate-900">
+              <%= link_to spot.name, waterfall_path(spot), class: "hover:text-sky-700" %>
+            </h2>
+
+            <% if spot.summary.present? %>
+              <p class="text-sm leading-6 text-slate-600"><%= spot.summary %></p>
+            <% end %>
+          </div>
+
+          <% if waterfall.height_meters.present? %>
+            <div class="rounded-full bg-sky-50 px-3 py-1 text-sm font-medium text-sky-800">
+              <%= t("waterfalls.shared.height", value: waterfall.height_meters) %>
+            </div>
+          <% end %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+</div>

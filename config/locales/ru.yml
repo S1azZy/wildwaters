@@ -60,3 +60,19 @@ ru:
       sign_out: "Выйти"
       signed_in_as: "Вы вошли как %{email}"
       title: "Кабинет"
+  waterfalls:
+    shared:
+      height: "%{value} м"
+    index:
+      eyebrow: "Каталог водопадов"
+      heading: "Найдите следующий водопад"
+      subheading: "Растущая коллекция красивых каскадов, троп к ним и природных купелей."
+      title: "Водопады"
+    show:
+      approach_difficulty_label: "Сложность подхода"
+      back: "Ко всем водопадам"
+      flow_seasonality_label: "Сезонность потока"
+      height_label: "Высота"
+      plunge_pool_label: "Купель"
+      plunge_pool_no: "Нет"
+      plunge_pool_yes: "Да"

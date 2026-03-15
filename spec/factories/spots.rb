@@ -10,5 +10,10 @@ FactoryBot.define do
     status { Spot::STATUSES[:draft] }
     location { RGeo::Geographic.spherical_factory(srid: 4326).point(115.1606, -8.2561) }
     published_at { nil }
+
+    trait :published do
+      status { Spot::STATUSES[:published] }
+      published_at { Time.current }
+    end
   end
 end
