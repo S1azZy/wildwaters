@@ -1,6 +1,6 @@
 # Wild Waters
 
-[![CI](https://img.shields.io/github/actions/workflow/status/s1azzy-dev/wildwaters/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml)
+[![CI](https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/s1azzy-dev/wildwaters/actions/workflows/ci.yml)
 ![Coverage](https://img.shields.io/badge/Coverage-SimpleCov-0ea5e9?style=for-the-badge)
 ![Ruby](https://img.shields.io/badge/Ruby-3.4.4-cc342d?style=for-the-badge&logo=ruby&logoColor=white)
 ![Rails](https://img.shields.io/badge/Rails-8.1.x-d30001?style=for-the-badge&logo=rubyonrails&logoColor=white)
