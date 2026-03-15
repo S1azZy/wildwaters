@@ -1,11 +1,11 @@
 require "securerandom"
 
 module Nanoid
-  SAFE_ALPHABET = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".freeze
+  SAFE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".freeze
 
   def self.generate(size: 21, alphabet: SAFE_ALPHABET, non_secure: false)
     return non_secure_generate(size:, alphabet:) if non_secure
-    return simple_generate(size:) if alphabet == SAFE_ALPHABET
+    return simple_generate(size:) if alphabet == SAFE_ALPHABET && SAFE_ALPHABET.size == 64
 
     complex_generate(size:, alphabet:)
   end
