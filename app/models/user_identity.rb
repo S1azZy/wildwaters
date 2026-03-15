@@ -8,7 +8,7 @@ class UserIdentity < ApplicationRecord
 
   has_secure_password validations: false
 
-  normalizes :email, with: ->(value) { value.to_s.strip.downcase.presence }
+  normalizes :email, with: ->(value) { EmailNormalizer.normalize(value) }
   normalizes :provider, with: ->(value) { value.to_s.strip.downcase.presence }
 
   validates :provider, presence: true, inclusion: { in: Auth::Constants::PROVIDERS }
