@@ -41,6 +41,39 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: region_closures; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.region_closures (
+    ancestor_id uuid NOT NULL,
+    descendant_id uuid NOT NULL,
+    depth integer NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: regions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.regions (
+    id uuid DEFAULT uuidv7() NOT NULL,
+    public_id text NOT NULL,
+    parent_id uuid,
+    name text NOT NULL,
+    slug text NOT NULL,
+    region_type text NOT NULL,
+    summary text,
+    description text,
+    external_ref text,
+    status text DEFAULT 'active'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -115,6 +148,22 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 
 --
+-- Name: region_closures region_closures_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.region_closures
+    ADD CONSTRAINT region_closures_pkey PRIMARY KEY (ancestor_id, descendant_id);
+
+
+--
+-- Name: regions regions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.regions
+    ADD CONSTRAINT regions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -144,6 +193,62 @@ ALTER TABLE ONLY public.user_identities
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_region_closures_on_ancestor_id_and_depth; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_region_closures_on_ancestor_id_and_depth ON public.region_closures USING btree (ancestor_id, depth);
+
+
+--
+-- Name: index_region_closures_on_descendant_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_region_closures_on_descendant_id ON public.region_closures USING btree (descendant_id);
+
+
+--
+-- Name: index_regions_on_external_ref; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_regions_on_external_ref ON public.regions USING btree (external_ref) WHERE (external_ref IS NOT NULL);
+
+
+--
+-- Name: index_regions_on_parent_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_regions_on_parent_id ON public.regions USING btree (parent_id);
+
+
+--
+-- Name: index_regions_on_parent_id_and_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_regions_on_parent_id_and_slug ON public.regions USING btree (parent_id, slug) WHERE (parent_id IS NOT NULL);
+
+
+--
+-- Name: index_regions_on_public_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_regions_on_public_id ON public.regions USING btree (public_id);
+
+
+--
+-- Name: index_regions_on_slug_where_parent_id_is_null; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_regions_on_slug_where_parent_id_is_null ON public.regions USING btree (slug) WHERE (parent_id IS NULL);
+
+
+--
+-- Name: index_regions_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_regions_on_status ON public.regions USING btree (status);
 
 
 --
@@ -217,6 +322,30 @@ CREATE UNIQUE INDEX index_users_on_primary_email ON public.users USING btree (pr
 
 
 --
+-- Name: region_closures region_closures_ancestor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.region_closures
+    ADD CONSTRAINT region_closures_ancestor_id_fkey FOREIGN KEY (ancestor_id) REFERENCES public.regions(id) ON DELETE CASCADE;
+
+
+--
+-- Name: region_closures region_closures_descendant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.region_closures
+    ADD CONSTRAINT region_closures_descendant_id_fkey FOREIGN KEY (descendant_id) REFERENCES public.regions(id) ON DELETE CASCADE;
+
+
+--
+-- Name: regions regions_parent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.regions
+    ADD CONSTRAINT regions_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.regions(id) ON DELETE SET NULL;
+
+
+--
 -- Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -247,6 +376,7 @@ ALTER TABLE ONLY public.user_identities
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260315213827'),
 ('20260314234833'),
 ('20260314143000'),
 ('20260314142000'),
