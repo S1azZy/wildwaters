@@ -5,7 +5,7 @@ class User < ApplicationRecord
   has_many :user_identities, dependent: :destroy
   has_many :sessions, dependent: :destroy
 
-  normalizes :primary_email, with: ->(value) { value.to_s.strip.downcase.presence }
+  normalizes :primary_email, with: ->(value) { EmailNormalizer.normalize(value) }
 
   validates :primary_email, presence: true, uniqueness: true
   validates :role, presence: true, inclusion: { in: ROLES }

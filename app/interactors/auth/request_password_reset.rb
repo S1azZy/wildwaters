@@ -18,7 +18,7 @@ module Auth
     private
 
     def find_password_identity(email)
-      UserIdentity.password.find_by(email: normalize_email(email))
+      UserIdentity.password.find_by(email: EmailNormalizer.normalize(email))
     end
 
     def issue_password_reset(user_identity)
@@ -40,10 +40,6 @@ module Auth
       return Success() if result.success?
 
       result.or { |error| fail_with(code: :delivery_failed, errors: { email: [ error.message ] }) }
-    end
-
-    def normalize_email(email)
-      email.to_s.strip.downcase.presence
     end
   end
 end

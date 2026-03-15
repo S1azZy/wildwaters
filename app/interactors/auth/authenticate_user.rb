@@ -20,7 +20,7 @@ module Auth
     private
 
     def find_password_identity(email)
-      user_identity = UserIdentity.password.find_by(email: normalize_email(email))
+      user_identity = UserIdentity.password.find_by(email: EmailNormalizer.normalize(email))
 
       return Success(user_identity) if user_identity
 
@@ -37,10 +37,6 @@ module Auth
       return Success(user) unless user.suspended?
 
       fail_with(code: :account_suspended)
-    end
-
-    def normalize_email(email)
-      email.to_s.strip.downcase.presence
     end
   end
 end
