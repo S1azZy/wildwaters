@@ -25,3 +25,4 @@
 - Added Stage 3 password reset flow with one-time token digests, reset mail delivery, active-session revocation after password change, and generic reset-request responses that do not reveal account existence.
 - Extracted a shared `EmailNormalizer` so account and auth flows use one canonical email normalization rule.
 - Vendored a local `Nanoid` module in `lib/` to own short public identifier generation without adding a gem dependency.
+- Added Region Foundation with hierarchical `regions`, closure-table traversal, and an ingestion-friendly `Regions::CreateRegion` interactor.
