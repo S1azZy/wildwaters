@@ -1,5 +1,8 @@
 # Changes
 
+## 2026-03-15
+- Replaced the README CI badge with the native GitHub Actions badge to avoid external badge lookup failures.
+
 ## 2026-03-12
 - Added initial project documentation pack for Wild Waters.
 - Defined product foundations, delivery phases, and quality/security baseline.
