@@ -22,6 +22,7 @@ ru:
       destroy:
         success: "Вы вышли из аккаунта."
       new:
+        forgot_password: "Забыли пароль?"
         heading: "Вход"
         sign_up_link: "Создать аккаунт"
         sign_up_prompt: "Нет аккаунта?"
@@ -29,6 +30,30 @@ ru:
         subheading: "Продолжайте путешествие по Wild Waters."
         title: "Вход"
       require_authentication: "Войдите, чтобы продолжить."
+    password_resets:
+      create:
+        success: "Если такой email существует, мы отправили инструкции для сброса пароля."
+      edit:
+        heading: "Задайте новый пароль"
+        submit: "Обновить пароль"
+        subheading: "Установите новый пароль для аккаунта Wild Waters."
+        title: "Сброс пароля"
+      mailer:
+        cta: "Сбросить пароль"
+        greeting: "Здравствуйте,"
+        ignore: "Если вы не запрашивали сброс, просто проигнорируйте это письмо."
+        instructions: "Перейдите по ссылке ниже, чтобы задать новый пароль."
+        subject: "Сброс пароля Wild Waters"
+      new:
+        heading: "Сброс пароля"
+        sign_in_link: "Вернуться ко входу"
+        sign_in_prompt: "Вспомнили пароль?"
+        submit: "Отправить ссылку"
+        subheading: "Мы отправим вам одноразовую ссылку для выбора нового пароля."
+        title: "Забыли пароль"
+      update:
+        failure: "Ссылка для сброса пароля недействительна или истекла."
+        success: "Пароль обновлён. Теперь войдите снова."
   dashboard:
     show:
       heading: "Кабинет"

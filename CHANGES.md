@@ -21,3 +21,4 @@
 - Refined auth provider constants to expose both a canonical list and named values for clearer, safer model logic and specs.
 - Added Stage 2 web auth with password sign up/sign in/sign out, persisted session tokens, `Current`-based request authentication, protected dashboard flow, and request/interactor coverage.
 - Added `faker` as an optional test/development helper for readable factories without making it mandatory across all specs.
+- Added Stage 3 password reset flow with one-time token digests, reset mail delivery, active-session revocation after password change, and generic reset-request responses that do not reveal account existence.

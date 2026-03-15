@@ -1,0 +1,20 @@
+<% content_for :title, t("auth.password_resets.new.title") %>
+
+<div class="mx-auto w-full max-w-md">
+  <h1 class="text-2xl font-semibold"><%= t("auth.password_resets.new.heading") %></h1>
+  <p class="mt-2 text-sm text-slate-600"><%= t("auth.password_resets.new.subheading") %></p>
+
+  <%= form_with url: password_reset_path, scope: :password_reset, class: "mt-8 space-y-4" do |form| %>
+    <div>
+      <%= form.label :email, t("auth.fields.email"), class: "mb-1 block text-sm font-medium" %>
+      <%= form.email_field :email, value: params.dig(:password_reset, :email), autocomplete: "email", class: "w-full rounded border px-3 py-2" %>
+    </div>
+
+    <%= form.submit t("auth.password_resets.new.submit"), class: "w-full rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white" %>
+  <% end %>
+
+  <p class="mt-4 text-sm text-slate-600">
+    <%= t("auth.password_resets.new.sign_in_prompt") %>
+    <%= link_to t("auth.password_resets.new.sign_in_link"), new_session_path, class: "font-medium text-slate-900 underline" %>
+  </p>
+</div>

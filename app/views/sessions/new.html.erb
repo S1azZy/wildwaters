@@ -15,6 +15,10 @@
       <%= form.password_field :password, autocomplete: "current-password", class: "w-full rounded border px-3 py-2" %>
     </div>
 
+    <p class="text-sm text-slate-600">
+      <%= link_to t("auth.sessions.new.forgot_password"), new_password_reset_path, class: "font-medium text-slate-900 underline" %>
+    </p>
+
     <%= form.submit t("auth.sessions.new.submit"), class: "w-full rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white" %>
   <% end %>
 

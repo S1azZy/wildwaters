@@ -17,7 +17,7 @@ class SessionsController < ApplicationController
     else
       @error_code = result.failure[:code]
       flash.now[:alert] = t("auth.sessions.create.failure")
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 

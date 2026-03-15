@@ -51,6 +51,7 @@ en:
       destroy:
         success: "Signed out successfully."
       new:
+        forgot_password: "Forgot your password?"
         heading: "Sign in"
         sign_up_link: "Create an account"
         sign_up_prompt: "Need an account?"
@@ -58,6 +59,30 @@ en:
         subheading: "Continue your Wild Waters journey."
         title: "Sign in"
       require_authentication: "Please sign in to continue."
+    password_resets:
+      create:
+        success: "If that email exists, we've sent password reset instructions."
+      edit:
+        heading: "Choose a new password"
+        submit: "Update password"
+        subheading: "Set a fresh password for your Wild Waters account."
+        title: "Reset password"
+      mailer:
+        cta: "Reset password"
+        greeting: "Hello,"
+        ignore: "If you didn't request this, you can safely ignore this email."
+        instructions: "Use the link below to choose a new password."
+        subject: "Reset your Wild Waters password"
+      new:
+        heading: "Reset your password"
+        sign_in_link: "Back to sign in"
+        sign_in_prompt: "Remembered it?"
+        submit: "Send reset link"
+        subheading: "We'll email you a one-time link to choose a new password."
+        title: "Forgot password"
+      update:
+        failure: "That password reset link is invalid or expired."
+        success: "Your password has been updated. Please sign in."
   dashboard:
     show:
       heading: "Dashboard"
