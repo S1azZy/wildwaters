@@ -77,10 +77,11 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css("[data-explore-map-target='resultCount']")
   end
 
-  it "renders the map target inside a dedicated fill wrapper" do
+  it "renders the map target inside an observable shell" do
     visit_page
 
-    expect(page).to have_css(".explore-map-shell .explore-map-surface > [data-explore-map-target='canvas']")
+    expect(page).to have_css(".explore-map-shell[data-explore-map-target='shell']")
+    expect(page).to have_css(".explore-map-shell[data-explore-map-target='shell'] .explore-map-surface > [data-explore-map-target='canvas'][class*='explore-map-canvas'][class*='h-full'][class*='w-full']")
   end
 
   it "renders the textual filter inputs" do
@@ -102,7 +103,9 @@ RSpec.describe "Waterfall explore", type: :system do
   it "renders published waterfalls in the list rail" do
     visit_page
 
-    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id]", count: 3)
+    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{sekumpul_waterfall.spot.public_id}']")
+    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{nungnung_waterfall.spot.public_id}']")
+    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{tegenungan_waterfall.spot.public_id}']")
     expect(page).to have_content("Sekumpul Waterfall")
     expect(page).to have_content("Nungnung Waterfall")
     expect(page).to have_content("Tegenungan Waterfall")

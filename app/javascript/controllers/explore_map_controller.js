@@ -15,6 +15,7 @@ export default class extends Controller {
     "mapState",
     "resultCount",
     "search",
+    "shell",
     "status"
   ]
 
@@ -49,12 +50,14 @@ export default class extends Controller {
     this.enhancedMode = true
     this.handleResize = () => this.resizeMap()
     this.buildMap()
+    this.observeShellResize()
     window.addEventListener("resize", this.handleResize)
   }
 
   disconnect() {
     clearTimeout(this.filterTimer)
     this.abortController?.abort()
+    this.resizeObserver?.disconnect()
     this.map?.remove()
     window.removeEventListener("resize", this.handleResize)
   }
@@ -134,6 +137,20 @@ export default class extends Controller {
       this.loadFeatures({ fitToResults: true })
     })
     this.map.on("moveend", () => this.loadFeatures())
+  }
+
+  observeShellResize() {
+    if (!this.hasShellTarget || typeof ResizeObserver === "undefined") {
+      return
+    }
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      if (entries.some((entry) => entry.contentRect.width > 0 && entry.contentRect.height > 0)) {
+        this.resizeMap()
+      }
+    })
+
+    this.resizeObserver.observe(this.shellTarget)
   }
 
   resizeMap() {

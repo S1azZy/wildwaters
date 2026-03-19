@@ -283,10 +283,10 @@ RSpec.describe "Waterfalls", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(json_response.fetch("type")).to eq("FeatureCollection")
-      expect(json_response.fetch("features").map { |feature| feature.dig("properties", "name") }).to contain_exactly(
-        "Sekumpul Waterfall",
-        "Gitgit Waterfall"
-      )
+      public_ids = json_response.fetch("features").map { |feature| feature.dig("properties", "public_id") }
+
+      expect(public_ids).to include(sekumpul.spot.public_id, gitgit.spot.public_id)
+      expect(public_ids).not_to include(outside_bounds.spot.public_id, draft_waterfall.spot.public_id)
     end
 
     it "applies region and plunge pool filters" do

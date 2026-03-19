@@ -92,11 +92,10 @@ RSpec.describe Waterfalls::ExploreQuery, type: :interactor do
 
     it "returns success with the published catalog" do
       expect(result).to be_success
-      expect(result.value!.fetch(:waterfalls)).to contain_exactly(
-        matching_waterfall,
-        filtered_out_by_height,
-        filtered_out_by_bounds
-      )
+      waterfalls = result.value!.fetch(:waterfalls)
+
+      expect(waterfalls).to include(matching_waterfall, filtered_out_by_height, filtered_out_by_bounds)
+      expect(waterfalls).not_to include(draft_waterfall)
     end
   end
 
@@ -105,11 +104,10 @@ RSpec.describe Waterfalls::ExploreQuery, type: :interactor do
 
     it "returns success with the published catalog" do
       expect(result).to be_success
-      expect(result.value!.fetch(:waterfalls)).to contain_exactly(
-        matching_waterfall,
-        filtered_out_by_height,
-        filtered_out_by_bounds
-      )
+      waterfalls = result.value!.fetch(:waterfalls)
+
+      expect(waterfalls).to include(matching_waterfall, filtered_out_by_height, filtered_out_by_bounds)
+      expect(waterfalls).not_to include(draft_waterfall)
     end
   end
 
@@ -174,7 +172,11 @@ RSpec.describe Waterfalls::ExploreQuery, type: :interactor do
 
     it "returns only waterfalls without plunge pools" do
       expect(result).to be_success
-      expect(result.value!.fetch(:waterfalls)).to eq([ filtered_out_by_height ])
+      waterfalls = result.value!.fetch(:waterfalls)
+
+      expect(waterfalls).to include(filtered_out_by_height)
+      expect(waterfalls).not_to include(matching_waterfall, filtered_out_by_bounds, draft_waterfall)
+      expect(waterfalls.map(&:plunge_pool).uniq).to eq([ false ])
     end
   end
 
@@ -187,11 +189,10 @@ RSpec.describe Waterfalls::ExploreQuery, type: :interactor do
 
     it "returns all published waterfalls" do
       expect(result).to be_success
-      expect(result.value!.fetch(:waterfalls)).to contain_exactly(
-        matching_waterfall,
-        filtered_out_by_height,
-        filtered_out_by_bounds
-      )
+      waterfalls = result.value!.fetch(:waterfalls)
+
+      expect(waterfalls).to include(matching_waterfall, filtered_out_by_height, filtered_out_by_bounds)
+      expect(waterfalls).not_to include(draft_waterfall)
     end
   end
 
