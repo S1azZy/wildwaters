@@ -113,4 +113,10 @@ RSpec.describe "Waterfall explore", type: :system do
 
     expect(page).to have_css("noscript", text: I18n.t("waterfalls.index.no_javascript"), visible: false)
   end
+
+  it "loads the map library before the explore controller bootstraps" do
+    visit_page
+
+    expect(page).to have_css("script[src*='maplibre-gl.js']:not([defer])", visible: false)
+  end
 end
