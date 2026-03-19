@@ -16,7 +16,11 @@ Rails.application.routes.draw do
   patch "password-reset/:token" => "password_resets#update", as: :password_reset_token
 
   get "dashboard" => "dashboard#show", as: :dashboard
-  resources :waterfalls, only: %i[index show], param: :slugged_public_id
+  resources :waterfalls, only: %i[index show], param: :slugged_public_id do
+    collection do
+      get :map_data
+    end
+  end
 
   root "waterfalls#index"
 end

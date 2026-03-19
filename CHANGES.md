@@ -4,6 +4,8 @@
 - Added a compact ADR documenting the map browse stack decision: `MapLibre GL JS`, map-first layout, bounds-based loading, clustering, and a future path to vector tiles or PMTiles.
 - Updated all bundle dependencies that could be safely advanced from `bundle outdated` and cleaned up deprecated Bundler platform declarations in `Gemfile`.
 - Promoted the project runtime baseline to Ruby `4.0.2` after verifying the app, Docker image, and full RSpec suite on the stable Ruby 4 release.
+- Reworked the public homepage into a map-first waterfall explore screen with MapLibre, interactor-backed MVP filters, a bounds-based `map_data` endpoint, and no-JavaScript request coverage.
+- Hardened waterfall explore backend handling so empty catalog filters stay valid while `map_data` requests still reject missing bounds.
 
 ## 2026-03-15
 - Simplified the README badges to keep only CI status and coverage, and switched CI to the native GitHub Actions badge.

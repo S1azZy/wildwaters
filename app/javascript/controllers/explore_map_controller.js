@@ -1,0 +1,595 @@
+import { Controller } from "@hotwired/stimulus"
+
+const DEFAULT_SELECTED_CARD_CLASS =
+  "ring-2 ring-emerald-700 border-emerald-300 shadow-[0_28px_80px_rgba(5,150,105,0.18)]"
+
+export default class extends Controller {
+  static targets = [
+    "canvas",
+    "card",
+    "empty",
+    "filters",
+    "heroResultCount",
+    "list",
+    "loading",
+    "mapState",
+    "resultCount",
+    "search",
+    "status"
+  ]
+
+  static values = {
+    detailsLabel: String,
+    emptyLabel: String,
+    initialLatitude: Number,
+    initialLongitude: Number,
+    initialZoom: Number,
+    listHint: String,
+    listMode: String,
+    loadingLabel: String,
+    locateLabel: String,
+    mapDataUrl: String,
+    mapStyleUrl: String,
+    mapUnavailableLabel: String,
+    visibleLabel: String
+  }
+
+  connect() {
+    this.allFeatures = []
+    this.enhancedMode = false
+    this.featuresLoaded = false
+    this.featuresByPublicId = new Map()
+    this.selectedPublicId = null
+
+    if (!this.hasCanvasTarget || !window.maplibregl) {
+      this.renderMapUnavailable()
+      return
+    }
+
+    this.enhancedMode = true
+    this.buildMap()
+  }
+
+  disconnect() {
+    clearTimeout(this.filterTimer)
+    this.abortController?.abort()
+    this.map?.remove()
+  }
+
+  filtersChanged(event) {
+    if (!this.enhancedMode) {
+      return
+    }
+
+    event.preventDefault()
+
+    clearTimeout(this.filterTimer)
+    this.filterTimer = setTimeout(() => this.loadFeatures({ fitToResults: true }), 180)
+  }
+
+  searchChanged() {
+    if (!this.featuresLoaded) {
+      return
+    }
+
+    this.applyFeatureState()
+  }
+
+  focusCard(event) {
+    if (!this.featuresLoaded) {
+      return
+    }
+
+    const publicId = event.currentTarget.dataset.publicId
+
+    if (!publicId) {
+      return
+    }
+
+    this.selectFeature(publicId, { flyTo: true })
+  }
+
+  cardSelected(event) {
+    if (!this.featuresLoaded) {
+      return
+    }
+
+    if (event.target.closest("a, button")) {
+      return
+    }
+
+    const publicId = event.currentTarget.dataset.publicId
+
+    if (!publicId) {
+      return
+    }
+
+    this.selectFeature(publicId, { flyTo: true })
+  }
+
+  buildMap() {
+    this.map = new window.maplibregl.Map({
+      container: this.canvasTarget,
+      style: this.mapStyleUrlValue,
+      center: [ this.initialLongitudeValue, this.initialLatitudeValue ],
+      zoom: this.initialZoomValue,
+      attributionControl: false
+    })
+
+    this.map.addControl(
+      new window.maplibregl.NavigationControl({ showCompass: false }),
+      "top-right"
+    )
+    this.map.addControl(
+      new window.maplibregl.AttributionControl({ compact: true }),
+      "bottom-right"
+    )
+
+    this.map.on("load", () => {
+      this.ensureMapLayers()
+      this.loadFeatures({ fitToResults: true })
+    })
+    this.map.on("moveend", () => this.loadFeatures())
+  }
+
+  ensureMapLayers() {
+    this.map.addSource("waterfalls", {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [] },
+      cluster: true,
+      clusterMaxZoom: 11,
+      clusterRadius: 42
+    })
+
+    this.map.addLayer({
+      id: "waterfall-clusters",
+      type: "circle",
+      source: "waterfalls",
+      filter: [ "has", "point_count" ],
+      paint: {
+        "circle-color": "#183028",
+        "circle-stroke-color": "#efe6d5",
+        "circle-stroke-width": 3,
+        "circle-radius": [
+          "step",
+          [ "get", "point_count" ],
+          20,
+          8,
+          24,
+          16,
+          30
+        ]
+      }
+    })
+
+    this.map.addLayer({
+      id: "waterfall-cluster-count",
+      type: "symbol",
+      source: "waterfalls",
+      filter: [ "has", "point_count" ],
+      layout: {
+        "text-field": [ "get", "point_count_abbreviated" ],
+        "text-size": 12
+      },
+      paint: {
+        "text-color": "#f8fafc"
+      }
+    })
+
+    this.map.addLayer({
+      id: "waterfall-points",
+      type: "circle",
+      source: "waterfalls",
+      filter: [ "!", [ "has", "point_count" ] ],
+      paint: {
+        "circle-color": "#c2743f",
+        "circle-radius": 8,
+        "circle-stroke-color": "#fffbeb",
+        "circle-stroke-width": 2.5
+      }
+    })
+
+    this.map.on("click", "waterfall-points", (event) => {
+      const publicId = event.features?.[0]?.properties?.public_id
+
+      if (!publicId) {
+        return
+      }
+
+      this.selectFeature(publicId)
+    })
+
+    this.map.on("click", "waterfall-clusters", (event) => {
+      const clusterFeature = event.features?.[0]
+      const clusterId = clusterFeature?.properties?.cluster_id
+
+      if (!clusterFeature || clusterId == null) {
+        return
+      }
+
+      this.map.getSource("waterfalls").getClusterExpansionZoom(clusterId, (error, zoom) => {
+        if (error) {
+          return
+        }
+
+        this.map.easeTo({
+          center: clusterFeature.geometry.coordinates,
+          zoom
+        })
+      })
+    })
+
+    this.map.on("mouseenter", "waterfall-points", () => {
+      this.map.getCanvas().style.cursor = "pointer"
+    })
+    this.map.on("mouseleave", "waterfall-points", () => {
+      this.map.getCanvas().style.cursor = ""
+    })
+  }
+
+  async loadFeatures({ fitToResults = false } = {}) {
+    if (!this.map?.isStyleLoaded()) {
+      return
+    }
+
+    this.setLoading(true)
+    this.setStatus(this.loadingLabelValue)
+    this.abortController?.abort()
+    this.abortController = new AbortController()
+
+    try {
+      const response = await fetch(this.mapDataUrl(), {
+        headers: { Accept: "application/json" },
+        signal: this.abortController.signal
+      })
+
+      if (!response.ok) {
+        this.showMapState(this.mapUnavailableLabelValue, { persistent: true })
+        this.setStatus(this.mapUnavailableLabelValue)
+        return
+      }
+
+      const featureCollection = await response.json()
+
+      this.map.getSource("waterfalls").setData(featureCollection)
+      this.featuresLoaded = true
+      this.allFeatures = featureCollection.features
+      this.featuresByPublicId = new Map(
+        featureCollection.features.map((feature) => [ feature.properties.public_id, feature ])
+      )
+      this.applyFeatureState()
+
+      if (fitToResults) {
+        this.fitToFeatures(featureCollection.features)
+      }
+
+      this.hideMapState(true)
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        this.showMapState(this.mapUnavailableLabelValue, { persistent: true })
+        this.setStatus(this.mapUnavailableLabelValue)
+      }
+    } finally {
+      this.setLoading(false)
+    }
+  }
+
+  mapDataUrl() {
+    const query = new URLSearchParams(new FormData(this.filtersTarget))
+    const bounds = this.map.getBounds()
+
+    query.set("west", bounds.getWest())
+    query.set("south", bounds.getSouth())
+    query.set("east", bounds.getEast())
+    query.set("north", bounds.getNorth())
+
+    return `${this.mapDataUrlValue}?${query.toString()}`
+  }
+
+  fitToFeatures(features) {
+    if (features.length === 0) {
+      return
+    }
+
+    const bounds = new window.maplibregl.LngLatBounds()
+    features.forEach((feature) => bounds.extend(feature.geometry.coordinates))
+
+    this.map.fitBounds(bounds, {
+      padding: 64,
+      maxZoom: 11,
+      duration: 0
+    })
+  }
+
+  renderList(features) {
+    this.listTarget.replaceChildren()
+
+    if (features.length === 0) {
+      this.emptyTarget.classList.remove("hidden")
+      this.emptyTarget.textContent = this.emptyLabelValue
+      return
+    }
+
+    this.emptyTarget.classList.add("hidden")
+
+    features.forEach((feature) => {
+      this.listTarget.append(this.buildCard(feature))
+    })
+
+    if (this.selectedPublicId) {
+      this.highlightSelectedCard(this.selectedPublicId)
+    }
+  }
+
+  buildCard(feature) {
+    const article = document.createElement("article")
+    article.className =
+      "group rounded-[1.6rem] border border-stone-200 bg-white/94 p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-[0_28px_80px_rgba(15,23,42,0.12)] focus-within:border-emerald-300 focus-within:ring-2 focus-within:ring-emerald-200"
+    article.dataset.action = "click->explore-map#cardSelected"
+    article.dataset.exploreMapTarget = "card"
+    article.dataset.publicId = feature.properties.public_id
+    article.dataset.searchText = this.searchableText(feature)
+    article.dataset.longitude = feature.geometry.coordinates[0]
+    article.dataset.latitude = feature.geometry.coordinates[1]
+
+    const header = document.createElement("div")
+    header.className = "flex items-start justify-between gap-4"
+
+    const content = document.createElement("div")
+    content.className = "min-w-0 flex-1 space-y-3"
+
+    const meta = document.createElement("div")
+    meta.className = "flex flex-wrap items-center gap-2"
+
+    meta.append(this.buildChip(feature.properties.region_name, "bg-stone-100 text-emerald-900/65"))
+
+    if (feature.properties.approach_difficulty) {
+      meta.append(
+        this.buildChip(
+          this.humanize(feature.properties.approach_difficulty),
+          "bg-emerald-50 text-emerald-900"
+        )
+      )
+    }
+
+    const title = document.createElement("a")
+    title.className = "block font-serif text-2xl leading-tight text-slate-950 transition group-hover:text-emerald-900"
+    title.href = feature.properties.path
+    title.textContent = feature.properties.name
+
+    content.append(meta, title)
+
+    if (feature.properties.summary) {
+      const summary = document.createElement("p")
+      summary.className = "line-clamp-2 text-sm leading-6 text-slate-600"
+      summary.textContent = feature.properties.summary
+      content.append(summary)
+    }
+
+    header.append(content)
+
+    if (feature.properties.height_label) {
+      header.append(this.buildChip(feature.properties.height_label, "shrink-0 bg-emerald-950 text-emerald-50"))
+    }
+
+    const chips = document.createElement("div")
+    chips.className = "mt-4 flex flex-wrap gap-2 text-xs font-medium text-slate-600"
+
+    if (feature.properties.plunge_pool_label) {
+      chips.append(this.buildChip(feature.properties.plunge_pool_label, "bg-sky-50 text-sky-800"))
+    }
+
+    const footer = document.createElement("div")
+    footer.className = "mt-5 flex items-center justify-between gap-3 border-t border-stone-200/80 pt-4"
+
+    const mode = document.createElement("span")
+    mode.className = "text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-slate-400"
+    mode.textContent = this.listModeValue
+
+    const actions = document.createElement("div")
+    actions.className = "flex items-center gap-2"
+
+    const locate = document.createElement("button")
+    locate.type = "button"
+    locate.className =
+      "inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
+    locate.dataset.action = "explore-map#focusCard"
+    locate.dataset.publicId = feature.properties.public_id
+    locate.textContent = this.locateLabelValue
+
+    const details = document.createElement("a")
+    details.className =
+      "inline-flex items-center gap-2 rounded-full px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-slate-600 transition hover:bg-stone-100 hover:text-slate-950"
+    details.href = feature.properties.path
+    details.textContent = this.detailsLabelValue
+
+    actions.append(locate, details)
+    footer.append(mode, actions)
+
+    article.append(header)
+
+    if (chips.childElementCount > 0) {
+      article.append(chips)
+    }
+
+    article.append(footer)
+
+    return article
+  }
+
+  selectFeature(publicId, { flyTo = false } = {}) {
+    const feature = this.featuresByPublicId.get(publicId)
+
+    if (!feature) {
+      return
+    }
+
+    this.selectedPublicId = publicId
+
+    if (this.hasSearchTarget && this.searchTarget.value && !this.featureMatchesSearch(feature)) {
+      this.searchTarget.value = ""
+      this.applyFeatureState()
+    }
+
+    this.highlightSelectedCard(publicId)
+
+    const selectedCard = this.cardTargets.find((card) => card.dataset.publicId === publicId)
+    selectedCard?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+
+    if (flyTo) {
+      this.map.easeTo({
+        center: feature.geometry.coordinates,
+        zoom: Math.max(this.map.getZoom(), 10.5),
+        duration: 700
+      })
+    }
+  }
+
+  updateResultCount(count) {
+    if (this.hasResultCountTarget) {
+      this.resultCountTarget.textContent = count
+    }
+
+    if (this.hasHeroResultCountTarget) {
+      this.heroResultCountTarget.textContent = count
+    }
+  }
+
+  renderMapUnavailable() {
+    this.setLoading(false)
+    this.showMapState(this.mapUnavailableLabelValue, { persistent: true })
+    this.setStatus(this.mapUnavailableLabelValue)
+  }
+
+  buildChip(text, classes) {
+    const chip = document.createElement("span")
+    chip.className = `rounded-full px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.24em] ${classes}`
+    chip.textContent = text
+
+    return chip
+  }
+
+  humanize(value) {
+    return value.replaceAll("_", " ").replace(/\b\w/g, (match) => match.toUpperCase())
+  }
+
+  setStatus(message) {
+    if (!this.hasStatusTarget) {
+      return
+    }
+
+    this.statusTarget.textContent = message
+  }
+
+  setLoading(isLoading) {
+    if (this.hasLoadingTarget) {
+      this.loadingTarget.classList.toggle("hidden", !isLoading)
+    }
+
+    if (this.hasListTarget) {
+      this.listTarget.classList.toggle("opacity-60", isLoading)
+    }
+
+    this.element.ariaBusy = isLoading ? "true" : "false"
+
+    if (isLoading) {
+      this.showMapState(this.loadingLabelValue)
+    } else {
+      this.hideMapState()
+    }
+  }
+
+  showMapState(message, { persistent = false } = {}) {
+    if (!this.hasMapStateTarget) {
+      return
+    }
+
+    this.mapStateTarget.dataset.persistent = persistent ? "true" : "false"
+    this.mapStateTarget.classList.remove("hidden")
+    this.mapStateTarget.classList.add("flex")
+
+    if (this.mapStateTarget.firstElementChild) {
+      this.mapStateTarget.firstElementChild.textContent = message
+    }
+  }
+
+  hideMapState(force = false) {
+    if (!this.hasMapStateTarget) {
+      return
+    }
+
+    if (!force && this.mapStateTarget.dataset.persistent === "true") {
+      return
+    }
+
+    this.mapStateTarget.dataset.persistent = "false"
+    this.mapStateTarget.classList.add("hidden")
+    this.mapStateTarget.classList.remove("flex")
+  }
+
+  applyFeatureState() {
+    const visibleFeatures = this.filteredFeatures()
+
+    this.renderList(visibleFeatures)
+    this.updateResultCount(visibleFeatures.length)
+    this.setStatus(this.statusMessage(visibleFeatures.length))
+  }
+
+  filteredFeatures() {
+    if (!this.hasSearchTarget) {
+      return this.allFeatures
+    }
+
+    const query = this.searchTarget.value.trim().toLowerCase()
+
+    if (query.length === 0) {
+      return this.allFeatures
+    }
+
+    return this.allFeatures.filter((feature) => this.searchableText(feature).includes(query))
+  }
+
+  featureMatchesSearch(feature) {
+    if (!this.hasSearchTarget) {
+      return true
+    }
+
+    const query = this.searchTarget.value.trim().toLowerCase()
+
+    if (query.length === 0) {
+      return true
+    }
+
+    return this.searchableText(feature).includes(query)
+  }
+
+  searchableText(feature) {
+    return [
+      feature.properties.name,
+      feature.properties.summary,
+      feature.properties.region_name,
+      feature.properties.approach_difficulty,
+      feature.properties.flow_seasonality
+    ].filter(Boolean).join(" ").toLowerCase()
+  }
+
+  highlightSelectedCard(publicId) {
+    this.cardTargets.forEach((card) => {
+      if (card.dataset.publicId === publicId) {
+        card.classList.add(...DEFAULT_SELECTED_CARD_CLASS.split(" "))
+      } else {
+        card.classList.remove(...DEFAULT_SELECTED_CARD_CLASS.split(" "))
+      }
+    })
+  }
+
+  statusMessage(visibleCount) {
+    const totalCount = this.allFeatures.length
+
+    if (this.hasSearchTarget && this.searchTarget.value.trim().length > 0) {
+      return `${visibleCount} / ${totalCount} ${this.visibleLabelValue}`
+    }
+
+    return this.listHintValue
+  }
+}
