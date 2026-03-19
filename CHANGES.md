@@ -2,6 +2,7 @@
 
 ## 2026-03-19
 - Added a compact ADR documenting the map browse stack decision: `MapLibre GL JS`, map-first layout, bounds-based loading, clustering, and a future path to vector tiles or PMTiles.
+- Updated all bundle dependencies that could be safely advanced from `bundle outdated` and cleaned up deprecated Bundler platform declarations in `Gemfile`.
 
 ## 2026-03-15
 - Simplified the README badges to keep only CI status and coverage, and switched CI to the native GitHub Actions badge.
