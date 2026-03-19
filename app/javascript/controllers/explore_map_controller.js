@@ -47,13 +47,16 @@ export default class extends Controller {
     }
 
     this.enhancedMode = true
+    this.handleResize = () => this.resizeMap()
     this.buildMap()
+    window.addEventListener("resize", this.handleResize)
   }
 
   disconnect() {
     clearTimeout(this.filterTimer)
     this.abortController?.abort()
     this.map?.remove()
+    window.removeEventListener("resize", this.handleResize)
   }
 
   filtersChanged(event) {
@@ -126,10 +129,19 @@ export default class extends Controller {
     )
 
     this.map.on("load", () => {
+      this.resizeMap()
       this.ensureMapLayers()
       this.loadFeatures({ fitToResults: true })
     })
     this.map.on("moveend", () => this.loadFeatures())
+  }
+
+  resizeMap() {
+    if (!this.map) {
+      return
+    }
+
+    requestAnimationFrame(() => this.map?.resize())
   }
 
   ensureMapLayers() {

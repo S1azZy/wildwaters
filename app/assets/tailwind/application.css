@@ -41,6 +41,15 @@
       linear-gradient(0deg, rgba(15, 23, 42, 0.18), transparent 18%);
   }
 
+  .explore-map-shell .explore-map-surface,
+  .explore-map-shell .explore-map-canvas,
+  .explore-map-shell .explore-map-canvas.maplibregl-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   .explore-scrollbar {
     scrollbar-color: rgba(24, 48, 40, 0.22) transparent;
     scrollbar-width: thin;

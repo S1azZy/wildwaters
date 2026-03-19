@@ -77,6 +77,12 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css("[data-explore-map-target='resultCount']")
   end
 
+  it "renders the map target inside a dedicated fill wrapper" do
+    visit_page
+
+    expect(page).to have_css(".explore-map-shell .explore-map-surface > [data-explore-map-target='canvas']")
+  end
+
   it "renders the textual filter inputs" do
     visit_page
 
