@@ -20,7 +20,7 @@ Product:
 
 ## Stack
 
-- Ruby `3.4.4`
+- Ruby `4.0.2`
 - Rails `8.1.x`
 - PostgreSQL `18` + PostGIS
 - Hotwire (`Turbo + Stimulus`)
@@ -48,7 +48,7 @@ It intentionally does not yet contain:
 
 ## Local bootstrap
 
-1. Ensure Ruby `3.4.4` is available via `asdf`.
+1. Ensure Ruby `4.0.2` is available via `asdf`.
 2. Run `bundle install`.
 3. Start PostgreSQL/PostGIS with `docker compose up -d db`.
 4. Create and prepare the database with `bin/rails db:prepare`.
