@@ -126,4 +126,11 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css("script[src*='maplibre-gl.js']:not([crossorigin])", visible: false)
     expect(page).to have_css("link[href*='maplibre-gl.css']:not([crossorigin])", visible: false)
   end
+
+  it "loads a published maplibre asset version" do
+    visit_page
+
+    expect(page).to have_css("script[src*='maplibre-gl@5.20.2/dist/maplibre-gl.js']", visible: false)
+    expect(page).to have_css("link[href*='maplibre-gl@5.20.2/dist/maplibre-gl.css']", visible: false)
+  end
 end

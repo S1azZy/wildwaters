@@ -1,8 +1,8 @@
 <% content_for :title, t("waterfalls.index.title") %>
 <% content_for :main_class, "mx-auto w-full max-w-[112rem] px-4 pb-10 pt-4 sm:px-6 lg:px-8" %>
 <% content_for :head do %>
-  <%= stylesheet_link_tag "https://unpkg.com/maplibre-gl@5.9.2/dist/maplibre-gl.css" %>
-  <script src="https://unpkg.com/maplibre-gl@5.9.2/dist/maplibre-gl.js"></script>
+  <%= stylesheet_link_tag "https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.css" %>
+  <script src="https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.js"></script>
 <% end %>
 <%
   region_options = [ [ t("waterfalls.index.filters.all_regions"), nil ] ]
