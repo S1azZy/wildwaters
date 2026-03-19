@@ -8,13 +8,14 @@ Rails.application.configure do
     policy.base_uri :self
     policy.child_src :blob
     policy.connect_src :self, "https://demotiles.maplibre.org"
-    policy.font_src :self, "https://demotiles.maplibre.org"
+    policy.font_src :self, :data, "https://demotiles.maplibre.org"
     policy.form_action :self
     policy.frame_ancestors :none
     policy.img_src :self, :data, :blob, "https://demotiles.maplibre.org"
     policy.object_src :none
     policy.script_src :self, "https://unpkg.com"
     policy.style_src :self, "https://unpkg.com"
+    policy.style_src_attr :unsafe_inline
     policy.worker_src :self, :blob
   end
 
