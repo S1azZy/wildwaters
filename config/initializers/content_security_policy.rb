@@ -14,7 +14,7 @@ Rails.application.configure do
     policy.img_src :self, :data, :blob, "https://demotiles.maplibre.org"
     policy.object_src :none
     policy.script_src :self, "https://unpkg.com"
-    policy.style_src :self, "https://unpkg.com"
+    policy.style_src :self, :unsafe_inline, "https://unpkg.com"
     policy.style_src_attr :unsafe_inline
     policy.worker_src :self, :blob
   end
