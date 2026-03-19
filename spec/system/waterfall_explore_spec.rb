@@ -119,4 +119,11 @@ RSpec.describe "Waterfall explore", type: :system do
 
     expect(page).to have_css("script[src*='maplibre-gl.js']:not([defer])", visible: false)
   end
+
+  it "loads remote maplibre assets without crossorigin mode" do
+    visit_page
+
+    expect(page).to have_css("script[src*='maplibre-gl.js']:not([crossorigin])", visible: false)
+    expect(page).to have_css("link[href*='maplibre-gl.css']:not([crossorigin])", visible: false)
+  end
 end
