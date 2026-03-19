@@ -43,7 +43,7 @@ Do not build in MVP:
 ## Stack
 
 Mandatory:
-- Ruby `3.4.x` until Ruby 4 is stable
+- Ruby `4.0.x`
 - Rails `8.1.x`
 - PostgreSQL `18.x` + PostGIS
 - Hotwire (`Turbo + Stimulus`)
