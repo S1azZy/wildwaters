@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+module DependencyFreshnessCheck
+  CHECKS = [
+    [ "Bundler", [ "bundle", "outdated" ] ],
+    [ "Importmap", [ "bin/importmap", "outdated" ] ],
+    [ "MapLibre GL", [ "bin/check-maplibre-gl" ] ]
+  ].freeze
+
+  module_function
+
+  def run(stdout: $stdout, shell_runner: method(:system))
+    failed = false
+
+    CHECKS.each do |label, command|
+      stdout.puts "==> #{label}: #{command.join(' ')}"
+      success = shell_runner.call(*command)
+      failed ||= !success
+      stdout.puts
+    end
+
+    failed ? 1 : 0
+  end
+
+  def run_cli
+    exit run
+  end
+end
+
+DependencyFreshnessCheck.run_cli if __FILE__ == $PROGRAM_NAME

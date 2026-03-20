@@ -3,7 +3,7 @@ SHELL := /bin/bash
 COMPOSE := docker compose
 APP := $(COMPOSE) run --rm web
 
-.PHONY: setup install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor
+.PHONY: setup install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor bundle-outdated importmap-outdated maplibre-outdated outdated
 
 setup:
 	$(COMPOSE) up --build -d
@@ -66,3 +66,15 @@ doctor:
 	@docker compose version
 	@docker info --format '{{.ServerVersion}}'
 	$(APP) bash -lc "ruby -v && bundle -v && bin/rails about"
+
+bundle-outdated:
+	$(APP) bundle outdated
+
+importmap-outdated:
+	$(APP) bin/importmap outdated
+
+maplibre-outdated:
+	$(APP) bin/check-maplibre-gl
+
+outdated:
+	$(APP) bin/check-outdated

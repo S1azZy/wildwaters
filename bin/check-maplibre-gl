@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative "../lib/maplibre_version_check"
+
+exit MaplibreVersionCheck.run_cli
