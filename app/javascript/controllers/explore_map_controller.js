@@ -4,9 +4,9 @@ import maplibregl from "maplibre-gl"
 const DEFAULT_SELECTED_CARD_CLASS =
   "ring-2 ring-emerald-700 border-emerald-300 shadow-[0_28px_80px_rgba(5,150,105,0.18)]"
 const ACTIVE_STYLE_BUTTON_CLASS =
-  "border-white/55 bg-white text-slate-950 shadow-[0_14px_34px_rgba(15,23,42,0.18)]"
+  "border-fuchsia-700 bg-white text-slate-950 shadow-[0_16px_34px_rgba(15,23,42,0.14)]"
 const INACTIVE_STYLE_BUTTON_CLASS =
-  "border-white/12 bg-black/18 text-white/78 hover:border-white/28 hover:bg-black/28"
+  "border-transparent bg-transparent text-slate-700 hover:border-stone-200 hover:bg-stone-50"
 const DEFAULT_STYLE_PREFERENCE_KEY = "wildwaters:explore-map-style"
 
 export default class extends Controller {
@@ -23,6 +23,7 @@ export default class extends Controller {
     "search",
     "shell",
     "styleButton",
+    "styleMenu",
     "status"
   ]
 
@@ -143,6 +144,7 @@ export default class extends Controller {
     this.syncStyleButtons()
     this.setLoading(true)
     this.map.setStyle(styleUrl)
+    this.closeStyleMenu()
   }
 
   buildMap() {
@@ -574,6 +576,14 @@ export default class extends Controller {
       button.classList.remove(...ACTIVE_STYLE_BUTTON_CLASS.split(" "), ...INACTIVE_STYLE_BUTTON_CLASS.split(" "))
       button.classList.add(...(isActive ? ACTIVE_STYLE_BUTTON_CLASS : INACTIVE_STYLE_BUTTON_CLASS).split(" "))
     })
+  }
+
+  closeStyleMenu() {
+    if (!this.hasStyleMenuTarget) {
+      return
+    }
+
+    this.styleMenuTarget.removeAttribute("open")
   }
 
   readStylePreference() {

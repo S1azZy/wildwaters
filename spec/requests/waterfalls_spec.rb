@@ -41,14 +41,22 @@ RSpec.describe "Waterfalls", type: :request do
       expect(style_sources).to satisfy { |values| values.include?("'self'") && !values.include?("https://unpkg.com") }
     end
 
-    it "allows OpenFreeMap runtime hosts for the map" do
+    it "allows OpenFreeMap and Stadia map connections" do
       perform_request
 
       expect(connect_sources).to include("'self'", "https://tiles.openfreemap.org")
+      expect(connect_sources).to include("https://tiles.stadiamaps.com")
       expect(connect_sources).not_to include("https://demotiles.maplibre.org")
+    end
+
+    it "allows approved font and image hosts for the map styles" do
+      perform_request
+
       expect(font_sources).to include("'self'", "data:", "https://tiles.openfreemap.org")
+      expect(font_sources).to include("https://tiles.stadiamaps.com")
       expect(font_sources).not_to include("https://demotiles.maplibre.org")
       expect(image_sources).to include("'self'", "data:", "blob:", "https://tiles.openfreemap.org")
+      expect(image_sources).to include("https://tiles.stadiamaps.com")
       expect(image_sources).not_to include("https://demotiles.maplibre.org")
     end
 
@@ -67,6 +75,13 @@ RSpec.describe "Waterfalls", type: :request do
       perform_request
 
       expect(response.body).to include('data-explore-map-default-style-id-value="positron"')
+    end
+
+    it "renders the outdoors map style in the style catalog contract" do
+      perform_request
+
+      expect(response.body).to include('data-style-id="outdoors"')
+      expect(response.body).to include("https://tiles.stadiamaps.com/styles/outdoors.json")
     end
   end
 

@@ -9,6 +9,11 @@
   map_style_url = ->(map_style) { map_style.respond_to?(:fetch) ? map_style.fetch(:style_url) : map_style.style_url }
   map_styles = Array(@map_styles).presence || [
     {
+      id: "outdoors",
+      name: t("waterfalls.index.map_styles.outdoors"),
+      style_url: "https://tiles.stadiamaps.com/styles/outdoors.json"
+    },
+    {
       id: "liberty",
       name: t("waterfalls.index.map_styles.liberty"),
       style_url: "https://tiles.openfreemap.org/styles/liberty"
@@ -166,19 +171,37 @@
           </div>
 
           <div class="pointer-events-auto flex flex-col items-start gap-3 sm:items-end">
-            <div class="flex flex-wrap items-center gap-2 rounded-[1.45rem] border border-white/14 bg-black/24 px-3 py-3 shadow-[0_18px_80px_rgba(0,0,0,0.28)] backdrop-blur">
-              <span class="px-2 text-[0.65rem] font-semibold uppercase tracking-[0.26em] text-white/62"><%= t("waterfalls.index.map_styles.label") %></span>
+            <details class="explore-map-style-menu relative" data-explore-map-target="styleMenu">
+              <summary class="explore-map-style-toggle flex cursor-pointer list-none items-center gap-3 rounded-[1.1rem] border border-white/14 bg-white/96 px-5 py-4 text-slate-900 shadow-[0_18px_80px_rgba(0,0,0,0.28)] transition hover:-translate-y-0.5">
+                <span class="explore-map-style-toggle-icon" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
+                <span class="text-xl font-semibold tracking-[0.01em] text-slate-800"><%= t("waterfalls.index.map_styles.menu_label") %></span>
+              </summary>
 
-              <% map_styles.each do |map_style| %>
-                <button
-                  type="button"
-                  class="explore-map-style-button rounded-full border px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.18em] transition"
-                  data-action="explore-map#switchStyle"
-                  data-explore-map-target="styleButton"
-                  data-style-id="<%= map_style_id.call(map_style) %>"
-                  data-style-url="<%= map_style_url.call(map_style) %>"><%= map_style_name.call(map_style) %></button>
-              <% end %>
-            </div>
+              <div class="explore-map-style-panel absolute right-0 top-[calc(100%+0.9rem)] z-20 w-[min(22rem,calc(100vw-2.5rem))] rounded-[1.5rem] border border-stone-200 bg-white/98 p-5 text-slate-900 shadow-[0_28px_90px_rgba(15,23,42,0.22)]">
+                <p class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500"><%= t("waterfalls.index.map_styles.panel_heading") %></p>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <% map_styles.each do |map_style| %>
+                    <button
+                      type="button"
+                      class="explore-map-style-option group text-left transition"
+                      data-action="explore-map#switchStyle"
+                      data-explore-map-target="styleButton"
+                      data-style-id="<%= map_style_id.call(map_style) %>"
+                      data-style-url="<%= map_style_url.call(map_style) %>">
+                      <span class="explore-map-style-preview explore-map-style-preview--<%= map_style_id.call(map_style) %>">
+                        <span class="explore-map-style-preview-inner"></span>
+                      </span>
+                      <span class="mt-2 block text-lg font-semibold leading-tight text-slate-800"><%= map_style_name.call(map_style) %></span>
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+            </details>
 
             <div class="flex flex-wrap gap-2">
               <span class="rounded-full border border-white/15 bg-white/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78"><%= t("waterfalls.index.chips.bounds_loaded") %></span>

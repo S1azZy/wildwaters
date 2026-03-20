@@ -84,15 +84,15 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-map-shell[data-explore-map-target='shell'] .explore-map-surface > [data-explore-map-target='canvas'][class*='explore-map-canvas'][class*='h-full'][class*='w-full']")
   end
 
-  it "renders the basemap style switcher" do
+  it "renders the basemap style dropdown" do
     visit_page
 
-    expect(page).to have_button(I18n.t("waterfalls.index.map_styles.liberty"))
-    expect(page).to have_button(I18n.t("waterfalls.index.map_styles.bright"))
-    expect(page).to have_button(I18n.t("waterfalls.index.map_styles.positron"))
-    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='liberty']")
-    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='bright']")
-    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='positron']")
+    expect(page).to have_css("summary", text: I18n.t("waterfalls.index.map_styles.menu_label"))
+    expect(page).to have_css("details[data-explore-map-target='styleMenu']")
+    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='liberty']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='bright']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='positron']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='outdoors']", visible: false)
   end
 
   it "renders the textual filter inputs" do

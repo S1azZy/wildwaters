@@ -1,8 +1,14 @@
 module Waterfalls
   class MapStyleCatalog
-    DEFAULT_STYLE_ID = "liberty"
+    DEFAULT_STYLE_ID = "outdoors"
 
     STYLES = [
+      {
+        id: "outdoors",
+        name: "Outdoors",
+        label_key: "waterfalls.index.map_styles.outdoors",
+        style_url: "https://tiles.stadiamaps.com/styles/outdoors.json"
+      },
       {
         id: "liberty",
         name: "Liberty",
