@@ -84,6 +84,17 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-map-shell[data-explore-map-target='shell'] .explore-map-surface > [data-explore-map-target='canvas'][class*='explore-map-canvas'][class*='h-full'][class*='w-full']")
   end
 
+  it "renders the basemap style switcher" do
+    visit_page
+
+    expect(page).to have_button(I18n.t("waterfalls.index.map_styles.liberty"))
+    expect(page).to have_button(I18n.t("waterfalls.index.map_styles.bright"))
+    expect(page).to have_button(I18n.t("waterfalls.index.map_styles.positron"))
+    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='liberty']")
+    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='bright']")
+    expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='positron']")
+  end
+
   it "renders the textual filter inputs" do
     visit_page
 

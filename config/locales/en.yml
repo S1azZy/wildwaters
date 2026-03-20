@@ -148,6 +148,11 @@ en:
       loading: "Refreshing map results..."
       map_eyebrow: "Explore screen"
       map_heading: "A map-led way to pick the next cascade worth the detour."
+      map_styles:
+        bright: "Bright"
+        label: "Map style"
+        liberty: "Liberty"
+        positron: "Positron"
       map_subheading: "Pan for nearby waterfalls, tighten the list with filters, and jump into detail pages once something looks promising."
       map_tip: "Tip: click a marker to sync the left rail, or use “Locate” on a card to fly the map to that waterfall."
       map_unavailable: "The map failed to load, but the waterfall list is still available below."

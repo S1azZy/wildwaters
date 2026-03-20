@@ -3,6 +3,11 @@ import maplibregl from "maplibre-gl"
 
 const DEFAULT_SELECTED_CARD_CLASS =
   "ring-2 ring-emerald-700 border-emerald-300 shadow-[0_28px_80px_rgba(5,150,105,0.18)]"
+const ACTIVE_STYLE_BUTTON_CLASS =
+  "border-white/55 bg-white text-slate-950 shadow-[0_14px_34px_rgba(15,23,42,0.18)]"
+const INACTIVE_STYLE_BUTTON_CLASS =
+  "border-white/12 bg-black/18 text-white/78 hover:border-white/28 hover:bg-black/28"
+const DEFAULT_STYLE_PREFERENCE_KEY = "wildwaters:explore-map-style"
 
 export default class extends Controller {
   static targets = [
@@ -17,10 +22,12 @@ export default class extends Controller {
     "resultCount",
     "search",
     "shell",
+    "styleButton",
     "status"
   ]
 
   static values = {
+    defaultStyleId: String,
     detailsLabel: String,
     emptyLabel: String,
     initialLatitude: Number,
@@ -33,6 +40,7 @@ export default class extends Controller {
     mapDataUrl: String,
     mapStyleUrl: String,
     mapUnavailableLabel: String,
+    stylePreferenceKey: String,
     visibleLabel: String
   }
 
@@ -42,12 +50,14 @@ export default class extends Controller {
     this.featuresLoaded = false
     this.featuresByPublicId = new Map()
     this.selectedPublicId = null
+    this.activeStyleId = this.resolveInitialStyleId()
 
     if (!this.hasCanvasTarget || typeof maplibregl.Map !== "function") {
       this.renderMapUnavailable()
       return
     }
 
+    this.syncStyleButtons()
     this.enhancedMode = true
     this.handleResize = () => this.resizeMap()
     this.buildMap()
@@ -114,10 +124,31 @@ export default class extends Controller {
     this.selectFeature(publicId, { flyTo: true })
   }
 
+  switchStyle(event) {
+    if (!this.enhancedMode || !this.map) {
+      return
+    }
+
+    event.preventDefault()
+
+    const styleId = event.currentTarget.dataset.styleId
+    const styleUrl = this.styleUrlFor(styleId)
+
+    if (!styleId || !styleUrl || styleId === this.activeStyleId) {
+      return
+    }
+
+    this.activeStyleId = styleId
+    this.persistStylePreference(styleId)
+    this.syncStyleButtons()
+    this.setLoading(true)
+    this.map.setStyle(styleUrl)
+  }
+
   buildMap() {
     this.map = new maplibregl.Map({
       container: this.canvasTarget,
-      style: this.mapStyleUrlValue,
+      style: this.currentStyleUrl(),
       center: [ this.initialLongitudeValue, this.initialLatitudeValue ],
       zoom: this.initialZoomValue,
       attributionControl: false
@@ -132,10 +163,10 @@ export default class extends Controller {
       "bottom-right"
     )
 
-    this.map.on("load", () => {
+    this.map.on("style.load", () => {
       this.resizeMap()
       this.ensureMapLayers()
-      this.loadFeatures({ fitToResults: true })
+      this.loadFeatures({ fitToResults: !this.featuresLoaded })
     })
     this.map.on("moveend", () => this.loadFeatures())
   }
@@ -163,6 +194,10 @@ export default class extends Controller {
   }
 
   ensureMapLayers() {
+    if (this.map.getSource("waterfalls")) {
+      return
+    }
+
     this.map.addSource("waterfalls", {
       type: "geojson",
       data: { type: "FeatureCollection", features: [] },
@@ -489,6 +524,84 @@ export default class extends Controller {
     this.setLoading(false)
     this.showMapState(this.mapUnavailableLabelValue, { persistent: true })
     this.setStatus(this.mapUnavailableLabelValue)
+  }
+
+  resolveInitialStyleId() {
+    const availableStyleIds = this.availableStyleIds()
+
+    if (availableStyleIds.length === 0) {
+      return null
+    }
+
+    const savedStyleId = this.readStylePreference()
+
+    if (savedStyleId && availableStyleIds.includes(savedStyleId)) {
+      return savedStyleId
+    }
+
+    if (this.hasDefaultStyleIdValue && availableStyleIds.includes(this.defaultStyleIdValue)) {
+      return this.defaultStyleIdValue
+    }
+
+    return availableStyleIds[0]
+  }
+
+  availableStyleIds() {
+    return this.hasStyleButtonTarget ? this.styleButtonTargets.map((button) => button.dataset.styleId) : []
+  }
+
+  currentStyleUrl() {
+    return this.styleUrlFor(this.activeStyleId) || this.mapStyleUrlValue
+  }
+
+  styleUrlFor(styleId) {
+    if (!styleId || !this.hasStyleButtonTarget) {
+      return null
+    }
+
+    return this.styleButtonTargets.find((button) => button.dataset.styleId === styleId)?.dataset.styleUrl || null
+  }
+
+  syncStyleButtons() {
+    if (!this.hasStyleButtonTarget) {
+      return
+    }
+
+    this.styleButtonTargets.forEach((button) => {
+      const isActive = button.dataset.styleId === this.activeStyleId
+
+      button.setAttribute("aria-pressed", isActive ? "true" : "false")
+      button.classList.remove(...ACTIVE_STYLE_BUTTON_CLASS.split(" "), ...INACTIVE_STYLE_BUTTON_CLASS.split(" "))
+      button.classList.add(...(isActive ? ACTIVE_STYLE_BUTTON_CLASS : INACTIVE_STYLE_BUTTON_CLASS).split(" "))
+    })
+  }
+
+  readStylePreference() {
+    if (typeof window === "undefined" || !window.localStorage) {
+      return null
+    }
+
+    try {
+      return window.localStorage.getItem(this.stylePreferenceKey())
+    } catch {
+      return null
+    }
+  }
+
+  persistStylePreference(styleId) {
+    if (!styleId || typeof window === "undefined" || !window.localStorage) {
+      return
+    }
+
+    try {
+      window.localStorage.setItem(this.stylePreferenceKey(), styleId)
+    } catch {
+      // Ignore storage failures and keep the in-memory selection.
+    }
+  }
+
+  stylePreferenceKey() {
+    return this.hasStylePreferenceKeyValue ? this.stylePreferenceKeyValue : DEFAULT_STYLE_PREFERENCE_KEY
   }
 
   buildChip(text, classes) {

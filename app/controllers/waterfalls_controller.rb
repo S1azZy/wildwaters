@@ -4,6 +4,9 @@ class WaterfallsController < ApplicationController
   def index
     @filters = explore_filter_input
     @waterfalls = limited_waterfalls(explore_result(input: @filters))
+    @map_styles = Waterfalls::MapStyleCatalog.all
+    @default_map_style = Waterfalls::MapStyleCatalog.default
+    @default_map_style_id = @default_map_style.fetch(:id)
     @regions = Region.ordered_for_explore
   end
 

@@ -7,11 +7,11 @@ Rails.application.configure do
     policy.default_src :self
     policy.base_uri :self
     policy.child_src :blob
-    policy.connect_src :self, "https://demotiles.maplibre.org"
-    policy.font_src :self, :data, "https://demotiles.maplibre.org"
+    policy.connect_src :self, "https://tiles.openfreemap.org"
+    policy.font_src :self, :data, "https://tiles.openfreemap.org"
     policy.form_action :self
     policy.frame_ancestors :none
-    policy.img_src :self, :data, :blob, "https://demotiles.maplibre.org"
+    policy.img_src :self, :data, :blob, "https://tiles.openfreemap.org"
     policy.object_src :none
     policy.script_src :self
     policy.style_src :self, :unsafe_inline

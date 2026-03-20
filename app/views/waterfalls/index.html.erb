@@ -4,6 +4,28 @@
   <%= stylesheet_link_tag "maplibre-gl", "data-turbo-track": "reload" %>
 <% end %>
 <%
+  map_style_id = ->(map_style) { map_style.respond_to?(:fetch) ? map_style.fetch(:id) : map_style.id }
+  map_style_name = ->(map_style) { map_style.respond_to?(:fetch) ? map_style.fetch(:name) : map_style.name }
+  map_style_url = ->(map_style) { map_style.respond_to?(:fetch) ? map_style.fetch(:style_url) : map_style.style_url }
+  map_styles = Array(@map_styles).presence || [
+    {
+      id: "liberty",
+      name: t("waterfalls.index.map_styles.liberty"),
+      style_url: "https://tiles.openfreemap.org/styles/liberty"
+    },
+    {
+      id: "bright",
+      name: t("waterfalls.index.map_styles.bright"),
+      style_url: "https://tiles.openfreemap.org/styles/bright"
+    },
+    {
+      id: "positron",
+      name: t("waterfalls.index.map_styles.positron"),
+      style_url: "https://tiles.openfreemap.org/styles/positron"
+    }
+  ]
+  default_map_style_id = @default_map_style_id.presence || map_style_id.call(map_styles.first)
+
   region_options = [ [ t("waterfalls.index.filters.all_regions"), nil ] ]
   region_options += @regions.map { |region| [ region.name, region.public_id ] }
 
@@ -27,7 +49,8 @@
                 data: {
                   controller: "explore-map",
                   explore_map_map_data_url_value: map_data_waterfalls_path,
-                  explore_map_map_style_url_value: "https://demotiles.maplibre.org/style.json",
+                  explore_map_map_style_url_value: map_style_url.call(map_styles.first),
+                  explore_map_default_style_id_value: default_map_style_id,
                   explore_map_initial_longitude_value: "115.1889",
                   explore_map_initial_latitude_value: "-8.2601",
                   explore_map_initial_zoom_value: "7.4",
@@ -38,6 +61,7 @@
                   explore_map_locate_label_value: t("waterfalls.index.actions.locate"),
                   explore_map_details_label_value: t("waterfalls.index.actions.details"),
                   explore_map_map_unavailable_label_value: t("waterfalls.index.map_unavailable"),
+                  explore_map_style_preference_key_value: "wildwaters:explore-map-style",
                   explore_map_visible_label_value: t("waterfalls.index.visible_label")
                 } do %>
   <div class="grid gap-5 xl:grid-cols-[24rem_minmax(0,1fr)]">
@@ -141,13 +165,29 @@
             <p class="mt-3 max-w-xl text-sm leading-6 text-white/78"><%= t("waterfalls.index.map_subheading") %></p>
           </div>
 
-          <div class="flex flex-wrap gap-2">
-            <span class="rounded-full border border-white/15 bg-white/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78"><%= t("waterfalls.index.chips.bounds_loaded") %></span>
-            <span class="rounded-full border border-white/15 bg-white/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78"><%= t("waterfalls.index.chips.published") %></span>
-            <span class="rounded-full border border-white/15 bg-black/24 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78">
-              <span data-explore-map-target="heroResultCount"><%= @waterfalls.size %></span>
-              <%= t("waterfalls.index.result_suffix") %>
-            </span>
+          <div class="pointer-events-auto flex flex-col items-start gap-3 sm:items-end">
+            <div class="flex flex-wrap items-center gap-2 rounded-[1.45rem] border border-white/14 bg-black/24 px-3 py-3 shadow-[0_18px_80px_rgba(0,0,0,0.28)] backdrop-blur">
+              <span class="px-2 text-[0.65rem] font-semibold uppercase tracking-[0.26em] text-white/62"><%= t("waterfalls.index.map_styles.label") %></span>
+
+              <% map_styles.each do |map_style| %>
+                <button
+                  type="button"
+                  class="explore-map-style-button rounded-full border px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.18em] transition"
+                  data-action="explore-map#switchStyle"
+                  data-explore-map-target="styleButton"
+                  data-style-id="<%= map_style_id.call(map_style) %>"
+                  data-style-url="<%= map_style_url.call(map_style) %>"><%= map_style_name.call(map_style) %></button>
+              <% end %>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <span class="rounded-full border border-white/15 bg-white/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78"><%= t("waterfalls.index.chips.bounds_loaded") %></span>
+              <span class="rounded-full border border-white/15 bg-white/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78"><%= t("waterfalls.index.chips.published") %></span>
+              <span class="rounded-full border border-white/15 bg-black/24 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78">
+                <span data-explore-map-target="heroResultCount"><%= @waterfalls.size %></span>
+                <%= t("waterfalls.index.result_suffix") %>
+              </span>
+            </div>
           </div>
         </div>
 
