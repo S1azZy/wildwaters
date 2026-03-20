@@ -1,6 +1,7 @@
 # Changes
 
 ## 2026-03-20
+- Added a dedicated `bin/check-outdated` runner so `make outdated` always executes Bundler, importmap, and MapLibre freshness checks before returning one combined status code.
 - Added dependency freshness checks for `bundle outdated`, `bin/importmap outdated`, and a new local `bin/check-maplibre-gl` script, plus a single `make outdated` aggregator target.
 - Added an explore map-style dropdown with four detailed basemaps, including an outdoors-oriented style, and switched the map stack from a simple demo style to a richer multi-style setup.
 - Fixed the explore homepage backend contract so the view receives an explicit default basemap id from the controller.

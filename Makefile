@@ -77,6 +77,4 @@ maplibre-outdated:
 	$(APP) bin/check-maplibre-gl
 
 outdated:
-	$(MAKE) bundle-outdated
-	$(MAKE) importmap-outdated
-	$(MAKE) maplibre-outdated
+	$(APP) bin/check-outdated
