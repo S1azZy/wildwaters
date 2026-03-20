@@ -1,5 +1,8 @@
 # Changes
 
+## 2026-03-20
+- Vendored MapLibre GL JS/CSS `5.20.2` into local Rails assets, pinned the JS in importmap, switched the explore map Stimulus controller to a module import, and removed the waterfall index CDN tags while keeping the remote demo style URL.
+
 ## 2026-03-19
 - Added a compact ADR documenting the map browse stack decision: `MapLibre GL JS`, map-first layout, bounds-based loading, clustering, and a future path to vector tiles or PMTiles.
 - Updated all bundle dependencies that could be safely advanced from `bundle outdated` and cleaned up deprecated Bundler platform declarations in `Gemfile`.

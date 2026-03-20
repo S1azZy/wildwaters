@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import maplibregl from "maplibre-gl"
 
 const DEFAULT_SELECTED_CARD_CLASS =
   "ring-2 ring-emerald-700 border-emerald-300 shadow-[0_28px_80px_rgba(5,150,105,0.18)]"
@@ -42,7 +43,7 @@ export default class extends Controller {
     this.featuresByPublicId = new Map()
     this.selectedPublicId = null
 
-    if (!this.hasCanvasTarget || !window.maplibregl) {
+    if (!this.hasCanvasTarget || typeof maplibregl.Map !== "function") {
       this.renderMapUnavailable()
       return
     }
@@ -114,7 +115,7 @@ export default class extends Controller {
   }
 
   buildMap() {
-    this.map = new window.maplibregl.Map({
+    this.map = new maplibregl.Map({
       container: this.canvasTarget,
       style: this.mapStyleUrlValue,
       center: [ this.initialLongitudeValue, this.initialLatitudeValue ],
@@ -123,11 +124,11 @@ export default class extends Controller {
     })
 
     this.map.addControl(
-      new window.maplibregl.NavigationControl({ showCompass: false }),
+      new maplibregl.NavigationControl({ showCompass: false }),
       "top-right"
     )
     this.map.addControl(
-      new window.maplibregl.AttributionControl({ compact: true }),
+      new maplibregl.AttributionControl({ compact: true }),
       "bottom-right"
     )
 
@@ -320,7 +321,7 @@ export default class extends Controller {
       return
     }
 
-    const bounds = new window.maplibregl.LngLatBounds()
+    const bounds = new maplibregl.LngLatBounds()
     features.forEach((feature) => bounds.extend(feature.geometry.coordinates))
 
     this.map.fitBounds(bounds, {

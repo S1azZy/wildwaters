@@ -123,23 +123,27 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css("noscript", text: I18n.t("waterfalls.index.no_javascript"), visible: false)
   end
 
-  it "loads the map library before the explore controller bootstraps" do
+  it "loads the map library through importmap before the explore controller bootstraps" do
     visit_page
 
-    expect(page).to have_css("script[src*='maplibre-gl.js']:not([defer])", visible: false)
+    expect(page).to have_css("script[type='importmap']", visible: false)
+    expect(page.html).to include('"maplibre-gl"')
+    expect(page.html).to include("/assets/maplibre-gl")
   end
 
-  it "loads remote maplibre assets without crossorigin mode" do
+  it "loads maplibre assets locally without remote CDN tags" do
     visit_page
 
-    expect(page).to have_css("script[src*='maplibre-gl.js']:not([crossorigin])", visible: false)
-    expect(page).to have_css("link[href*='maplibre-gl.css']:not([crossorigin])", visible: false)
+    expect(page).not_to have_css("script[src*='unpkg.com/maplibre-gl']", visible: false)
+    expect(page).not_to have_css("link[href*='unpkg.com/maplibre-gl']", visible: false)
+    expect(page).to have_css("link[href*='/assets/maplibre-gl']", visible: false)
   end
 
-  it "loads a published maplibre asset version" do
+  it "pins the published maplibre asset version locally" do
     visit_page
 
-    expect(page).to have_css("script[src*='maplibre-gl@5.20.2/dist/maplibre-gl.js']", visible: false)
-    expect(page).to have_css("link[href*='maplibre-gl@5.20.2/dist/maplibre-gl.css']", visible: false)
+    expect(page.html).to include("/assets/maplibre-gl")
+    expect(page.html).not_to include("maplibre-gl@5.20.2/dist/maplibre-gl.js")
+    expect(page.html).not_to include("maplibre-gl@5.20.2/dist/maplibre-gl.css")
   end
 end
