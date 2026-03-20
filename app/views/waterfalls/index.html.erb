@@ -1,36 +1,181 @@
 <% content_for :title, t("waterfalls.index.title") %>
+<% content_for :main_class, "mx-auto w-full max-w-[112rem] px-4 pb-10 pt-4 sm:px-6 lg:px-8" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.css" %>
+  <script src="https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.js"></script>
+<% end %>
+<%
+  region_options = [ [ t("waterfalls.index.filters.all_regions"), nil ] ]
+  region_options += @regions.map { |region| [ region.name, region.public_id ] }
 
-<div class="mx-auto flex w-full max-w-4xl flex-col gap-6">
-  <header class="space-y-2">
-    <p class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500"><%= t("waterfalls.index.eyebrow") %></p>
-    <h1 class="text-3xl font-semibold text-slate-900"><%= t("waterfalls.index.heading") %></h1>
-    <p class="max-w-2xl text-sm text-slate-600"><%= t("waterfalls.index.subheading") %></p>
-  </header>
+  plunge_pool_options = [
+    [ t("waterfalls.index.filters.any_plunge_pool"), nil ],
+    [ t("waterfalls.index.filters.plunge_pool_yes"), true ],
+    [ t("waterfalls.index.filters.plunge_pool_no"), false ]
+  ]
 
-  <div class="grid gap-4">
-    <% @waterfalls.each do |waterfall| %>
-      <% spot = waterfall.spot %>
+  difficulty_options = [
+    [ t("waterfalls.index.filters.any_difficulty"), nil ],
+    [ t("waterfalls.index.filters.easy"), "easy" ],
+    [ t("waterfalls.index.filters.moderate"), "moderate" ],
+    [ t("waterfalls.index.filters.hard"), "hard" ]
+  ]
+%>
 
-      <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div class="space-y-2">
-            <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500"><%= spot.region.name %></p>
-            <h2 class="text-xl font-semibold text-slate-900">
-              <%= link_to spot.name, waterfall_path(spot), class: "hover:text-sky-700" %>
-            </h2>
-
-            <% if spot.summary.present? %>
-              <p class="text-sm leading-6 text-slate-600"><%= spot.summary %></p>
-            <% end %>
+<%= content_tag :section,
+                id: "explore-home",
+                class: "flex w-full flex-col gap-5",
+                data: {
+                  controller: "explore-map",
+                  explore_map_map_data_url_value: map_data_waterfalls_path,
+                  explore_map_map_style_url_value: "https://demotiles.maplibre.org/style.json",
+                  explore_map_initial_longitude_value: "115.1889",
+                  explore_map_initial_latitude_value: "-8.2601",
+                  explore_map_initial_zoom_value: "7.4",
+                  explore_map_loading_label_value: t("waterfalls.index.loading"),
+                  explore_map_list_hint_value: t("waterfalls.index.list_hint"),
+                  explore_map_list_mode_value: t("waterfalls.index.list_mode"),
+                  explore_map_empty_label_value: t("waterfalls.index.empty"),
+                  explore_map_locate_label_value: t("waterfalls.index.actions.locate"),
+                  explore_map_details_label_value: t("waterfalls.index.actions.details"),
+                  explore_map_map_unavailable_label_value: t("waterfalls.index.map_unavailable"),
+                  explore_map_visible_label_value: t("waterfalls.index.visible_label")
+                } do %>
+  <div class="grid gap-5 xl:grid-cols-[24rem_minmax(0,1fr)]">
+    <aside class="order-2 flex min-h-[42rem] flex-col overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,241,232,0.96))] shadow-[0_32px_100px_rgba(15,23,42,0.14)] xl:order-1 xl:sticky xl:top-[6.25rem] xl:h-[calc(100vh-7.5rem)]">
+      <div class="border-b border-stone-200/90 px-5 pb-5 pt-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="space-y-3">
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-emerald-900/55"><%= t("waterfalls.index.eyebrow") %></p>
+            <div class="space-y-3">
+              <h1 class="max-w-sm font-serif text-4xl leading-none text-slate-950 sm:text-[2.85rem]"><%= t("waterfalls.index.heading") %></h1>
+              <p class="max-w-md text-sm leading-6 text-slate-600"><%= t("waterfalls.index.subheading") %></p>
+            </div>
           </div>
 
-          <% if waterfall.height_meters.present? %>
-            <div class="rounded-full bg-sky-50 px-3 py-1 text-sm font-medium text-sky-800">
-              <%= t("waterfalls.shared.height", value: waterfall.height_meters) %>
-            </div>
-          <% end %>
+          <div class="flex flex-wrap gap-2">
+            <p class="rounded-full bg-stone-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-stone-50 shadow-[0_12px_30px_rgba(15,23,42,0.18)]">
+              <span data-explore-map-target="resultCount"><%= @waterfalls.size %></span>
+              <%= t("waterfalls.index.result_suffix") %>
+            </p>
+            <p class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-900"><%= t("waterfalls.index.published_only") %></p>
+          </div>
         </div>
-      </article>
-    <% end %>
+      </div>
+
+      <div class="border-b border-stone-200/90 px-5 py-5">
+        <div class="grid gap-2">
+          <%= label_tag :explore_search, t("waterfalls.index.filters.search"), class: "text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" %>
+          <%= search_field_tag :explore_search, nil, id: :explore_search, placeholder: t("waterfalls.index.filters.search_placeholder"), autocomplete: "off", class: "rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100", data: { explore_map_target: "search", action: "input->explore-map#searchChanged" } %>
+          <p class="text-sm leading-6 text-slate-500"><%= t("waterfalls.index.filters.search_hint") %></p>
+        </div>
+      </div>
+
+      <%= form_with url: waterfalls_path, method: :get, scope: nil, class: "grid gap-4 border-b border-stone-200/90 px-5 py-5 sm:grid-cols-2 xl:grid-cols-1", data: { explore_map_target: "filters", action: "input->explore-map#filtersChanged change->explore-map#filtersChanged submit->explore-map#filtersChanged" } do %>
+        <div class="grid gap-2">
+          <%= label_tag :region_public_id, t("waterfalls.index.filters.region"), class: "text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" %>
+          <%= select_tag(
+                :region_public_id,
+                options_for_select(region_options, @filters[:region_public_id]),
+                class: "rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+              ) %>
+        </div>
+
+        <div class="grid gap-2">
+          <%= label_tag :min_height_meters, t("waterfalls.index.filters.min_height"), class: "text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" %>
+          <%= number_field_tag :min_height_meters, @filters[:min_height_meters], min: 0, step: 5, placeholder: t("waterfalls.index.filters.min_height_placeholder"), autocomplete: "off", class: "rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" %>
+        </div>
+
+        <div class="grid gap-2">
+          <%= label_tag :plunge_pool, t("waterfalls.index.filters.plunge_pool"), class: "text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" %>
+          <%= select_tag(
+                :plunge_pool,
+                options_for_select(plunge_pool_options, @filters[:plunge_pool]),
+                class: "rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+              ) %>
+        </div>
+
+        <div class="grid gap-2">
+          <%= label_tag :approach_difficulty, t("waterfalls.index.filters.approach_difficulty"), class: "text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" %>
+          <%= select_tag(
+                :approach_difficulty,
+                options_for_select(difficulty_options, @filters[:approach_difficulty]),
+                class: "rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+              ) %>
+        </div>
+
+        <div class="flex items-center gap-3 sm:col-span-2 xl:col-span-1">
+          <%= submit_tag t("waterfalls.index.filters.apply"), class: "inline-flex cursor-pointer items-center justify-center rounded-full bg-emerald-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-900" %>
+          <%= link_to t("waterfalls.index.filters.reset"), waterfalls_path, class: "inline-flex items-center justify-center rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-950" %>
+        </div>
+      <% end %>
+
+      <div class="flex items-center justify-between gap-3 border-b border-stone-200/90 px-5 py-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500"><%= t("waterfalls.index.list_heading") %></p>
+          <p class="mt-1 text-sm text-slate-500" data-explore-map-target="status" aria-live="polite"><%= t("waterfalls.index.list_hint") %></p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-emerald-900" data-explore-map-target="loading"><%= t("waterfalls.index.loading") %></span>
+          <span class="rounded-full bg-stone-100 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500"><%= t("waterfalls.index.list_mode") %></span>
+        </div>
+      </div>
+
+      <div class="explore-scrollbar flex-1 overflow-y-auto px-4 py-4">
+        <div class="grid gap-4" data-explore-map-target="list" aria-live="polite">
+          <%= render partial: "waterfall_card", collection: @waterfalls, as: :waterfall %>
+        </div>
+
+        <p class="hidden rounded-[1.75rem] border border-dashed border-stone-300 bg-white/80 px-5 py-8 text-center text-sm leading-6 text-slate-500" data-explore-map-target="empty">
+          <%= t("waterfalls.index.empty") %>
+        </p>
+      </div>
+    </aside>
+
+    <div class="order-1 xl:order-2">
+      <div class="explore-map-shell relative min-h-[58vh] overflow-hidden rounded-[2.25rem] border border-emerald-950/10 bg-[radial-gradient(circle_at_18%_18%,rgba(16,185,129,0.26),transparent_22%),radial-gradient(circle_at_84%_16%,rgba(234,179,8,0.18),transparent_24%),linear-gradient(180deg,rgba(24,48,40,0.96),rgba(15,23,42,0.9))] shadow-[0_40px_120px_rgba(15,23,42,0.2)] xl:min-h-[calc(100vh-7.5rem)]" data-explore-map-target="shell">
+        <div class="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-wrap items-start justify-between gap-3 p-5 sm:p-6">
+          <div class="max-w-2xl rounded-[1.6rem] border border-white/15 bg-black/24 px-4 py-4 text-white shadow-[0_18px_80px_rgba(0,0,0,0.3)] backdrop-blur">
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-white/65"><%= t("waterfalls.index.map_eyebrow") %></p>
+            <h2 class="mt-2 max-w-xl font-serif text-3xl leading-none text-white sm:text-[2.6rem]"><%= t("waterfalls.index.map_heading") %></h2>
+            <p class="mt-3 max-w-xl text-sm leading-6 text-white/78"><%= t("waterfalls.index.map_subheading") %></p>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <span class="rounded-full border border-white/15 bg-white/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78"><%= t("waterfalls.index.chips.bounds_loaded") %></span>
+            <span class="rounded-full border border-white/15 bg-white/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78"><%= t("waterfalls.index.chips.published") %></span>
+            <span class="rounded-full border border-white/15 bg-black/24 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/78">
+              <span data-explore-map-target="heroResultCount"><%= @waterfalls.size %></span>
+              <%= t("waterfalls.index.result_suffix") %>
+            </span>
+          </div>
+        </div>
+
+        <div class="explore-map-surface absolute inset-0">
+          <div class="h-full w-full explore-map-canvas" data-explore-map-target="canvas"></div>
+        </div>
+
+        <div class="pointer-events-none absolute inset-x-5 top-28 z-10 hidden justify-center sm:top-32" data-explore-map-target="mapState">
+          <div class="max-w-sm rounded-full border border-white/18 bg-black/35 px-4 py-3 text-center text-sm leading-6 text-white/86 shadow-[0_18px_80px_rgba(0,0,0,0.28)] backdrop-blur"></div>
+        </div>
+
+        <div class="pointer-events-none absolute bottom-5 left-5 z-10 max-w-sm rounded-[1.5rem] border border-white/15 bg-black/28 px-4 py-3 text-sm leading-6 text-white/82 shadow-[0_18px_80px_rgba(0,0,0,0.28)] backdrop-blur">
+          <%= t("waterfalls.index.map_tip") %>
+        </div>
+
+        <noscript>
+          <div class="absolute inset-x-5 bottom-5 rounded-[1.5rem] border border-white/15 bg-black/35 px-4 py-4 text-sm leading-6 text-white/84 shadow-[0_18px_80px_rgba(0,0,0,0.28)]">
+            <%= t("waterfalls.index.no_javascript") %>
+          </div>
+        </noscript>
+      </div>
+    </div>
   </div>
-</div>
+
+  <section id="about" class="rounded-[2rem] border border-stone-200 bg-white/84 px-6 py-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:px-8">
+    <p class="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-slate-500"><%= t("waterfalls.index.about.eyebrow") %></p>
+    <h2 class="mt-2 max-w-3xl font-serif text-2xl text-slate-950 sm:text-[2rem]"><%= t("waterfalls.index.about.heading") %></h2>
+    <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600"><%= t("waterfalls.index.about.body") %></p>
+  </section>
+<% end %>

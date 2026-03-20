@@ -27,6 +27,8 @@ class Region < ApplicationRecord
   enum :region_type, REGION_TYPES, prefix: true
   enum :status, STATUSES, prefix: true
 
+  scope :ordered_for_explore, -> { status_active.order(:name) }
+
   normalizes :name, with: ->(value) { value.to_s.squish.presence }
   normalizes :slug, with: ->(value) { value.to_s.parameterize.presence }
   normalizes :external_ref, with: ->(value) { value.to_s.strip.presence }

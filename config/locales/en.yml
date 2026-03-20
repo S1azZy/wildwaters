@@ -28,6 +28,14 @@
 #       enabled: "ON"
 
 en:
+  layouts:
+    header:
+      create_account: "Create account"
+      dashboard: "Dashboard"
+      explore: "Explore"
+      info: "Info"
+      sign_in: "Sign in"
+      sign_out: "Sign out"
   auth:
     fields:
       email: "Email"
@@ -90,13 +98,65 @@ en:
       signed_in_as: "Signed in as %{email}"
       title: "Dashboard"
   waterfalls:
+    map_data:
+      invalid_bounds: "Map bounds are invalid."
     shared:
       height: "%{value} m"
     index:
+      about:
+        body: "Wild Waters is building a waterfall-first atlas for people who choose their next swim or hike by geography first. Start with the map, tighten the filters, then dive into the detail pages once a place feels right."
+        cards:
+          community_body: "Profiles, saves, reviews, and future check-ins will layer onto the same public map surface."
+          community_title: "Built for community"
+          editorial_body: "Every waterfall card is meant to stay compact on the map and deepen on the detail page."
+          editorial_title: "Editorial depth"
+          map_first_body: "The map leads, the list follows, and filters keep the browse loop calm even as data grows."
+          map_first_title: "Map-first by default"
+        eyebrow: "Why this screen exists"
+        heading: "Browse the catalog like an outdoor atlas, not a spreadsheet."
+      actions:
+        details: "Details"
+        locate: "Locate"
+      chips:
+        bounds_loaded: "Bounds-based loading"
+        published: "Published only"
+      empty: "No waterfalls match the current map window and filters yet."
       eyebrow: "Waterfall catalog"
+      filters:
+        all_regions: "All regions"
+        any_difficulty: "Any difficulty"
+        any_plunge_pool: "Any plunge pool"
+        apply: "Refresh map"
+        approach_difficulty: "Approach"
+        easy: "Easy"
+        hard: "Hard"
+        min_height: "Minimum height"
+        min_height_placeholder: "ex. 30"
+        moderate: "Moderate"
+        plunge_pool: "Plunge pool"
+        plunge_pool_no: "No plunge pool"
+        plunge_pool_yes: "Plunge pool"
+        region: "Region"
+        reset: "Reset"
+        search: "Search visible waterfalls"
+        search_hint: "Search within the currently loaded cards by waterfall name, summary, or region."
+        search_placeholder: "Search the current list"
       heading: "Find your next waterfall"
+      list_heading: "Visible waterfalls"
+      list_hint: "Move the map or refine the filters to change the list."
+      list_mode: "Map + list"
+      loading: "Refreshing map results..."
+      map_eyebrow: "Explore screen"
+      map_heading: "A map-led way to pick the next cascade worth the detour."
+      map_subheading: "Pan for nearby waterfalls, tighten the list with filters, and jump into detail pages once something looks promising."
+      map_tip: "Tip: click a marker to sync the left rail, or use “Locate” on a card to fly the map to that waterfall."
+      map_unavailable: "The map failed to load, but the waterfall list is still available below."
+      no_javascript: "JavaScript is disabled, so the map is paused. The waterfall list and filters still work as a regular catalog."
+      published_only: "Published only"
+      result_suffix: "shown"
       subheading: "A growing collection of remarkable cascades, trail approaches, and natural swimming spots."
       title: "Waterfalls"
+      visible_label: "visible"
     show:
       approach_difficulty_label: "Approach"
       back: "Back to all waterfalls"

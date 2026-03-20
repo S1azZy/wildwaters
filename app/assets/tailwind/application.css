@@ -1,1 +1,97 @@
 @import "tailwindcss";
+
+@theme {
+  --color-explore-forest: #183028;
+  --color-explore-moss: #2f5a4f;
+  --color-explore-sand: #f4f1e8;
+  --color-explore-clay: #c2743f;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  [data-display-text] {
+    font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  }
+}
+
+@layer components {
+  .explore-shell {
+    background:
+      radial-gradient(circle at top, rgba(15, 118, 110, 0.14), transparent 42%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 241, 232, 0.94));
+  }
+
+  .explore-map-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.18), transparent 24%),
+      linear-gradient(0deg, rgba(15, 23, 42, 0.18), transparent 18%);
+  }
+
+  .explore-map-shell .explore-map-surface,
+  .explore-map-shell .explore-map-canvas,
+  .explore-map-shell .explore-map-canvas.maplibregl-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .explore-scrollbar {
+    scrollbar-color: rgba(24, 48, 40, 0.22) transparent;
+    scrollbar-width: thin;
+  }
+
+  .explore-scrollbar::-webkit-scrollbar {
+    width: 0.75rem;
+  }
+
+  .explore-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .explore-scrollbar::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+    background-color: rgba(24, 48, 40, 0.22);
+  }
+
+  .explore-map-shell .maplibregl-ctrl-top-right {
+    top: 5.75rem;
+    right: 1rem;
+  }
+
+  .explore-map-shell .maplibregl-ctrl-group {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 1rem;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.18);
+  }
+
+  .explore-map-shell .maplibregl-ctrl button {
+    background-color: rgba(255, 255, 255, 0.92);
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
