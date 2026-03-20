@@ -24,10 +24,13 @@ RSpec.describe "Waterfalls", type: :request do
     it "sets a content security policy for the map experience" do
       perform_request
 
+      script_sources = content_security_policy_directives.fetch("script-src")
+      style_sources = content_security_policy_directives.fetch("style-src")
+
       expect(response).to have_http_status(:ok)
       expect(content_security_policy_directives.fetch("default-src")).to eq([ "'self'" ])
-      expect(content_security_policy_directives.fetch("script-src")).to include("'self'", "https://unpkg.com")
-      expect(content_security_policy_directives.fetch("style-src")).to include("'self'", "https://unpkg.com")
+      expect(script_sources).to satisfy { |values| values.include?("'self'") && !values.include?("https://unpkg.com") }
+      expect(style_sources).to satisfy { |values| values.include?("'self'") && !values.include?("https://unpkg.com") }
       expect(content_security_policy_directives.fetch("connect-src")).to include("'self'", "https://demotiles.maplibre.org")
       expect(content_security_policy_directives.fetch("worker-src")).to include("'self'", "blob:")
     end
