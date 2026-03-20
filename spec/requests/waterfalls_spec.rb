@@ -7,6 +7,12 @@ RSpec.describe "Waterfalls", type: :request do
     let(:published_waterfall) do
       create(:waterfall, spot: create(:spot, :published, name: "Sekumpul Waterfall"))
     end
+    let(:script_sources) { content_security_policy_directives.fetch("script-src") }
+    let(:style_sources) { content_security_policy_directives.fetch("style-src") }
+    let(:connect_sources) { content_security_policy_directives.fetch("connect-src") }
+    let(:font_sources) { content_security_policy_directives.fetch("font-src") }
+    let(:image_sources) { content_security_policy_directives.fetch("img-src") }
+    let(:worker_sources) { content_security_policy_directives.fetch("worker-src") }
 
     before do
       published_waterfall
@@ -21,18 +27,61 @@ RSpec.describe "Waterfalls", type: :request do
       expect(response.body).to include("Sekumpul Waterfall")
     end
 
-    it "sets a content security policy for the map experience" do
+    it "uses a same-origin default source policy" do
       perform_request
-
-      script_sources = content_security_policy_directives.fetch("script-src")
-      style_sources = content_security_policy_directives.fetch("style-src")
 
       expect(response).to have_http_status(:ok)
       expect(content_security_policy_directives.fetch("default-src")).to eq([ "'self'" ])
+    end
+
+    it "does not allow unpkg script and style sources" do
+      perform_request
+
       expect(script_sources).to satisfy { |values| values.include?("'self'") && !values.include?("https://unpkg.com") }
       expect(style_sources).to satisfy { |values| values.include?("'self'") && !values.include?("https://unpkg.com") }
-      expect(content_security_policy_directives.fetch("connect-src")).to include("'self'", "https://demotiles.maplibre.org")
-      expect(content_security_policy_directives.fetch("worker-src")).to include("'self'", "blob:")
+    end
+
+    it "allows OpenFreeMap and Stadia map connections" do
+      perform_request
+
+      expect(connect_sources).to include("'self'", "https://tiles.openfreemap.org")
+      expect(connect_sources).to include("https://tiles.stadiamaps.com")
+      expect(connect_sources).not_to include("https://demotiles.maplibre.org")
+    end
+
+    it "allows approved font and image hosts for the map styles" do
+      perform_request
+
+      expect(font_sources).to include("'self'", "data:", "https://tiles.openfreemap.org")
+      expect(font_sources).to include("https://tiles.stadiamaps.com")
+      expect(font_sources).not_to include("https://demotiles.maplibre.org")
+      expect(image_sources).to include("'self'", "data:", "blob:", "https://tiles.openfreemap.org")
+      expect(image_sources).to include("https://tiles.stadiamaps.com")
+      expect(image_sources).not_to include("https://demotiles.maplibre.org")
+    end
+
+    it "allows blob workers for the map experience" do
+      perform_request
+
+      expect(worker_sources).to include("'self'", "blob:")
+    end
+
+    it "uses the backend default map style instead of catalog order" do
+      allow(Waterfalls::MapStyleCatalog).to receive_messages(all: [
+          { id: "liberty", name: "Liberty", style_url: "https://tiles.openfreemap.org/styles/liberty" },
+          { id: "bright", name: "Bright", style_url: "https://tiles.openfreemap.org/styles/bright" }
+        ], default: { id: "positron", name: "Positron", style_url: "https://tiles.openfreemap.org/styles/positron" })
+
+      perform_request
+
+      expect(response.body).to include('data-explore-map-default-style-id-value="positron"')
+    end
+
+    it "renders the outdoors map style in the style catalog contract" do
+      perform_request
+
+      expect(response.body).to include('data-style-id="outdoors"')
+      expect(response.body).to include("https://tiles.stadiamaps.com/styles/outdoors.json")
     end
   end
 

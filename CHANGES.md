@@ -1,6 +1,9 @@
 # Changes
 
 ## 2026-03-20
+- Added an explore map-style dropdown with four detailed basemaps, including an outdoors-oriented style, and switched the map stack from a simple demo style to a richer multi-style setup.
+- Fixed the explore homepage backend contract so the view receives an explicit default basemap id from the controller.
+- Added a server-provided MapLibre basemap catalog for Liberty, Bright, and Positron styles and repointed explore CSP allowances from the old demo tile host to OpenFreeMap.
 - Vendored MapLibre GL JS/CSS `5.20.2` into local Rails assets, pinned the JS in importmap, switched the explore map Stimulus controller to a module import, and removed the waterfall index CDN tags while keeping the remote demo style URL.
 
 ## 2026-03-19

@@ -85,6 +85,111 @@
   .explore-map-shell .maplibregl-ctrl button {
     background-color: rgba(255, 255, 255, 0.92);
   }
+
+  .explore-map-style-menu > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .explore-map-style-toggle {
+    backdrop-filter: blur(14px);
+  }
+
+  .explore-map-style-toggle:focus-visible,
+  .explore-map-style-option:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.72);
+    outline-offset: 2px;
+  }
+
+  .explore-map-style-toggle-icon {
+    display: inline-grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.18rem;
+    width: 2rem;
+    height: 1.55rem;
+  }
+
+  .explore-map-style-toggle-icon span {
+    border-radius: 0.22rem;
+    background: linear-gradient(180deg, rgba(71, 85, 105, 0.92), rgba(51, 65, 85, 0.96));
+  }
+
+  .explore-map-style-panel {
+    backdrop-filter: blur(18px);
+  }
+
+  .explore-map-style-option[aria-pressed="true"] .explore-map-style-preview {
+    box-shadow: 0 0 0 4px #a21caf;
+  }
+
+  .explore-map-style-preview {
+    display: block;
+    overflow: hidden;
+    border-radius: 1.15rem;
+    padding: 0.38rem;
+    background: white;
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35);
+    transition: box-shadow 180ms ease, transform 180ms ease;
+  }
+
+  .explore-map-style-option:hover .explore-map-style-preview {
+    transform: translateY(-1px);
+  }
+
+  .explore-map-style-preview-inner {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 0.95rem;
+  }
+
+  .explore-map-style-preview--liberty .explore-map-style-preview-inner {
+    background:
+      linear-gradient(125deg, #9ddd74 0 42%, transparent 42%),
+      linear-gradient(90deg, transparent 0 62%, #d7d9dd 62% 71%, transparent 71%),
+      linear-gradient(150deg, transparent 0 28%, #f3f1eb 28% 40%, #8e939a 40% 49%, #f3f1eb 49% 59%, transparent 59%),
+      linear-gradient(180deg, #69bfe9 0 100%);
+  }
+
+  .explore-map-style-preview--bright .explore-map-style-preview-inner {
+    background:
+      linear-gradient(90deg, transparent 0 58%, #cfd4da 58% 66%, transparent 66%),
+      linear-gradient(150deg, transparent 0 22%, #ece7de 22% 34%, #7a7f86 34% 43%, #ece7de 43% 54%, transparent 54%),
+      linear-gradient(180deg, #6f747a 0, #50565f 100%);
+    position: relative;
+  }
+
+  .explore-map-style-preview--bright .explore-map-style-preview-inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.12), transparent 24%),
+      radial-gradient(circle at 82% 20%, rgba(255, 255, 255, 0.1), transparent 22%),
+      repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 10px);
+  }
+
+  .explore-map-style-preview--positron .explore-map-style-preview-inner {
+    background:
+      linear-gradient(90deg, transparent 0 60%, #d6d8dc 60% 68%, transparent 68%),
+      linear-gradient(150deg, transparent 0 24%, #f5f4ef 24% 36%, #a9adb5 36% 45%, #f5f4ef 45% 55%, transparent 55%),
+      linear-gradient(180deg, #eef2e4 0 40%, #f4f5f1 40% 100%);
+  }
+
+  .explore-map-style-preview--outdoors .explore-map-style-preview-inner {
+    background:
+      linear-gradient(90deg, transparent 0 58%, #d7d8d2 58% 66%, transparent 66%),
+      linear-gradient(150deg, transparent 0 22%, #f2eee5 22% 34%, #8f8678 34% 42%, #f2eee5 42% 52%, transparent 52%),
+      linear-gradient(180deg, #d7e7c3 0, #ceddb6 100%);
+    position: relative;
+  }
+
+  .explore-map-style-preview--outdoors .explore-map-style-preview-inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-radial-gradient(circle at 50% 50%, rgba(95, 124, 73, 0.22) 0 1px, transparent 1px 11px),
+      linear-gradient(180deg, transparent 0 70%, rgba(87, 142, 90, 0.2) 70% 100%);
+  }
 }
 
 @layer utilities {
