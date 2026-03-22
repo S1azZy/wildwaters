@@ -1,6 +1,8 @@
 ru:
   layouts:
     header:
+      brand_name: "Wild Waters"
+      brand_tagline: "Swim the World"
       create_account: "Создать аккаунт"
       dashboard: "Кабинет"
       explore: "Карта"

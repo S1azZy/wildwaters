@@ -30,6 +30,8 @@
 en:
   layouts:
     header:
+      brand_name: "Wild Waters"
+      brand_tagline: "Swim the World"
       create_account: "Create account"
       dashboard: "Dashboard"
       explore: "Explore"
