@@ -86,6 +86,24 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-map-shell[data-explore-map-target='shell'] .explore-map-surface > [data-explore-map-target='canvas'][class*='explore-map-canvas'][class*='h-full'][class*='w-full']")
   end
 
+  it "renders a full-bleed map shell under the header" do
+    visit_page
+
+    expect(page).to have_css("main.w-full.min-h-0.p-0")
+    expect(page).to have_css("section#explore-home.explore-layout-shell")
+    expect(page).to have_css(".explore-map-shell.explore-map-shell--full-bleed[data-explore-map-target='shell']")
+    expect(page).to have_css(".explore-map-shell--viewport-fit[data-explore-map-target='shell']")
+  end
+
+  it "renders floating explore overlays on top of the map" do
+    visit_page
+
+    expect(page).to have_css(".explore-controls-overlay")
+    expect(page).to have_css(".explore-results-overlay")
+    expect(page).to have_css(".explore-results-overlay [data-explore-map-target='list']")
+    expect(page).to have_css(".explore-controls-overlay [data-explore-map-target='filters']")
+  end
+
   it "renders the basemap style dropdown" do
     visit_page
 
@@ -111,6 +129,12 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_select("plunge_pool")
     expect(page).to have_select("approach_difficulty")
     expect(page).to have_css("form[action='#{waterfalls_path}'][method='get']")
+  end
+
+  it "exposes the shared card template for refreshed list rendering" do
+    visit_page
+
+    expect(page).to have_css("[data-explore-map-target='list'][data-card-class-template]")
   end
 
   it "renders published waterfalls in the list rail" do
