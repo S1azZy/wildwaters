@@ -4,32 +4,35 @@ module Ui
                 :current_path,
                 :authenticated,
                 :explore_path,
-                :info_path,
                 :dashboard_path,
+                :map_path,
+                :activity_path,
+                :profile_path,
                 :sign_in_path,
-                :registration_path,
-                :session_path
+                :registration_path
 
     def initialize(
       labels:,
       current_path:,
       authenticated:,
       explore_path:,
-      info_path:,
       dashboard_path:,
+      map_path: nil,
+      activity_path: nil,
+      profile_path:,
       sign_in_path:,
-      registration_path:,
-      session_path:
+      registration_path:
     )
       @labels = labels.symbolize_keys
       @current_path = current_path
       @authenticated = authenticated
       @explore_path = explore_path
-      @info_path = info_path
       @dashboard_path = dashboard_path
+      @map_path = map_path
+      @activity_path = activity_path
+      @profile_path = profile_path
       @sign_in_path = sign_in_path
       @registration_path = registration_path
-      @session_path = session_path
     end
 
     def brand_name
@@ -43,16 +46,19 @@ module Ui
     def navigation_items
       [
         navigation_item(:explore, labels.fetch(:explore), explore_path),
-        navigation_item(:info, labels.fetch(:info), info_path)
+        navigation_item(:map, labels.fetch(:map), map_path),
+        navigation_item(:activity, labels.fetch(:activity), activity_path),
+        navigation_item(:profile, labels.fetch(:profile), profile_path)
       ]
     end
 
-    def session_actions
+    def utility_actions
       return guest_actions unless authenticated
 
       [
-        action_item(:dashboard, labels.fetch(:dashboard), dashboard_path),
-        action_item(:sign_out, labels.fetch(:sign_out), session_path, method: :delete)
+        action_item(:notifications, labels.fetch(:notifications), nil, kind: :icon_button),
+        action_item(:settings, labels.fetch(:settings), nil, kind: :icon_button),
+        action_item(:profile, labels.fetch(:profile), dashboard_path, kind: :avatar_link)
       ]
     end
 
@@ -60,8 +66,8 @@ module Ui
 
     def guest_actions
       [
-        action_item(:sign_in, labels.fetch(:sign_in), sign_in_path),
-        action_item(:create_account, labels.fetch(:create_account), registration_path)
+        action_item(:sign_in, labels.fetch(:sign_in), sign_in_path, kind: :button),
+        action_item(:create_account, labels.fetch(:create_account), registration_path, kind: :button)
       ]
     end
 
@@ -74,18 +80,19 @@ module Ui
       }
     end
 
-    def action_item(key, label, path, method: nil)
+    def action_item(key, label, path, kind:)
       {
         key:,
         label:,
         path:,
-        method:
+        kind:
       }
     end
 
     def current?(key, path)
-      return false if current_path.to_s.include?("#")
-      return false unless key == :explore
+      return false if path.blank?
+
+      return normalized_path(current_path) == normalized_path(path) if key == :explore
 
       normalized_path(current_path) == normalized_path(path)
     end

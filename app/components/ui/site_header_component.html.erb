@@ -1,54 +1,91 @@
 <header class="site-header-surface sticky top-0 z-50" data-ui="site-header">
-  <div class="mx-auto flex w-full max-w-[112rem] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
-    <div class="site-header-shell">
-      <%= link_to explore_path, class: "site-header-brand group", data: { ui: "site-header-brand" } do %>
-        <span class="site-header-badge" aria-hidden="true">
-          <span class="site-header-badge-inner">WW</span>
-        </span>
-        <span class="site-header-brand-copy">
-          <span class="site-header-brand-name"><%= brand_name %></span>
-          <span class="site-header-brand-tagline" data-ui="site-header-tagline"><%= brand_tagline %></span>
-        </span>
-      <% end %>
-
-      <nav class="site-header-primary-nav hidden lg:flex" data-ui="site-header-primary-nav" aria-label="Primary">
-        <% navigation_items.each do |item| %>
-          <% item_classes = [
-               "site-header-nav-link",
-               ("site-header-nav-link--current" if item.fetch(:current))
-             ].compact.join(" ") %>
-          <%= link_to item.fetch(:label), item.fetch(:path), class: item_classes, data: { current: item.fetch(:current) } %>
+  <div class="mx-auto flex w-full max-w-[120rem] flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8">
+    <div class="site-header-shell" data-ui="site-header-desktop-row">
+      <div class="site-header-leading">
+        <%= link_to explore_path, class: "site-header-brand group", data: { ui: "site-header-brand" } do %>
+          <span class="site-header-brand-copy">
+            <span class="site-header-brand-name"><%= brand_name %></span>
+            <span class="site-header-brand-tagline" data-ui="site-header-tagline"><%= brand_tagline %></span>
+          </span>
         <% end %>
-      </nav>
 
-      <div class="site-header-actions" data-ui="site-header-actions">
-        <% session_actions.each do |action| %>
-          <% if action[:method].present? %>
-            <%= button_to action.fetch(:label),
-                          action.fetch(:path),
-                          method: action.fetch(:method),
-                          form_class: "inline-flex",
-                          class: "ui-button ui-button--outlined ui-button--sm site-header-action-control" %>
-          <% elsif action.fetch(:key) == :create_account %>
-            <%= render Ui::ButtonComponent.new(variant: :primary, size: :sm, href: action.fetch(:path)) do %>
-              <%= action.fetch(:label) %>
-            <% end %>
-          <% else %>
-            <%= render Ui::ButtonComponent.new(variant: :secondary, size: :sm, href: action.fetch(:path)) do %>
-              <%= action.fetch(:label) %>
+        <nav class="site-header-primary-nav hidden md:flex" data-ui="site-header-primary-nav" aria-label="Primary">
+          <% navigation_items.each do |item| %>
+            <% item_classes = [
+                 "site-header-nav-link",
+                 ("site-header-nav-link--current" if item.fetch(:current))
+               ].compact.join(" ") %>
+            <% if item.fetch(:path).present? %>
+              <%= link_to item.fetch(:label),
+                          item.fetch(:path),
+                          class: item_classes,
+                          data: { ui: "site-header-nav-item", current: item.fetch(:current) } %>
+            <% else %>
+              <span class="<%= item_classes %>" data-ui="site-header-nav-item" data-current="<%= item.fetch(:current) %>"><%= item.fetch(:label) %></span>
             <% end %>
           <% end %>
+        </nav>
+      </div>
+
+      <div class="site-header-actions" data-ui="site-header-actions">
+        <% if authenticated %>
+          <div class="site-header-auth-actions" data-ui="site-header-auth-actions">
+            <% utility_actions.each do |action| %>
+              <% case action.fetch(:kind) %>
+              <% when :icon_button %>
+                <%= render Ui::IconButtonComponent.new(label: action.fetch(:label), variant: :ghost, size: :md) do %>
+                  <% if action.fetch(:key) == :notifications %>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-5 w-5">
+                      <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5" />
+                      <path d="M9 17a3 3 0 0 0 6 0" />
+                    </svg>
+                  <% else %>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-5 w-5">
+                      <circle cx="12" cy="12" r="3.25" />
+                      <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .34 1.7 1.7 0 0 0-.73 1.37V21.2A2 2 0 0 1 11.27 23h-.54A2 2 0 0 1 8.73 21.2v-.1A1.7 1.7 0 0 0 8 19.74 1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1 .34l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.7 1.7 0 0 0 3.6 15a1.7 1.7 0 0 0-.34-1 1.7 1.7 0 0 0-1.37-.73H1.8A2 2 0 0 1 0 11.27v-.54A2 2 0 0 1 1.8 8.73h.1A1.7 1.7 0 0 0 3.26 8 1.7 1.7 0 0 0 3.6 7a1.7 1.7 0 0 0-.34-1l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.7 1.7 0 0 0 7 4.6a1.7 1.7 0 0 0 1-.34 1.7 1.7 0 0 0 .73-1.37V2.8A2 2 0 0 1 10.73 1h.54A2 2 0 0 1 13.27 2.8v.1A1.7 1.7 0 0 0 14 4.26a1.7 1.7 0 0 0 1 .34 1.7 1.7 0 0 0 1-.34l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.7 1.7 0 0 0 19.4 7a1.7 1.7 0 0 0 .34 1 1.7 1.7 0 0 0 1.37.73h.1A2 2 0 0 1 23 10.73v.54A2 2 0 0 1 21.2 13.27h-.1A1.7 1.7 0 0 0 19.74 14a1.7 1.7 0 0 0-.34 1Z" />
+                    </svg>
+                  <% end %>
+                <% end %>
+              <% when :avatar_link %>
+                <%= link_to action.fetch(:path), class: "site-header-avatar", data: { ui: "site-header-avatar" }, aria: { label: action.fetch(:label) } do %>
+                  <span class="site-header-avatar-shell">
+                    <span class="site-header-avatar-core" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                        <circle cx="12" cy="8" r="3.2" />
+                        <path d="M6.5 18.2a6.2 6.2 0 0 1 11 0" />
+                      </svg>
+                    </span>
+                  </span>
+                  <span class="sr-only"><%= action.fetch(:label) %></span>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="site-header-guest-actions" data-ui="site-header-guest-actions">
+            <% utility_actions.each do |action| %>
+              <% link_classes = action.fetch(:key) == :create_account ? "site-header-cta" : "site-header-auth-link" %>
+              <%= link_to action.fetch(:label), action.fetch(:path), class: link_classes %>
+            <% end %>
+          </div>
         <% end %>
       </div>
     </div>
 
-    <nav class="site-header-mobile-nav lg:hidden" data-ui="site-header-primary-nav" aria-label="Primary">
+    <nav class="site-header-mobile-nav md:hidden" data-ui="site-header-primary-nav" aria-label="Primary">
       <% navigation_items.each do |item| %>
         <% item_classes = [
              "site-header-mobile-link",
              ("site-header-mobile-link--current" if item.fetch(:current))
            ].compact.join(" ") %>
-        <%= link_to item.fetch(:label), item.fetch(:path), class: item_classes, data: { current: item.fetch(:current) } %>
+        <% if item.fetch(:path).present? %>
+          <%= link_to item.fetch(:label),
+                      item.fetch(:path),
+                      class: item_classes,
+                      data: { ui: "site-header-nav-item", current: item.fetch(:current) } %>
+        <% else %>
+          <span class="<%= item_classes %>" data-ui="site-header-nav-item" data-current="<%= item.fetch(:current) %>"><%= item.fetch(:label) %></span>
+        <% end %>
       <% end %>
     </nav>
   </div>

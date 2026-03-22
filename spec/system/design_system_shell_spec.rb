@@ -9,6 +9,15 @@ RSpec.describe "Design system shell", type: :system do
     expect(page).to have_css("[data-ui='site-header-tagline']", text: I18n.t("layouts.header.brand_tagline"))
   end
 
+  it "renders the shared guest header navigation items" do
+    visit root_path
+
+    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.explore"))
+    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.map"))
+    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.activity"))
+    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.profile"))
+  end
+
   it "renders the shared guest header navigation and actions" do
     visit root_path
 

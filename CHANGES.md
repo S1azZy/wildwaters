@@ -22,6 +22,7 @@
 - Reworked the public homepage into a map-first waterfall explore screen with MapLibre, interactor-backed MVP filters, a bounds-based `map_data` endpoint, and no-JavaScript request coverage.
 - Hardened waterfall explore backend handling so empty catalog filters stay valid while `map_data` requests still reject missing bounds.
 - Updated explore request/interactor/system specs so they stay deterministic even when demo seed waterfalls exist in the test catalog.
+- Reworked the shared site header toward the new design direction with a single-row product nav, calmer typography, and a compact desktop action cluster that matches the explore reference more closely.
 
 ## 2026-03-15
 - Simplified the README badges to keep only CI status and coverage, and switched CI to the native GitHub Actions badge.
