@@ -1,14 +1,16 @@
 ru:
   layouts:
     header:
+      activity: "Активность"
       brand_name: "Wild Waters"
       brand_tagline: "Swim the World"
       create_account: "Создать аккаунт"
-      dashboard: "Кабинет"
-      explore: "Карта"
-      info: "Инфо"
+      explore: "Explore"
+      map: "Map"
+      notifications: "Уведомления"
+      profile: "Профиль"
+      settings: "Настройки"
       sign_in: "Войти"
-      sign_out: "Выйти"
   auth:
     fields:
       email: "Email"

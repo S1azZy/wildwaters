@@ -63,9 +63,11 @@ RSpec.describe "Waterfall explore", type: :system do
     visit_page
 
     expect(page).to have_current_path(root_path)
-    expect(page).to have_link("WW")
+    expect(page).to have_css("[data-ui='site-header-brand']", text: I18n.t("layouts.header.brand_name"))
+    expect(page).to have_css("[data-ui='site-header-primary-nav']")
+    expect(page).to have_css("[data-ui='site-header-actions']")
     expect(page).to have_link(I18n.t("layouts.header.sign_in"))
-    expect(page).to have_link(I18n.t("layouts.header.create_account"))
+    expect(page).not_to have_link(I18n.t("layouts.header.create_account"))
   end
 
   it "renders the explore page shell" do

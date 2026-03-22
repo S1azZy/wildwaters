@@ -7,8 +7,24 @@ RSpec.describe "Design system shell", type: :system do
     expect(page).to have_css("[data-ui='site-header']")
     expect(page).to have_css("[data-ui='site-header-brand']", text: I18n.t("layouts.header.brand_name"))
     expect(page).to have_css("[data-ui='site-header-tagline']", text: I18n.t("layouts.header.brand_tagline"))
+  end
+
+  it "renders the shared guest header navigation items" do
+    visit root_path
+
+    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.explore"))
+    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.map"))
+    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.activity"))
+    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.profile"))
+  end
+
+  it "renders the shared guest header navigation and actions" do
+    visit root_path
+
+    expect(page).to have_css("[data-ui='site-header-primary-nav']")
+    expect(page).to have_css("[data-ui='site-header-actions']")
     expect(page).to have_link(I18n.t("layouts.header.sign_in"))
-    expect(page).to have_link(I18n.t("layouts.header.create_account"))
+    expect(page).not_to have_link(I18n.t("layouts.header.create_account"))
   end
 
   it "renders layout flash messages through the shared application shell" do

@@ -33,20 +33,19 @@
               brand_name: t("layouts.header.brand_name"),
               brand_tagline: t("layouts.header.brand_tagline"),
               explore: t("layouts.header.explore"),
-              info: t("layouts.header.info"),
-              dashboard: t("layouts.header.dashboard"),
-              sign_in: t("layouts.header.sign_in"),
-              create_account: t("layouts.header.create_account"),
-              sign_out: t("layouts.header.sign_out")
+              map: t("layouts.header.map"),
+              activity: t("layouts.header.activity"),
+              profile: t("layouts.header.profile"),
+              notifications: t("layouts.header.notifications"),
+              settings: t("layouts.header.settings"),
+              sign_in: t("layouts.header.sign_in")
             },
             current_path: request.fullpath,
             authenticated: authenticated?,
             explore_path: root_path,
-            info_path: root_path(anchor: "about"),
             dashboard_path: dashboard_path,
-            sign_in_path: new_session_path,
-            registration_path: new_registration_path,
-            session_path: session_path
+            profile_path: authenticated? ? dashboard_path : new_session_path,
+            sign_in_path: new_session_path
           ) %>
 
       <main class="<%= content_for?(:main_class) ? yield(:main_class) : "mx-auto w-full max-w-[112rem] px-4 py-6 sm:px-6 lg:px-8" %>">
