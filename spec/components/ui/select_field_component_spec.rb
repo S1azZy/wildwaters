@@ -40,6 +40,19 @@ RSpec.describe Ui::SelectFieldComponent, type: :component do
         /Unknown select field size/
       )
     end
+
+    it "generates unique default input ids for repeated fields" do
+      first_component = described_class.new(name: "region", label: "Region", options: [])
+      second_component = described_class.new(name: "region", label: "Region", options: [])
+
+      expect(first_component.input_id).not_to eq(second_component.input_id)
+    end
+
+    it "preserves an explicit input_id override" do
+      component = described_class.new(name: "region", label: "Region", options: [], input_id: "region_filter")
+
+      expect(component.input_id).to eq("region_filter")
+    end
   end
 
   it "renders a matching select field shell with prompt and options" do

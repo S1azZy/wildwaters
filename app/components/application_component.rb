@@ -19,4 +19,10 @@ class ApplicationComponent < ViewComponent::Base
 
     token.presence || fallback
   end
+
+  def generated_input_id(prefix:, value:, fallback:)
+    token = normalized_dom_id(value, fallback:)
+
+    "#{prefix}_#{token}_#{object_id.to_s(36)}"
+  end
 end

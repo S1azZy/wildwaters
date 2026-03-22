@@ -40,6 +40,19 @@ RSpec.describe Ui::TextFieldComponent, type: :component do
         /Unknown text field size/
       )
     end
+
+    it "generates unique default input ids for repeated fields" do
+      first_component = described_class.new(name: "query", label: "Search")
+      second_component = described_class.new(name: "query", label: "Search")
+
+      expect(first_component.input_id).not_to eq(second_component.input_id)
+    end
+
+    it "preserves an explicit input_id override" do
+      component = described_class.new(name: "query", label: "Search", input_id: "search_field")
+
+      expect(component.input_id).to eq("search_field")
+    end
   end
 
   it "renders the shared text field shell with label, icon, and supporting copy" do

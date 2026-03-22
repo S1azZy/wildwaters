@@ -57,7 +57,7 @@ module Ui
       @size = normalize_option(size, allowed: SIZES, error_prefix: "Unknown text field size")
       @type = type.to_sym
       @disabled = disabled
-      @input_id = input_id.presence || "text_field_#{normalized_dom_id(name, fallback: "field")}"
+      @input_id = input_id.presence || generated_input_id(prefix: "text_field", value: name, fallback: "field")
     end
 
     def state

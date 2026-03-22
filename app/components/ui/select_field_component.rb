@@ -56,7 +56,7 @@ module Ui
       @error = error
       @size = normalize_option(size, allowed: SIZES, error_prefix: "Unknown select field size")
       @disabled = disabled
-      @input_id = input_id.presence || "select_field_#{normalized_dom_id(name, fallback: "field")}"
+      @input_id = input_id.presence || generated_input_id(prefix: "select_field", value: name, fallback: "field")
     end
 
     def state
