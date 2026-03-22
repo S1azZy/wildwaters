@@ -21,24 +21,25 @@
     backdrop-filter: blur(16px);
   }
 
+  .site-header-surface--compact {
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: 0 4px 14px rgba(17, 24, 39, 0.025);
+  }
+
   .site-header-frame {
     position: relative;
   }
 
-  .site-header-shell {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    min-height: 4.25rem;
+  .site-header-frame--wide {
+    max-width: 120rem;
   }
 
-  .site-header-leading {
-    display: flex;
+  .site-header-shell {
+    display: grid;
     align-items: center;
-    gap: 3.5rem;
-    flex: 1 1 auto;
-    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 2.25rem;
+    min-height: 4rem;
   }
 
   .site-header-brand {
@@ -75,6 +76,7 @@
 
   .site-header-primary-nav {
     align-items: center;
+    justify-self: start;
     gap: 2.6rem;
   }
 
@@ -261,10 +263,9 @@
 
   @media (max-width: 767px) {
     .site-header-shell {
-      gap: 1rem;
-    }
-
-    .site-header-leading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 1rem;
     }
 

@@ -1,31 +1,29 @@
-<header class="site-header-surface sticky top-0 z-50" data-ui="site-header">
-  <div class="site-header-frame mx-auto flex w-full max-w-[68rem] flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8" data-ui="site-header-frame">
+<header class="site-header-surface site-header-surface--compact sticky top-0 z-50" data-ui="site-header">
+  <div class="site-header-frame site-header-frame--wide mx-auto flex w-full max-w-[120rem] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8" data-ui="site-header-frame">
     <div class="site-header-shell" data-ui="site-header-desktop-row">
-      <div class="site-header-leading">
-        <%= link_to explore_path, class: "site-header-brand group", data: { ui: "site-header-brand" } do %>
-          <span class="site-header-brand-copy">
-            <span class="site-header-brand-name"><%= brand_name %></span>
-            <span class="site-header-brand-tagline" data-ui="site-header-tagline"><%= brand_tagline %></span>
-          </span>
-        <% end %>
+      <%= link_to explore_path, class: "site-header-brand group", data: { ui: "site-header-brand" } do %>
+        <span class="site-header-brand-copy">
+          <span class="site-header-brand-name"><%= brand_name %></span>
+          <span class="site-header-brand-tagline" data-ui="site-header-tagline"><%= brand_tagline %></span>
+        </span>
+      <% end %>
 
-        <nav class="site-header-primary-nav hidden md:flex" data-ui="site-header-primary-nav" aria-label="Primary">
-          <% navigation_items.each do |item| %>
-            <% item_classes = [
-                 "site-header-nav-link",
-                 ("site-header-nav-link--current" if item.fetch(:current))
-               ].compact.join(" ") %>
-            <% if item.fetch(:path).present? %>
-              <%= link_to item.fetch(:label),
-                          item.fetch(:path),
-                          class: item_classes,
-                          data: { ui: "site-header-nav-item", current: item.fetch(:current) } %>
-            <% else %>
-              <span class="<%= item_classes %>" data-ui="site-header-nav-item" data-current="<%= item.fetch(:current) %>"><%= item.fetch(:label) %></span>
-            <% end %>
+      <nav class="site-header-primary-nav hidden md:flex" data-ui="site-header-primary-nav" aria-label="Primary">
+        <% navigation_items.each do |item| %>
+          <% item_classes = [
+               "site-header-nav-link",
+               ("site-header-nav-link--current" if item.fetch(:current))
+             ].compact.join(" ") %>
+          <% if item.fetch(:path).present? %>
+            <%= link_to item.fetch(:label),
+                        item.fetch(:path),
+                        class: item_classes,
+                        data: { ui: "site-header-nav-item", current: item.fetch(:current) } %>
+          <% else %>
+            <span class="<%= item_classes %>" data-ui="site-header-nav-item" data-current="<%= item.fetch(:current) %>"><%= item.fetch(:label) %></span>
           <% end %>
-        </nav>
-      </div>
+        <% end %>
+      </nav>
 
       <div class="site-header-actions" data-ui="site-header-actions">
         <% if authenticated %>

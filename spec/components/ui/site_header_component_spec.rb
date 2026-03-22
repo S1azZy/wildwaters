@@ -102,13 +102,20 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
   end
 
   describe "rendering" do
-    it "renders the branded desktop row shell" do
+    it "renders the header shell structure" do
       render_inline(build_component(current_path: "/", authenticated: false))
 
       expect(page).to have_css("[data-ui='site-header']")
       expect(page).to have_css("[data-ui='site-header-frame']")
+      expect(page).to have_css(".site-header-surface--compact")
+      expect(page).to have_css(".site-header-frame--wide")
       expect(page).not_to have_css(".site-header-frame-surface")
       expect(page).to have_css("[data-ui='site-header-desktop-row']")
+    end
+
+    it "renders the brand block inside the header shell" do
+      render_inline(build_component(current_path: "/", authenticated: false))
+
       expect(page).to have_css("[data-ui='site-header-brand']", text: "Wild Waters")
       expect(page).to have_css("[data-ui='site-header-primary-nav']")
     end
