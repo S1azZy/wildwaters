@@ -1,0 +1,29 @@
+<div class="ui-field" data-ui="select-field" data-size="<%= size %>" data-state="<%= state %>">
+  <% if label.present? %>
+    <label for="<%= input_id %>" class="ui-field__label"><%= label %></label>
+  <% end %>
+
+  <div class="ui-field__control-shell ui-field__control-shell--<%= size %>">
+    <%= content_tag :select,
+                    id: input_id,
+                    name: name,
+                    disabled: disabled,
+                    class: "ui-field__control ui-field__select",
+                    aria: {
+                      label: aria_label,
+                      describedby: described_by_id,
+                      invalid: error.present? ? true : nil
+                    } do %>
+      <% if prompt.present? %>
+        <option value=""><%= prompt %></option>
+      <% end %>
+      <%= options_for_select(options, selected) %>
+    <% end %>
+
+    <span class="ui-field__chevron" aria-hidden="true">⌄</span>
+  </div>
+
+  <% if supporting_copy.present? %>
+    <p id="<%= described_by_id %>" class="ui-field__supporting-copy" data-ui="<%= supporting_copy_data_ui %>"><%= supporting_copy %></p>
+  <% end %>
+</div>

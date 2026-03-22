@@ -35,6 +35,19 @@
   --color-tertiary-800: #5c3f29;
   --color-tertiary-900: #3f2b1c;
 
+  --color-danger-50: #fff4f3;
+  --color-danger-100: #ffe2df;
+  --color-danger-500: #c95b4f;
+  --color-danger-700: #8f2f25;
+
+  --color-success-50: #f3faee;
+  --color-success-100: #ddf0cf;
+  --color-success-700: #335f0d;
+
+  --color-info-50: #eef7fa;
+  --color-info-100: #d8edf2;
+  --color-info-700: #285567;
+
   --color-neutral-50: #f7f8fb;
   --color-neutral-100: #eef1f5;
   --color-neutral-200: #dce2eb;

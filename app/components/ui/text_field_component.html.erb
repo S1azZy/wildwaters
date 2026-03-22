@@ -1,0 +1,28 @@
+<div class="ui-field" data-ui="text-field" data-size="<%= size %>" data-state="<%= state %>">
+  <% if label.present? %>
+    <label for="<%= input_id %>" class="ui-field__label"><%= label %></label>
+  <% end %>
+
+  <div class="ui-field__control-shell ui-field__control-shell--<%= size %>">
+    <% if leading_icon? %>
+      <span class="ui-field__leading-icon" data-ui="text-field-leading-icon" aria-hidden="true"><%= leading_icon %></span>
+    <% end %>
+
+    <%= tag.input type: type,
+                  name: name,
+                  id: input_id,
+                  value: value,
+                  placeholder: placeholder,
+                  disabled: disabled,
+                  class: "ui-field__control ui-field__input",
+                  aria: {
+                    label: aria_label,
+                    describedby: described_by_id,
+                    invalid: error.present? ? true : nil
+                  } %>
+  </div>
+
+  <% if supporting_copy.present? %>
+    <p id="<%= described_by_id %>" class="ui-field__supporting-copy" data-ui="<%= supporting_copy_data_ui %>"><%= supporting_copy %></p>
+  <% end %>
+</div>
