@@ -10,4 +10,18 @@ RSpec.describe "Design system shell", type: :system do
     expect(page).to have_link(I18n.t("layouts.header.sign_in"))
     expect(page).to have_link(I18n.t("layouts.header.create_account"))
   end
+
+  it "renders layout flash messages through the shared application shell" do
+    visit new_password_reset_path
+
+    fill_in I18n.t("auth.fields.email"), with: "missing@example.com"
+    click_button I18n.t("auth.password_resets.new.submit")
+
+    expect(page).to have_current_path(new_session_path)
+    expect(page).to have_css("[data-ui='flash'][data-tone='notice']")
+    expect(page).to have_css(
+      "[data-ui='flash-message']",
+      text: I18n.t("auth.password_resets.create.success")
+    )
+  end
 end
