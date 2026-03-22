@@ -77,8 +77,7 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css("[data-explore-map-target='canvas']")
     expect(page).to have_css("[data-explore-map-target='list']")
     expect(page).to have_css("[data-explore-map-target='resultCount']")
-    expect(page).not_to have_content(I18n.t("waterfalls.index.map_eyebrow"))
-    expect(page).not_to have_content(I18n.t("waterfalls.index.about.heading"))
+    expect(page).not_to have_content(I18n.t("waterfalls.index.map_heading"))
   end
 
   it "renders the map target inside an observable shell" do
