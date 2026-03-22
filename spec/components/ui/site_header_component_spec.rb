@@ -115,6 +115,7 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       render_inline(build_component(current_path: "/", authenticated: false))
 
       expect(page).to have_css(".site-header-frame--compact")
+      expect(page).to have_css(".site-header-frame--relaxed")
       expect(page).to have_css(".site-header-frame--trimmed")
       expect(page).to have_css(".site-header-shell--feather")
       expect(page).not_to have_css(".site-header-frame-surface")

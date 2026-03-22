@@ -39,6 +39,11 @@
     padding-bottom: 0.18rem;
   }
 
+  .site-header-frame--relaxed {
+    padding-top: 0.3rem;
+    padding-bottom: 0.2rem;
+  }
+
   .site-header-shell {
     display: grid;
     align-items: center;
