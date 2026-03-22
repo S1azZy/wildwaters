@@ -33,13 +33,12 @@ en:
       activity: "Activity"
       brand_name: "Wild Waters"
       brand_tagline: "Swim the World"
-      create_account: "Create account"
       explore: "Explore"
       map: "Map"
       notifications: "Notifications"
       profile: "Profile"
       settings: "Settings"
-      sign_in: "Sign in"
+      sign_in: "Log in"
   auth:
     fields:
       email: "Email"

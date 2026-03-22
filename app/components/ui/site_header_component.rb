@@ -8,8 +8,7 @@ module Ui
                 :map_path,
                 :activity_path,
                 :profile_path,
-                :sign_in_path,
-                :registration_path
+                :sign_in_path
 
     def initialize(
       labels:,
@@ -20,8 +19,7 @@ module Ui
       map_path: nil,
       activity_path: nil,
       profile_path:,
-      sign_in_path:,
-      registration_path:
+      sign_in_path:
     )
       @labels = labels.symbolize_keys
       @current_path = current_path
@@ -32,7 +30,6 @@ module Ui
       @activity_path = activity_path
       @profile_path = profile_path
       @sign_in_path = sign_in_path
-      @registration_path = registration_path
     end
 
     def brand_name
@@ -66,8 +63,7 @@ module Ui
 
     def guest_actions
       [
-        action_item(:sign_in, labels.fetch(:sign_in), sign_in_path, kind: :button),
-        action_item(:create_account, labels.fetch(:create_account), registration_path, kind: :button)
+        action_item(:sign_in, labels.fetch(:sign_in), sign_in_path, kind: :button)
       ]
     end
 

@@ -1,5 +1,5 @@
 <header class="site-header-surface sticky top-0 z-50" data-ui="site-header">
-  <div class="mx-auto flex w-full max-w-[120rem] flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8">
+  <div class="site-header-frame mx-auto flex w-full max-w-[68rem] flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8" data-ui="site-header-frame">
     <div class="site-header-shell" data-ui="site-header-desktop-row">
       <div class="site-header-leading">
         <%= link_to explore_path, class: "site-header-brand group", data: { ui: "site-header-brand" } do %>
@@ -64,8 +64,7 @@
         <% else %>
           <div class="site-header-guest-actions" data-ui="site-header-guest-actions">
             <% utility_actions.each do |action| %>
-              <% link_classes = action.fetch(:key) == :create_account ? "site-header-cta" : "site-header-auth-link" %>
-              <%= link_to action.fetch(:label), action.fetch(:path), class: link_classes %>
+              <%= link_to action.fetch(:label), action.fetch(:path), class: "site-header-cta" %>
             <% end %>
           </div>
         <% end %>

@@ -11,8 +11,7 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       profile: "Profile",
       notifications: "Notifications",
       settings: "Settings",
-      sign_in: "Sign in",
-      create_account: "Create account"
+      sign_in: "Log in"
     }
   end
   let(:base_arguments) do
@@ -23,8 +22,7 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       map_path: nil,
       activity_path: nil,
       profile_path: "/profile",
-      sign_in_path: "/session/new",
-      registration_path: "/registration/new"
+      sign_in_path: "/session/new"
     }
   end
 
@@ -85,8 +83,7 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
 
       expect(component.utility_actions).to eq(
         [
-          { key: :sign_in, label: "Sign in", path: "/session/new", kind: :button },
-          { key: :create_account, label: "Create account", path: "/registration/new", kind: :button }
+          { key: :sign_in, label: "Log in", path: "/session/new", kind: :button }
         ]
       )
     end
@@ -109,6 +106,8 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       render_inline(build_component(current_path: "/", authenticated: false))
 
       expect(page).to have_css("[data-ui='site-header']")
+      expect(page).to have_css("[data-ui='site-header-frame']")
+      expect(page).not_to have_css(".site-header-frame-surface")
       expect(page).to have_css("[data-ui='site-header-desktop-row']")
       expect(page).to have_css("[data-ui='site-header-brand']", text: "Wild Waters")
       expect(page).to have_css("[data-ui='site-header-primary-nav']")
@@ -128,8 +127,8 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
 
       expect(page).to have_css("[data-ui='site-header-actions']")
       expect(page).to have_css("[data-ui='site-header-guest-actions']")
-      expect(page).to have_link("Sign in", href: "/session/new")
-      expect(page).to have_link("Create account", href: "/registration/new")
+      expect(page).to have_link("Log in", href: "/session/new")
+      expect(page).not_to have_link("Create account", href: "/registration/new")
     end
 
     it "renders authenticated utility icons and avatar" do

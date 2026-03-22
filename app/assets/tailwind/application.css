@@ -16,9 +16,13 @@
 
   .site-header-surface {
     border-bottom: 1px solid rgba(226, 228, 217, 0.8);
-    background: rgba(255, 255, 255, 0.88);
-    box-shadow: 0 8px 24px rgba(17, 24, 39, 0.04);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 6px 18px rgba(17, 24, 39, 0.03);
     backdrop-filter: blur(16px);
+  }
+
+  .site-header-frame {
+    position: relative;
   }
 
   .site-header-shell {
