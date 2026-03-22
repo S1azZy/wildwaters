@@ -114,9 +114,9 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
     it "renders the trimmed wide frame treatment" do
       render_inline(build_component(current_path: "/", authenticated: false))
 
-      expect(page).to have_css(".site-header-frame--wide")
+      expect(page).to have_css(".site-header-frame--compact")
       expect(page).to have_css(".site-header-frame--trimmed")
-      expect(page).to have_css(".site-header-shell--slim")
+      expect(page).to have_css(".site-header-shell--feather")
       expect(page).not_to have_css(".site-header-frame-surface")
     end
 
@@ -131,6 +131,7 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       render_inline(build_component(current_path: "/", authenticated: false))
 
       expect(page).to have_link("Explore", href: "/")
+      expect(page).to have_css(".site-header-nav-link--prominent", text: "Explore")
       expect(page).to have_css("[data-ui='site-header-nav-item']", text: "Map")
       expect(page).to have_css("[data-ui='site-header-nav-item']", text: "Activity")
       expect(page).to have_css("[data-ui='site-header-nav-item']", text: "Profile")

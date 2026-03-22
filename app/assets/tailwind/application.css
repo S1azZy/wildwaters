@@ -30,13 +30,13 @@
     position: relative;
   }
 
-  .site-header-frame--wide {
+  .site-header-frame--compact {
     max-width: 120rem;
   }
 
   .site-header-frame--trimmed {
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
+    padding-top: 0.18rem;
+    padding-bottom: 0.18rem;
   }
 
   .site-header-shell {
@@ -47,8 +47,8 @@
     min-height: 4rem;
   }
 
-  .site-header-shell--slim {
-    min-height: 2.45rem;
+  .site-header-shell--feather {
+    min-height: 2.08rem;
   }
 
   .site-header-brand {
@@ -65,7 +65,7 @@
   .site-header-brand-name {
     display: block;
     font-family: var(--font-display);
-    font-size: clamp(1.28rem, 1.05vw, 1.72rem);
+    font-size: clamp(1.42rem, 1.08vw, 1.8rem);
     font-weight: 300;
     line-height: 0.94;
     letter-spacing: -0.04em;
@@ -74,9 +74,9 @@
 
   .site-header-brand-tagline {
     display: block;
-    margin-top: 0.14rem;
+    margin-top: 0.12rem;
     padding-left: 0.05rem;
-    font-size: 0.46rem;
+    font-size: 0.49rem;
     font-weight: 600;
     letter-spacing: 0.28em;
     text-transform: uppercase;
@@ -93,14 +93,18 @@
     position: relative;
     display: inline-flex;
     align-items: center;
-    min-height: 1.35rem;
+    min-height: 1.5rem;
     padding-block: 0.08rem;
     color: color-mix(in srgb, var(--color-neutral-700) 88%, transparent);
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     font-weight: 500;
     letter-spacing: -0.02em;
     text-decoration: none;
     transition: color 180ms ease;
+  }
+
+  .site-header-nav-link--prominent {
+    font-weight: 500;
   }
 
   .site-header-nav-link::after {
@@ -165,10 +169,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 1.9rem;
-    padding-inline: 0.78rem;
+    min-height: 1.95rem;
+    padding-inline: 0.84rem;
     border-radius: 9999px;
-    font-size: 0.76rem;
+    font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: -0.02em;
     text-decoration: none;
