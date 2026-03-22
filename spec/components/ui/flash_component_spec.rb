@@ -1,6 +1,33 @@
 require "rails_helper"
 
 RSpec.describe Ui::FlashComponent, type: :component do
+  def build_flash(messages)
+    ActionDispatch::Flash::FlashHash.new.tap do |flash|
+      messages.each do |key, value|
+        flash[key] = value
+      end
+    end
+  end
+
+  def sample_flash
+    build_flash(
+      notice: "Saved",
+      alert: "Something went wrong",
+      success: [ "Uploaded", "Published" ],
+      ignored: "",
+      custom: "Queued"
+    )
+  end
+
+  def expected_flash_messages
+    [
+      { type: :notice, message: "Saved" },
+      { type: :alert, message: "Something went wrong" },
+      { type: :success, message: "Uploaded, Published" },
+      { type: :notice, message: "Queued" }
+    ]
+  end
+
   describe ".new" do
     it "inherits from ApplicationComponent" do
       expect(described_class).to be < ApplicationComponent
@@ -24,23 +51,9 @@ RSpec.describe Ui::FlashComponent, type: :component do
 
   describe ".collection_attributes" do
     it "normalizes supported flash types and drops blank messages" do
-      flash = ActionDispatch::Flash::FlashHash.new
-      flash[:notice] = "Saved"
-      flash[:alert] = "Something went wrong"
-      flash[:success] = [ "Uploaded", "Published" ]
-      flash[:ignored] = ""
-      flash[:custom] = "Queued"
+      messages = described_class.collection_attributes(sample_flash)
 
-      messages = described_class.collection_attributes(flash)
-
-      expect(messages).to eq(
-        [
-          { type: :notice, message: "Saved" },
-          { type: :alert, message: "Something went wrong" },
-          { type: :success, message: "Uploaded, Published" },
-          { type: :notice, message: "Queued" }
-        ]
-      )
+      expect(messages).to eq(expected_flash_messages)
     end
   end
 
