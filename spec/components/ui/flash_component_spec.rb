@@ -23,17 +23,19 @@ RSpec.describe Ui::FlashComponent, type: :component do
   end
 
   describe ".collection_attributes" do
-    it "normalizes supported flash types and drops blank messages" do
-      messages = described_class.collection_attributes(
-        ActionDispatch::Flash::FlashHash[
-          notice: "Saved",
-          alert: "Something went wrong",
-          success: [ "Uploaded", "Published" ],
-          ignored: "",
-          custom: "Queued"
-        ]
-      )
+    subject(:messages) { described_class.collection_attributes(flash) }
 
+    let(:flash) do
+      {
+        notice: "Saved",
+        alert: "Something went wrong",
+        success: [ "Uploaded", "Published" ],
+        ignored: "",
+        custom: "Queued"
+      }
+    end
+
+    it "normalizes supported flash types and drops blank messages" do
       expect(messages).to eq(
         [
           { type: :notice, message: "Saved" },
