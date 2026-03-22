@@ -93,4 +93,32 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       )
     end
   end
+
+  describe "rendering" do
+    it "renders the brand and primary navigation" do
+      render_inline(build_component(current_path: "/", authenticated: false))
+
+      expect(page).to have_css("[data-ui='site-header']")
+      expect(page).to have_css("[data-ui='site-header-brand']", text: "Wild Waters")
+      expect(page).to have_css("[data-ui='site-header-primary-nav']")
+      expect(page).to have_link("Explore", href: "/")
+      expect(page).to have_link("Info", href: "/#about")
+    end
+
+    it "renders the guest action cluster" do
+      render_inline(build_component(current_path: "/", authenticated: false))
+
+      expect(page).to have_css("[data-ui='site-header-actions']")
+      expect(page).to have_link("Sign in", href: "/session/new")
+      expect(page).to have_link("Create account", href: "/registration/new")
+    end
+
+    it "renders authenticated actions in the utility cluster" do
+      render_inline(build_component(current_path: "/dashboard", authenticated: true))
+
+      expect(page).to have_css("[data-ui='site-header-actions']")
+      expect(page).to have_link("Dashboard", href: "/dashboard")
+      expect(page).to have_button("Sign out")
+    end
+  end
 end

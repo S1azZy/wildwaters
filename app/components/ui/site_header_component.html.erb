@@ -1,48 +1,54 @@
 <header class="site-header-surface sticky top-0 z-50" data-ui="site-header">
-  <div class="mx-auto flex w-full max-w-[112rem] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-    <div class="flex items-center gap-4 md:gap-6">
-      <%= link_to explore_path, class: "group inline-flex items-center gap-3", data: { ui: "site-header-brand" } do %>
-        <span class="site-header-badge inline-flex h-11 w-11 items-center justify-center rounded-[1.4rem] text-sm font-semibold uppercase tracking-[0.24em] text-white transition group-hover:-translate-y-0.5">
-          WW
+  <div class="mx-auto flex w-full max-w-[112rem] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
+    <div class="site-header-shell">
+      <%= link_to explore_path, class: "site-header-brand group", data: { ui: "site-header-brand" } do %>
+        <span class="site-header-badge" aria-hidden="true">
+          <span class="site-header-badge-inner">WW</span>
         </span>
-        <span>
-          <span class="block font-display text-[1.95rem] leading-none tracking-[-0.03em] text-primary-700"> <%= labels.fetch(:brand_name) %> </span>
-          <span class="mt-1 block text-[0.65rem] font-semibold uppercase tracking-[0.34em] text-neutral-500" data-ui="site-header-tagline"><%= labels.fetch(:brand_tagline) %></span>
+        <span class="site-header-brand-copy">
+          <span class="site-header-brand-name"><%= brand_name %></span>
+          <span class="site-header-brand-tagline" data-ui="site-header-tagline"><%= brand_tagline %></span>
         </span>
       <% end %>
 
-      <nav class="site-header-nav hidden items-center gap-2 rounded-full px-2 py-1.5 lg:flex">
+      <nav class="site-header-primary-nav hidden lg:flex" data-ui="site-header-primary-nav" aria-label="Primary">
         <% navigation_items.each do |item| %>
-          <% item_classes = item.fetch(:current) ? "ui-button ui-button--primary ui-button--sm" : "ui-button ui-button--secondary ui-button--sm" %>
-          <%= link_to item.fetch(:label), item.fetch(:path), class: item_classes %>
+          <% item_classes = [
+               "site-header-nav-link",
+               ("site-header-nav-link--current" if item.fetch(:current))
+             ].compact.join(" ") %>
+          <%= link_to item.fetch(:label), item.fetch(:path), class: item_classes, data: { current: item.fetch(:current) } %>
         <% end %>
       </nav>
-    </div>
 
-    <div class="site-header-nav flex items-center gap-2 rounded-full px-2 py-1.5">
-      <% session_actions.each do |action| %>
-        <% if action[:method].present? %>
-          <%= button_to action.fetch(:label),
-                        action.fetch(:path),
-                        method: action.fetch(:method),
-                        form_class: "inline-flex",
-                        class: "ui-button ui-button--primary ui-button--sm" %>
-        <% elsif action.fetch(:key) == :create_account %>
-          <%= render Ui::ButtonComponent.new(variant: :primary, size: :sm, href: action.fetch(:path)) do %>
-            <%= action.fetch(:label) %>
-          <% end %>
-        <% else %>
-          <%= render Ui::ButtonComponent.new(variant: :secondary, size: :sm, href: action.fetch(:path)) do %>
-            <%= action.fetch(:label) %>
+      <div class="site-header-actions" data-ui="site-header-actions">
+        <% session_actions.each do |action| %>
+          <% if action[:method].present? %>
+            <%= button_to action.fetch(:label),
+                          action.fetch(:path),
+                          method: action.fetch(:method),
+                          form_class: "inline-flex",
+                          class: "ui-button ui-button--outlined ui-button--sm site-header-action-control" %>
+          <% elsif action.fetch(:key) == :create_account %>
+            <%= render Ui::ButtonComponent.new(variant: :primary, size: :sm, href: action.fetch(:path)) do %>
+              <%= action.fetch(:label) %>
+            <% end %>
+          <% else %>
+            <%= render Ui::ButtonComponent.new(variant: :secondary, size: :sm, href: action.fetch(:path)) do %>
+              <%= action.fetch(:label) %>
+            <% end %>
           <% end %>
         <% end %>
-      <% end %>
+      </div>
     </div>
 
-    <nav class="site-header-nav flex w-full items-center gap-2 rounded-full px-2 py-1.5 lg:hidden">
+    <nav class="site-header-mobile-nav lg:hidden" data-ui="site-header-primary-nav" aria-label="Primary">
       <% navigation_items.each do |item| %>
-        <% item_classes = item.fetch(:current) ? "ui-button ui-button--primary ui-button--sm flex-1" : "ui-button ui-button--secondary ui-button--sm flex-1" %>
-        <%= link_to item.fetch(:label), item.fetch(:path), class: item_classes %>
+        <% item_classes = [
+             "site-header-mobile-link",
+             ("site-header-mobile-link--current" if item.fetch(:current))
+           ].compact.join(" ") %>
+        <%= link_to item.fetch(:label), item.fetch(:path), class: item_classes, data: { current: item.fetch(:current) } %>
       <% end %>
     </nav>
   </div>

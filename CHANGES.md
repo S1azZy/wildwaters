@@ -1,6 +1,7 @@
 # Changes
 
 ## 2026-03-22
+- Refined the shared site header into a calmer, more mature product shell with a dedicated primary nav, utility action cluster, and improved mobile row while keeping the current route structure intact.
 - Completed design-system Phase 2 with shared `Ui::BadgeComponent`, `Ui::CardComponent`, `Ui::EmptyStateComponent`, `Ui::FilterChipComponent`, `Ui::FlashComponent`, `Ui::IconButtonComponent`, `Ui::SelectFieldComponent`, and `Ui::TextFieldComponent`, including the supporting token/CSS layer, field initializer compatibility fixes, accessible flash live-region behavior, and layout-level shared flash rendering.
 - Normalized the Bundler lockfile platform list to stable names and pinned Bundler to the repository Ruby version via `.ruby-version` so routine `bundle install` runs stop churning `Gemfile.lock`.
 - Added ADR 0002 to fix Wild Waters' design-system direction around the `Digital Naturalist` visual north star, shared design tokens, and a `ViewComponent`-based shared UI layer.
