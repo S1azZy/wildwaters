@@ -1,0 +1,87 @@
+@theme {
+  --font-display: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "Inter", "Avenir Next", "Segoe UI", sans-serif;
+
+  --color-primary-50: #f3f9eb;
+  --color-primary-100: #e5f2d4;
+  --color-primary-200: #cbe2a8;
+  --color-primary-300: #a9cc75;
+  --color-primary-400: #7cab47;
+  --color-primary-500: #2c5601;
+  --color-primary-600: #244700;
+  --color-primary-700: #1d3d00;
+  --color-primary-800: #162f00;
+  --color-primary-900: #0d1d00;
+
+  --color-secondary-50: #eef7fa;
+  --color-secondary-100: #d8edf2;
+  --color-secondary-200: #b9dde7;
+  --color-secondary-300: #8fc5d5;
+  --color-secondary-400: #63aabf;
+  --color-secondary-500: #3e7b91;
+  --color-secondary-600: #2f6679;
+  --color-secondary-700: #285567;
+  --color-secondary-800: #234554;
+  --color-secondary-900: #1d3946;
+
+  --color-tertiary-50: #fff8ef;
+  --color-tertiary-100: #ffefd8;
+  --color-tertiary-200: #ffe8cc;
+  --color-tertiary-300: #f5d3a0;
+  --color-tertiary-400: #ddb37d;
+  --color-tertiary-500: #b8864e;
+  --color-tertiary-600: #996941;
+  --color-tertiary-700: #7a5335;
+  --color-tertiary-800: #5c3f29;
+  --color-tertiary-900: #3f2b1c;
+
+  --color-neutral-50: #f7f8fb;
+  --color-neutral-100: #eef1f5;
+  --color-neutral-200: #dce2eb;
+  --color-neutral-300: #c2ccda;
+  --color-neutral-400: #93a1b5;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+  --color-neutral-950: #0b1220;
+
+  --color-surface-base: #f7f8fb;
+  --color-surface-subtle: #eff3fb;
+  --color-surface-raised: #ffffff;
+  --color-surface-overlay: rgba(255, 255, 255, 0.8);
+  --color-surface-inverse: #111827;
+
+  --radius-ui-sm: 0.75rem;
+  --radius-ui-md: 1rem;
+  --radius-ui-lg: 1.5rem;
+  --radius-ui-xl: 2rem;
+  --radius-ui-pill: 9999px;
+
+  --shadow-ui-ambient: 0 24px 70px rgba(17, 24, 39, 0.08);
+  --shadow-ui-floating: 0 24px 80px rgba(17, 24, 39, 0.12);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --ww-shell-gradient:
+      radial-gradient(circle at top left, rgba(62, 123, 145, 0.12), transparent 32%),
+      radial-gradient(circle at top right, rgba(44, 86, 1, 0.1), transparent 28%),
+      linear-gradient(180deg, var(--color-surface-base), #fdfdfb 100%);
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--color-neutral-900);
+    background: var(--ww-shell-gradient);
+  }
+
+  h1,
+  h2,
+  h3,
+  [data-display-text] {
+    font-family: var(--font-display);
+  }
+}

@@ -19,47 +19,35 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen bg-explore-sand text-slate-900 antialiased">
-    <div class="explore-shell min-h-screen">
-      <header class="sticky top-0 z-50 border-b border-white/60 bg-stone-50/84 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-        <div class="mx-auto flex w-full max-w-[112rem] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-          <div class="flex items-center gap-4 md:gap-6">
-            <%= link_to root_path, class: "group inline-flex items-center gap-3" do %>
-              <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-950 text-sm font-semibold uppercase tracking-[0.24em] text-emerald-50 shadow-[0_16px_35px_rgba(24,48,40,0.28)] transition group-hover:-translate-y-0.5">
-                WW
-              </span>
-              <span>
-                <span class="block text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-emerald-900/70">Wild Waters</span>
-                <span class="block font-serif text-base text-slate-950 sm:text-lg"><%= t("waterfalls.index.title") %></span>
-              </span>
-            <% end %>
-
-            <nav class="hidden items-center gap-2 rounded-full border border-stone-200/80 bg-white/80 px-2 py-1 shadow-[0_10px_30px_rgba(15,23,42,0.06)] lg:flex">
-              <%= link_to t("layouts.header.explore"), root_path, class: "rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-emerald-950 hover:text-white" %>
-              <%= link_to t("layouts.header.info"), root_path(anchor: "about"), class: "rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-emerald-950 hover:text-white" %>
-            </nav>
-          </div>
-
-          <div class="flex items-center gap-2 rounded-full border border-stone-200/80 bg-white/78 px-2 py-1 shadow-[0_10px_30px_rgba(15,23,42,0.06)]">
-            <% if authenticated? %>
-              <%= link_to t("layouts.header.dashboard"), dashboard_path, class: "rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900" %>
-              <%= button_to t("layouts.header.sign_out"), session_path, method: :delete, form_class: "inline-flex", class: "rounded-full bg-emerald-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-900" %>
-            <% else %>
-              <%= link_to t("layouts.header.sign_in"), new_session_path, class: "rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900" %>
-              <%= link_to t("layouts.header.create_account"), new_registration_path, class: "rounded-full bg-emerald-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-900" %>
-            <% end %>
-          </div>
-
-          <nav class="flex w-full items-center gap-2 rounded-full border border-stone-200/80 bg-white/75 px-2 py-1 shadow-[0_10px_30px_rgba(15,23,42,0.06)] lg:hidden">
-            <%= link_to t("layouts.header.explore"), root_path, class: "flex-1 rounded-full px-4 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-emerald-950 hover:text-white" %>
-            <%= link_to t("layouts.header.info"), root_path(anchor: "about"), class: "flex-1 rounded-full px-4 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-emerald-950 hover:text-white" %>
-          </nav>
-        </div>
-      </header>
+  <body class="min-h-screen text-neutral-900 antialiased">
+    <div class="site-shell">
+      <%= render Ui::SiteHeaderComponent.new(
+            labels: {
+              brand_name: t("layouts.header.brand_name"),
+              brand_tagline: t("layouts.header.brand_tagline"),
+              explore: t("layouts.header.explore"),
+              info: t("layouts.header.info"),
+              dashboard: t("layouts.header.dashboard"),
+              sign_in: t("layouts.header.sign_in"),
+              create_account: t("layouts.header.create_account"),
+              sign_out: t("layouts.header.sign_out")
+            },
+            current_path: request.fullpath,
+            authenticated: authenticated?,
+            explore_path: root_path,
+            info_path: root_path(anchor: "about"),
+            dashboard_path: dashboard_path,
+            sign_in_path: new_session_path,
+            registration_path: new_registration_path,
+            session_path: session_path
+          ) %>
 
       <main class="<%= content_for?(:main_class) ? yield(:main_class) : "mx-auto w-full max-w-[112rem] px-4 py-6 sm:px-6 lg:px-8" %>">
         <% if flash.any? %>

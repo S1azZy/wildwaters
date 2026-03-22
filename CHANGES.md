@@ -2,6 +2,7 @@
 
 ## 2026-03-22
 - Added ADR 0002 to fix Wild Waters' design-system direction around the `Digital Naturalist` visual north star, shared design tokens, and a `ViewComponent`-based shared UI layer.
+- Started design-system Phase 1 by adopting `ViewComponent`, adding component test support, and introducing the first shared UI class layer with `ApplicationComponent`, `Ui::ButtonComponent`, and `Ui::SiteHeaderComponent`.
 
 ## 2026-03-20
 - Added a dedicated `bin/check-outdated` runner so `make outdated` always executes Bundler, importmap, and MapLibre freshness checks before returning one combined status code.

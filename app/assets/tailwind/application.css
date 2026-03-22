@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./design_tokens.css";
 
 @theme {
   --color-explore-forest: #183028;
@@ -7,24 +8,103 @@
   --color-explore-clay: #c2743f;
 }
 
-@layer base {
-  :root {
-    color-scheme: light;
-  }
-
-  body {
-    font-family: "Avenir Next", "Segoe UI", sans-serif;
-  }
-
-  h1,
-  h2,
-  h3,
-  [data-display-text] {
-    font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  }
-}
-
 @layer components {
+  .site-shell {
+    min-height: 100vh;
+    background: var(--ww-shell-gradient);
+  }
+
+  .site-header-surface {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: var(--shadow-ui-ambient);
+    backdrop-filter: blur(18px);
+  }
+
+  .site-header-nav {
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
+  }
+
+  .site-header-badge {
+    background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500));
+    box-shadow: 0 18px 45px rgba(29, 61, 0, 0.24);
+  }
+
+  .ui-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-ui-pill);
+    font-weight: 600;
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .ui-button:hover {
+    transform: translateY(-1px);
+  }
+
+  .ui-button:focus-visible {
+    outline: 2px solid rgba(44, 86, 1, 0.26);
+    outline-offset: 2px;
+  }
+
+  .ui-button--sm {
+    min-height: 2.5rem;
+    padding-inline: 0.9rem;
+    font-size: 0.875rem;
+  }
+
+  .ui-button--md {
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .ui-button--primary {
+    background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500));
+    color: white;
+    box-shadow: 0 16px 40px rgba(29, 61, 0, 0.18);
+  }
+
+  .ui-button--primary:hover {
+    background: linear-gradient(135deg, var(--color-primary-800), var(--color-primary-600));
+  }
+
+  .ui-button--secondary {
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--color-neutral-700);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.28);
+  }
+
+  .ui-button--secondary:hover {
+    color: var(--color-primary-700);
+    box-shadow: inset 0 0 0 1px rgba(44, 86, 1, 0.28);
+  }
+
+  .ui-button--inverted {
+    background: var(--color-neutral-800);
+    color: white;
+  }
+
+  .ui-button--outlined {
+    background: transparent;
+    color: var(--color-neutral-700);
+    box-shadow: inset 0 0 0 1px rgba(100, 116, 139, 0.3);
+  }
+
+  .ui-button--outlined:hover {
+    color: var(--color-primary-700);
+    box-shadow: inset 0 0 0 1px rgba(44, 86, 1, 0.28);
+  }
+
   .explore-shell {
     background:
       radial-gradient(circle at top, rgba(15, 118, 110, 0.14), transparent 42%),
