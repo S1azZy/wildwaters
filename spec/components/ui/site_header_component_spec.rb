@@ -108,9 +108,16 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       expect(page).to have_css("[data-ui='site-header']")
       expect(page).to have_css("[data-ui='site-header-frame']")
       expect(page).to have_css(".site-header-surface--compact")
-      expect(page).to have_css(".site-header-frame--wide")
-      expect(page).not_to have_css(".site-header-frame-surface")
       expect(page).to have_css("[data-ui='site-header-desktop-row']")
+    end
+
+    it "renders the trimmed wide frame treatment" do
+      render_inline(build_component(current_path: "/", authenticated: false))
+
+      expect(page).to have_css(".site-header-frame--wide")
+      expect(page).to have_css(".site-header-frame--trimmed")
+      expect(page).to have_css(".site-header-shell--slim")
+      expect(page).not_to have_css(".site-header-frame-surface")
     end
 
     it "renders the brand block inside the header shell" do

@@ -34,12 +34,21 @@
     max-width: 120rem;
   }
 
+  .site-header-frame--trimmed {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+
   .site-header-shell {
     display: grid;
     align-items: center;
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 2.25rem;
     min-height: 4rem;
+  }
+
+  .site-header-shell--slim {
+    min-height: 2.45rem;
   }
 
   .site-header-brand {
@@ -56,20 +65,20 @@
   .site-header-brand-name {
     display: block;
     font-family: var(--font-display);
-    font-size: clamp(2rem, 1.7vw, 2.35rem);
+    font-size: clamp(1.28rem, 1.05vw, 1.72rem);
     font-weight: 300;
-    line-height: 0.96;
-    letter-spacing: -0.045em;
+    line-height: 0.94;
+    letter-spacing: -0.04em;
     color: var(--color-primary-700);
   }
 
   .site-header-brand-tagline {
     display: block;
-    margin-top: 0.42rem;
+    margin-top: 0.14rem;
     padding-left: 0.05rem;
-    font-size: 0.62rem;
+    font-size: 0.46rem;
     font-weight: 600;
-    letter-spacing: 0.34em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
     color: color-mix(in srgb, var(--color-neutral-700) 60%, transparent);
   }
@@ -77,17 +86,17 @@
   .site-header-primary-nav {
     align-items: center;
     justify-self: start;
-    gap: 2.6rem;
+    gap: 2rem;
   }
 
   .site-header-nav-link {
     position: relative;
     display: inline-flex;
     align-items: center;
-    min-height: 2rem;
-    padding-block: 0.12rem;
+    min-height: 1.35rem;
+    padding-block: 0.08rem;
     color: color-mix(in srgb, var(--color-neutral-700) 88%, transparent);
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     font-weight: 500;
     letter-spacing: -0.02em;
     text-decoration: none;
@@ -156,10 +165,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.7rem;
-    padding-inline: 1rem;
+    min-height: 1.9rem;
+    padding-inline: 0.78rem;
     border-radius: 9999px;
-    font-size: 0.92rem;
+    font-size: 0.76rem;
     font-weight: 600;
     letter-spacing: -0.02em;
     text-decoration: none;
@@ -181,10 +190,10 @@
   }
 
   .site-header-cta {
-    padding-inline: 1.2rem;
+    padding-inline: 0.85rem;
     background: var(--color-primary-700);
     color: white;
-    box-shadow: 0 10px 24px rgba(29, 61, 0, 0.14);
+    box-shadow: 0 8px 18px rgba(29, 61, 0, 0.12);
   }
 
   .site-header-cta:hover,
@@ -274,19 +283,19 @@
     }
 
     .site-header-brand-name {
-      font-size: 1.9rem;
+      font-size: 1.18rem;
     }
 
     .site-header-brand-tagline {
-      font-size: 0.58rem;
-      letter-spacing: 0.3em;
+      font-size: 0.42rem;
+      letter-spacing: 0.24em;
     }
 
     .site-header-auth-link,
     .site-header-cta {
-      min-height: 2.45rem;
-      padding-inline: 0.82rem;
-      font-size: 0.84rem;
+      min-height: 1.82rem;
+      padding-inline: 0.68rem;
+      font-size: 0.74rem;
     }
   }
 
