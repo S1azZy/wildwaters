@@ -8,11 +8,14 @@ const ACTIVE_STYLE_BUTTON_CLASS =
 const INACTIVE_STYLE_BUTTON_CLASS =
   "border-transparent bg-transparent text-slate-700 hover:border-stone-200 hover:bg-stone-50"
 const DEFAULT_STYLE_PREFERENCE_KEY = "wildwaters:explore-map-style"
+const DEFAULT_CARD_CLASS_TEMPLATE =
+  "group rounded-[1.35rem] border border-white/80 bg-white/95 p-4 shadow-[0_18px_50px_rgba(15,23,42,0.1)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-[0_28px_80px_rgba(15,23,42,0.14)] focus-within:border-emerald-300 focus-within:ring-2 focus-within:ring-emerald-200 backdrop-blur"
 
 export default class extends Controller {
   static targets = [
     "canvas",
     "card",
+    "controlsPanel",
     "empty",
     "filters",
     "heroResultCount",
@@ -20,6 +23,7 @@ export default class extends Controller {
     "loading",
     "mapState",
     "resultCount",
+    "resultsPanel",
     "search",
     "shell",
     "styleButton",
@@ -60,7 +64,11 @@ export default class extends Controller {
 
     this.syncStyleButtons()
     this.enhancedMode = true
-    this.handleResize = () => this.resizeMap()
+    this.handleResize = () => {
+      this.syncViewportOffset()
+      this.resizeMap()
+    }
+    this.syncViewportOffset()
     this.buildMap()
     this.observeShellResize()
     window.addEventListener("resize", this.handleResize)
@@ -158,7 +166,7 @@ export default class extends Controller {
 
     this.map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
-      "top-right"
+      "bottom-right"
     )
     this.map.addControl(
       new maplibregl.AttributionControl({ compact: true }),
@@ -180,11 +188,17 @@ export default class extends Controller {
 
     this.resizeObserver = new ResizeObserver((entries) => {
       if (entries.some((entry) => entry.contentRect.width > 0 && entry.contentRect.height > 0)) {
+        this.syncViewportOffset()
         this.resizeMap()
       }
     })
 
     this.resizeObserver.observe(this.shellTarget)
+    const header = this.headerElement()
+
+    if (header) {
+      this.resizeObserver.observe(header)
+    }
   }
 
   resizeMap() {
@@ -193,6 +207,20 @@ export default class extends Controller {
     }
 
     requestAnimationFrame(() => this.map?.resize())
+  }
+
+  syncViewportOffset() {
+    if (!this.hasShellTarget) {
+      return
+    }
+
+    const headerHeight = this.headerElement()?.offsetHeight || 0
+
+    this.shellTarget.style.setProperty("--explore-header-offset", `${headerHeight}px`)
+  }
+
+  headerElement() {
+    return document.querySelector("[data-ui='site-header']")
   }
 
   ensureMapLayers() {
@@ -362,10 +390,39 @@ export default class extends Controller {
     features.forEach((feature) => bounds.extend(feature.geometry.coordinates))
 
     this.map.fitBounds(bounds, {
-      padding: 64,
+      padding: this.fitPadding(),
       maxZoom: 11,
       duration: 0
     })
+  }
+
+  fitPadding() {
+    const padding = { top: 72, right: 56, bottom: 56, left: 56 }
+
+    if (!this.hasShellTarget) {
+      return padding
+    }
+
+    const shellRect = this.shellTarget.getBoundingClientRect()
+
+    if (this.hasControlsPanelTarget) {
+      const controlsRect = this.controlsPanelTarget.getBoundingClientRect()
+      padding.top = Math.max(padding.top, Math.ceil(controlsRect.bottom - shellRect.top) + 24)
+    }
+
+    if (this.hasResultsPanelTarget) {
+      const resultsRect = this.resultsPanelTarget.getBoundingClientRect()
+      const resultsWidthRatio = resultsRect.width / Math.max(shellRect.width, 1)
+      const bottomInset = Math.ceil(shellRect.bottom - resultsRect.top) + 24
+
+      if (resultsWidthRatio > 0.55) {
+        padding.bottom = Math.max(padding.bottom, bottomInset)
+      } else {
+        padding.left = Math.max(padding.left, Math.ceil(resultsRect.right - shellRect.left) + 24)
+      }
+    }
+
+    return padding
   }
 
   renderList(features) {
@@ -390,8 +447,7 @@ export default class extends Controller {
 
   buildCard(feature) {
     const article = document.createElement("article")
-    article.className =
-      "group rounded-[1.6rem] border border-stone-200 bg-white/94 p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-[0_28px_80px_rgba(15,23,42,0.12)] focus-within:border-emerald-300 focus-within:ring-2 focus-within:ring-emerald-200"
+    article.className = this.cardClassTemplate()
     article.dataset.action = "click->explore-map#cardSelected"
     article.dataset.exploreMapTarget = "card"
     article.dataset.publicId = feature.properties.public_id
@@ -506,6 +562,7 @@ export default class extends Controller {
     if (flyTo) {
       this.map.easeTo({
         center: feature.geometry.coordinates,
+        padding: this.fitPadding(),
         zoom: Math.max(this.map.getZoom(), 10.5),
         duration: 700
       })
@@ -744,5 +801,9 @@ export default class extends Controller {
     }
 
     return this.listHintValue
+  }
+
+  cardClassTemplate() {
+    return this.listTarget.dataset.cardClassTemplate || DEFAULT_CARD_CLASS_TEMPLATE
   }
 }

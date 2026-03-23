@@ -1,5 +1,8 @@
 # Changes
 
+## 2026-03-23
+- Reworked the public explore homepage into a full-bleed map surface under the shared header, moving the filters into floating map overlays and turning the waterfall list into a floating results rail while preserving existing map/list synchronization.
+
 ## 2026-03-22
 - Refined the shared site header into a calmer, more mature product shell with a dedicated primary nav, utility action cluster, and improved mobile row while keeping the current route structure intact.
 - Completed design-system Phase 2 with shared `Ui::BadgeComponent`, `Ui::CardComponent`, `Ui::EmptyStateComponent`, `Ui::FilterChipComponent`, `Ui::FlashComponent`, `Ui::IconButtonComponent`, `Ui::SelectFieldComponent`, and `Ui::TextFieldComponent`, including the supporting token/CSS layer, field initializer compatibility fixes, accessible flash live-region behavior, and layout-level shared flash rendering.
