@@ -179,7 +179,7 @@ export default class extends Controller {
 
     this.map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
-      "bottom-right"
+      "top-right"
     )
     this.map.addControl(
       new maplibregl.AttributionControl({ compact: true }),
