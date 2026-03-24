@@ -1,5 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
-import maplibregl from "maplibre-gl"
+import "maplibre-gl"
+
+const maplibregl = window.maplibregl
 
 const DEFAULT_SELECTED_CARD_CLASS =
   "ring-2 ring-emerald-700 border-emerald-300 shadow-[0_28px_80px_rgba(5,150,105,0.18)]"
@@ -18,12 +20,12 @@ export default class extends Controller {
     "controlsPanel",
     "empty",
     "filters",
-    "heroResultCount",
     "list",
     "loading",
     "mapState",
     "resultCount",
     "resultsPanel",
+    "resultsToggle",
     "search",
     "shell",
     "styleButton",
@@ -45,6 +47,7 @@ export default class extends Controller {
     mapDataUrl: String,
     mapStyleUrl: String,
     mapUnavailableLabel: String,
+    panelOpenClass: String,
     stylePreferenceKey: String,
     visibleLabel: String
   }
@@ -56,6 +59,7 @@ export default class extends Controller {
     this.featuresByPublicId = new Map()
     this.selectedPublicId = null
     this.activeStyleId = this.resolveInitialStyleId()
+    this.resultsOpen = false
 
     if (!this.hasCanvasTarget || typeof maplibregl.Map !== "function") {
       this.renderMapUnavailable()
@@ -63,6 +67,7 @@ export default class extends Controller {
     }
 
     this.syncStyleButtons()
+    this.syncResultsPanel()
     this.enhancedMode = true
     this.handleResize = () => {
       this.syncViewportOffset()
@@ -72,6 +77,14 @@ export default class extends Controller {
     this.buildMap()
     this.observeShellResize()
     window.addEventListener("resize", this.handleResize)
+  }
+
+  toggleResults(event) {
+    event?.preventDefault()
+
+    this.resultsOpen = !this.resultsOpen
+    this.syncResultsPanel()
+    this.resizeMap()
   }
 
   disconnect() {
@@ -216,6 +229,7 @@ export default class extends Controller {
 
     const headerHeight = this.headerElement()?.offsetHeight || 0
 
+    this.element.style.setProperty("--explore-header-offset", `${headerHeight}px`)
     this.shellTarget.style.setProperty("--explore-header-offset", `${headerHeight}px`)
   }
 
@@ -410,7 +424,7 @@ export default class extends Controller {
       padding.top = Math.max(padding.top, Math.ceil(controlsRect.bottom - shellRect.top) + 24)
     }
 
-    if (this.hasResultsPanelTarget) {
+    if (this.hasResultsPanelTarget && this.resultsOpen) {
       const resultsRect = this.resultsPanelTarget.getBoundingClientRect()
       const resultsWidthRatio = resultsRect.width / Math.max(shellRect.width, 1)
       const bottomInset = Math.ceil(shellRect.bottom - resultsRect.top) + 24
@@ -442,6 +456,19 @@ export default class extends Controller {
 
     if (this.selectedPublicId) {
       this.highlightSelectedCard(this.selectedPublicId)
+    }
+  }
+
+  syncResultsPanel() {
+    if (this.hasResultsPanelTarget) {
+      this.resultsPanelTarget.dataset.resultsState = this.resultsOpen ? "expanded" : "collapsed"
+      this.resultsPanelTarget.classList.toggle("is-collapsed", !this.resultsOpen)
+      this.resultsPanelTarget.classList.toggle(this.panelOpenClass, this.resultsOpen)
+    }
+
+    if (this.hasResultsToggleTarget) {
+      this.resultsToggleTarget.dataset.resultsState = this.resultsOpen ? "expanded" : "collapsed"
+      this.resultsToggleTarget.setAttribute("aria-expanded", String(this.resultsOpen))
     }
   }
 

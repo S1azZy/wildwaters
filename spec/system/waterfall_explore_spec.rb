@@ -95,13 +95,15 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-map-shell--viewport-fit[data-explore-map-target='shell']")
   end
 
-  it "renders floating explore overlays on top of the map" do
+  it "renders a dedicated filter bar directly under the header" do
     visit_page
 
-    expect(page).to have_css(".explore-controls-overlay")
-    expect(page).to have_css(".explore-results-overlay")
-    expect(page).to have_css(".explore-results-overlay [data-explore-map-target='list']")
-    expect(page).to have_css(".explore-controls-overlay [data-explore-map-target='filters']")
+    expect(page).to have_css(".explore-filter-band")
+    expect(page).to have_css(".explore-filter-row[data-desktop-layout='single-row']")
+    expect(page).to have_css(".explore-filter-form[data-desktop-wrap='never']")
+    expect(page).to have_css(".explore-filter-band [data-explore-map-target='filters']")
+    expect(page).to have_css(".explore-filter-band [data-explore-map-target='search']")
+    expect(page).to have_css(".explore-map-shell--viewport-fit[data-explore-map-target='shell']")
   end
 
   it "renders the basemap style dropdown" do
@@ -137,15 +139,15 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css("[data-explore-map-target='list'][data-card-class-template]")
   end
 
-  it "renders published waterfalls in the list rail" do
+  it "renders a collapsible results panel that is hidden by default" do
     visit_page
 
+    expect(page).to have_css("[data-explore-map-target='resultsToggle']")
+    expect(page).to have_css("[data-explore-map-target='resultsToggle'][aria-expanded='false']")
+    expect(page).to have_css("[data-explore-map-target='resultsPanel'].is-collapsed", visible: false)
     expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{sekumpul_waterfall.spot.public_id}']")
     expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{nungnung_waterfall.spot.public_id}']")
     expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{tegenungan_waterfall.spot.public_id}']")
-    expect(page).to have_content("Sekumpul Waterfall")
-    expect(page).to have_content("Nungnung Waterfall")
-    expect(page).to have_content("Tegenungan Waterfall")
   end
 
   it "does not render draft waterfalls in the public explore rail" do
