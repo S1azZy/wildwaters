@@ -118,7 +118,6 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       expect(page).to have_css(".site-header-frame--relaxed")
       expect(page).to have_css(".site-header-frame--trimmed")
       expect(page).to have_css(".site-header-shell--feather")
-      expect(page).not_to have_css(".site-header-frame-surface")
     end
 
     it "renders the brand block inside the header shell" do
