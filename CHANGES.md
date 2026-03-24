@@ -2,6 +2,7 @@
 
 ## 2026-03-24
 - Reworked the explore screen into an AllTrails-style map-first layout with a dedicated single-band filter bar under the shared header, a collapsible de-emphasized results rail, and CSP-enabled Google font loading for the intended typography.
+- Refined the project process rule so mandatory red-green TDD now applies to behavior-changing work, while purely visual UI polish no longer requires artificial failing tests.
 - Refreshed the outdated dependency set by moving Rails to `8.1.2.1`, updating `net-ssh`, `nokogiri`, `rubocop`, and `solid_queue`, and vendoring `MapLibre GL JS` `5.21.0` to keep `make outdated` aligned with current safe versions.
 
 ## 2026-03-23
