@@ -527,22 +527,14 @@
   }
 
   .explore-results-shell[data-results-state="expanded"] {
-<<<<<<< HEAD
     width: min(24rem, calc(100vw - 2rem));
-=======
-    width: min(28rem, calc(100vw - 2rem));
->>>>>>> 648a14d (refine: unify explore rail toggle)
     box-shadow:
       0 28px 80px rgba(15, 23, 42, 0.17),
       0 2px 0 rgba(255, 255, 255, 0.72) inset;
   }
 
   .explore-results-shell[data-results-state="collapsed"] {
-<<<<<<< HEAD
     width: min(18.25rem, calc(100vw - 2rem));
-=======
-    width: fit-content;
->>>>>>> 648a14d (refine: unify explore rail toggle)
   }
 
   .explore-results-shell:hover {
