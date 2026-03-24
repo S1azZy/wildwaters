@@ -235,6 +235,7 @@ export default class extends Controller {
   }
 
   scheduleResultsResize() {
+<<<<<<< HEAD
     this.suppressMoveendLoadsFor(350)
     this.resizeMap()
     clearTimeout(this.resultsResizeTimer)
@@ -255,6 +256,11 @@ export default class extends Controller {
 
   moveendLoadsSuppressed() {
     return performance.now() < this.suppressedMoveendLoadsUntil
+=======
+    this.resizeMap()
+    clearTimeout(this.resultsResizeTimer)
+    this.resultsResizeTimer = setTimeout(() => this.resizeMap(), 300)
+>>>>>>> 648a14d (refine: unify explore rail toggle)
   }
 
   syncViewportOffset() {

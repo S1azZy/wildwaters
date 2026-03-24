@@ -109,11 +109,11 @@
               ) %>
         </div>
 
-        <div class="explore-filter-actions flex items-center gap-2.5 whitespace-nowrap">
-          <%= link_to t("waterfalls.index.filters.reset"), waterfalls_path, class: "inline-flex min-h-[2.85rem] items-center justify-center rounded-full border border-stone-300 bg-white px-4 text-[0.92rem] font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-950" %>
-        </div>
       <% end %>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 648a14d (refine: unify explore rail toggle)
     </div>
   </div>
 
@@ -170,16 +170,25 @@
       </div>
     </div>
 
+<<<<<<< HEAD
     <aside class="explore-results-shell absolute left-3 top-3 z-20 max-w-[calc(100%-1.5rem)] pointer-events-auto sm:left-4 sm:top-4 sm:max-w-[calc(100%-2rem)] lg:left-5 lg:top-5 lg:max-w-[24rem]" data-results-shell data-results-state="collapsed">
       <button type="button" class="explore-results-toggle flex min-h-[4.05rem] w-full items-center justify-between gap-4 px-5 text-left transition" data-action="explore-map#toggleResults" data-explore-map-target="resultsToggle" aria-expanded="false" aria-controls="explore-results-panel">
         <span class="truncate whitespace-nowrap text-[1.02rem] font-semibold tracking-[-0.025em] text-slate-950 sm:text-[1.08rem]"><%= t("waterfalls.index.rail_toggle") %></span>
         <span class="explore-results-toggle-chevron flex h-[2.55rem] w-[2.55rem] shrink-0 items-center justify-center rounded-full border-[3px] border-blue-400/85 bg-stone-100/94 text-slate-800 shadow-[0_10px_24px_rgba(59,130,246,0.18)]">
           <svg class="h-[0.98rem] w-[0.98rem]" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+=======
+    <aside class="explore-results-shell absolute left-4 top-4 z-20 max-w-[calc(100%-2rem)] pointer-events-auto" data-results-shell data-results-state="collapsed">
+      <button type="button" class="explore-results-toggle flex min-h-[4.15rem] w-full items-center justify-between gap-4 px-5 text-left transition" data-action="explore-map#toggleResults" data-explore-map-target="resultsToggle" aria-expanded="false" aria-controls="explore-results-panel">
+        <span class="truncate whitespace-nowrap text-[1.1rem] font-semibold tracking-[-0.025em] text-slate-950 sm:text-[1.16rem]"><%= t("waterfalls.index.rail_toggle") %></span>
+        <span class="explore-results-toggle-chevron flex h-[2.7rem] w-[2.7rem] shrink-0 items-center justify-center rounded-full border-[3px] border-blue-400/85 bg-stone-100/94 text-slate-800 shadow-[0_10px_24px_rgba(59,130,246,0.18)]">
+          <svg class="h-[1rem] w-[1rem]" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+>>>>>>> 648a14d (refine: unify explore rail toggle)
             <path d="M6 9.5 12 15.5 18 9.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
       </button>
 
+<<<<<<< HEAD
       <aside id="explore-results-panel" class="explore-results-overlay is-collapsed flex flex-col overflow-hidden lg:w-[24rem]" data-explore-map-target="resultsPanel">
       <div class="border-b border-stone-200/90 px-5 py-4" data-explore-map-target="resultsHeader">
         <div class="flex items-center justify-between gap-3">
@@ -188,6 +197,25 @@
             <%= t("waterfalls.index.result_suffix") %>
           </p>
 
+=======
+      <div id="explore-results-panel" class="explore-results-overlay is-collapsed flex w-full flex-col overflow-hidden" data-explore-map-target="resultsPanel">
+      <div class="border-b border-stone-200/90 px-5 pb-4 pt-2">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="space-y-2">
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-emerald-900/55"><%= t("waterfalls.index.eyebrow") %></p>
+            <div class="space-y-2">
+              <h1 class="max-w-sm font-serif text-3xl leading-none text-slate-950 sm:text-[2.45rem]"><%= t("waterfalls.index.heading") %></h1>
+              <p class="max-w-md text-sm leading-6 text-slate-600"><%= t("waterfalls.index.subheading") %></p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <p class="rounded-full bg-stone-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-stone-50 shadow-[0_12px_30px_rgba(15,23,42,0.18)]">
+              <span data-explore-map-target="resultCount"><%= @waterfalls.size %></span>
+              <%= t("waterfalls.index.result_suffix") %>
+            </p>
+          </div>
+>>>>>>> 648a14d (refine: unify explore rail toggle)
         </div>
       </div>
 
@@ -199,6 +227,12 @@
         <p class="hidden rounded-[1.75rem] border border-dashed border-stone-300 bg-white/80 px-5 py-8 text-center text-sm leading-6 text-slate-500" data-explore-map-target="empty">
           <%= t("waterfalls.index.empty") %>
         </p>
+<<<<<<< HEAD
+=======
+      </div>
+      </div>
+    </aside>
+>>>>>>> 648a14d (refine: unify explore rail toggle)
 
         <div class="mt-4 h-5 shrink-0" data-explore-map-target="endCap" aria-hidden="true"></div>
       </div>

@@ -7,6 +7,7 @@
 - Tightened the waterfall explore results rail into a viewport-bounded panel with a compact count summary, a dedicated scrolling list region, and a visible end-of-list marker while keeping the existing collapse/expand behavior.
 
 ## 2026-03-24
+- Reworked the on-map explore rail into a single expanding surface so the collapsed `Explore waterfalls` pill now grows into the full results panel with smoother motion and a unified floating-card treatment.
 - Slimmed the explore filter bar by removing its extra frame chrome, moved the map-style control into the on-map toolbar beside zoom controls, and removed the standalone refresh button from the desktop explore controls.
 - Reworked the explore screen into an AllTrails-style map-first layout with a dedicated single-band filter bar under the shared header, a collapsible de-emphasized results rail, and CSP-enabled Google font loading for the intended typography.
 - Refined the project process rule so mandatory red-green TDD now applies to behavior-changing work, while purely visual UI polish no longer requires artificial failing tests.
