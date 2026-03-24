@@ -1,5 +1,8 @@
 # Changes
 
+## 2026-03-24
+- Refreshed the outdated dependency set by moving Rails to `8.1.2.1`, updating `net-ssh`, `nokogiri`, `rubocop`, and `solid_queue`, and vendoring `MapLibre GL JS` `5.21.0` to keep `make outdated` aligned with current safe versions.
+
 ## 2026-03-23
 - Reworked the public explore homepage into a full-bleed map surface under the shared header, moving the filters into floating map overlays and turning the waterfall list into a floating results rail while preserving existing map/list synchronization.
 
@@ -16,7 +19,7 @@
 - Added an explore map-style dropdown with four detailed basemaps, including an outdoors-oriented style, and switched the map stack from a simple demo style to a richer multi-style setup.
 - Fixed the explore homepage backend contract so the view receives an explicit default basemap id from the controller.
 - Added a server-provided MapLibre basemap catalog for Liberty, Bright, and Positron styles and repointed explore CSP allowances from the old demo tile host to OpenFreeMap.
-- Vendored MapLibre GL JS/CSS `5.20.2` into local Rails assets, pinned the JS in importmap, switched the explore map Stimulus controller to a module import, and removed the waterfall index CDN tags while keeping the remote demo style URL.
+- Vendored MapLibre GL JS/CSS `5.21.0` into local Rails assets, pinned the JS in importmap, switched the explore map Stimulus controller to a module import, and removed the waterfall index CDN tags while keeping the remote demo style URL.
 
 ## 2026-03-19
 - Added a compact ADR documenting the map browse stack decision: `MapLibre GL JS`, map-first layout, bounds-based loading, clustering, and a future path to vector tiles or PMTiles.

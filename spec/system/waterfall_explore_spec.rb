@@ -180,7 +180,7 @@ RSpec.describe "Waterfall explore", type: :system do
     visit_page
 
     expect(page.html).to include("/assets/maplibre-gl")
-    expect(page.html).not_to include("maplibre-gl@5.20.2/dist/maplibre-gl.js")
-    expect(page.html).not_to include("maplibre-gl@5.20.2/dist/maplibre-gl.css")
+    expect(page.html).not_to include("maplibre-gl@5.21.0/dist/maplibre-gl.js")
+    expect(page.html).not_to include("maplibre-gl@5.21.0/dist/maplibre-gl.css")
   end
 end
