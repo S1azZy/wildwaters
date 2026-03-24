@@ -143,15 +143,17 @@ Before merge:
 
 ## Strict rules
 
-1. Every code change starts with a failing test.
-2. Do not write production code before the test is red.
-3. If the test is not red first, rewrite the test before writing code.
-4. The only valid flow is: red test, minimal code, green test.
-5. Code written before the test is a process error and must be corrected.
+1. Every behavior-changing code change starts with a failing test.
+2. Do not write production code that changes system behavior before the test is red.
+3. If a behavior-changing test is not red first, rewrite the test before writing code.
+4. The valid flow for behavior changes is: red test, minimal code, green test.
+5. Purely visual or stylistic UI design work may proceed without a red test first, but any changed behavior, interaction, state, or business logic still requires the red-green flow.
+6. Code written before the test for a behavior change is a process error and must be corrected.
 
 ## Not to do
 
-- Do not write code before writing the test.
+- Do not write behavior-changing code before writing the test.
+- Do not add artificial or low-value tests just to satisfy the red-green rule for purely visual design polish.
 - Push to main
 
 ## Directory expectations
