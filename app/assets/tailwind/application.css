@@ -124,39 +124,24 @@
     pointer-events: auto;
   }
 
-  .explore-map-toolbar-button,
-  .maplibregl-ctrl-group button {
+  .explore-map-toolbar-panel {
+    border: 1px solid rgba(255, 255, 255, 0.82);
+  }
+
+  .explore-map-toolbar-button {
     width: 3.5rem;
     height: 3.5rem;
     min-height: 3.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(229, 231, 235, 0.96);
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
     color: #1f2937;
   }
 
   .explore-map-style-toggle {
     gap: 0;
     padding: 0;
-  }
-
-  .maplibregl-ctrl-top-right {
-    top: 5rem;
-    right: 1rem;
-  }
-
-  .maplibregl-ctrl-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    box-shadow: none;
-    background: transparent;
-    border: 0;
-  }
-
-  .maplibregl-ctrl-group button .maplibregl-ctrl-icon {
-    opacity: 1;
   }
 
   @media (min-width: 1280px) {

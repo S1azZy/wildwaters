@@ -115,8 +115,16 @@ RSpec.describe "Waterfall explore", type: :system do
   it "renders the basemap style control on top of the map" do
     visit_page
 
+    expect(page).to have_css(".explore-map-toolbar")
     expect(page).to have_css(".explore-map-shell details[data-explore-map-target='styleMenu']")
     expect(page).to have_css(".explore-map-shell summary", text: I18n.t("waterfalls.index.map_styles.menu_label"))
+  end
+
+  it "renders custom zoom controls inside the shared map toolbar" do
+    visit_page
+
+    expect(page).to have_css(".explore-map-toolbar button[aria-label='Zoom in']")
+    expect(page).to have_css(".explore-map-toolbar button[aria-label='Zoom out']")
   end
 
   it "renders the basemap style options for all supported map views" do
