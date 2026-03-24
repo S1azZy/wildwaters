@@ -17,21 +17,23 @@
   }
 
   .explore-layout-shell {
-    min-height: 100%;
+    min-height: calc(100vh - var(--explore-header-offset, 0px));
+    height: calc(100vh - var(--explore-header-offset, 0px));
     background: #dfe7dd;
   }
 
   .explore-map-shell--full-bleed {
-    min-height: calc(100vh - var(--explore-header-offset, 0px));
-    height: calc(100vh - var(--explore-header-offset, 0px));
+    min-height: 0;
+    height: auto;
     border: 0;
     border-radius: 0;
     box-shadow: none;
   }
 
   .explore-map-shell--viewport-fit {
-    min-height: calc(100vh - var(--explore-header-offset, 0px));
-    height: calc(100vh - var(--explore-header-offset, 0px));
+    min-height: 0;
+    height: auto;
+    flex: 1 1 auto;
   }
 
   .explore-controls-overlay {
@@ -40,21 +42,105 @@
     gap: 1rem;
   }
 
+  .explore-filter-band {
+    position: relative;
+    z-index: 30;
+  }
+
+  .explore-filter-row {
+    max-width: 110rem;
+  }
+
+  .explore-filter-search,
+  .explore-filter-form,
+  .explore-filter-field {
+    min-width: 0;
+  }
+
+  .explore-filter-form {
+    align-items: stretch;
+  }
+
+  .explore-filter-actions,
+  .explore-filter-utility {
+    flex-wrap: nowrap;
+  }
+
+  .explore-filter-band input,
+  .explore-filter-band select,
+  .explore-filter-band button,
+  .explore-filter-band summary,
+  .explore-filter-band a {
+    min-height: 2.85rem;
+  }
+
+  .explore-results-toggle {
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(214, 211, 209, 0.92);
+    color: #334155;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  }
+
+  .explore-results-toggle[data-results-state="expanded"] {
+    background: #183028;
+    border-color: #183028;
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(24, 48, 40, 0.18);
+  }
+
   .explore-filter-bar {
     width: 100%;
   }
 
   .explore-results-overlay {
     width: auto;
+    border-color: rgba(255, 255, 255, 0.78);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 241, 232, 0.9));
+    box-shadow: 0 20px 56px rgba(15, 23, 42, 0.11);
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      visibility 180ms ease;
+  }
+
+  .explore-results-overlay.is-collapsed {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate3d(-0.75rem, 0, 0);
+  }
+
+  .explore-results-overlay.is-expanded {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @media (min-width: 1280px) {
+    .explore-filter-row {
+      display: grid;
+      grid-template-columns: minmax(0, 14rem) minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 0.75rem;
+      min-height: 4.5rem;
+    }
+
+    .explore-filter-form {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+      column-gap: 0.75rem;
+      row-gap: 0.75rem;
+      align-items: center;
+    }
+
+    .explore-filter-utility {
+      justify-self: end;
+    }
   }
 
   @supports (height: 100dvh) {
-    .explore-map-shell--full-bleed {
-      min-height: calc(100dvh - var(--explore-header-offset, 0px));
-      height: calc(100dvh - var(--explore-header-offset, 0px));
-    }
-
-    .explore-map-shell--viewport-fit {
+    .explore-layout-shell {
       min-height: calc(100dvh - var(--explore-header-offset, 0px));
       height: calc(100dvh - var(--explore-header-offset, 0px));
     }

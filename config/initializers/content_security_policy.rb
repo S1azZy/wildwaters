@@ -8,13 +8,13 @@ Rails.application.configure do
     policy.base_uri :self
     policy.child_src :blob
     policy.connect_src :self, "https://tiles.openfreemap.org", "https://tiles.stadiamaps.com"
-    policy.font_src :self, :data, "https://tiles.openfreemap.org", "https://tiles.stadiamaps.com"
+    policy.font_src :self, :data, "https://fonts.gstatic.com", "https://tiles.openfreemap.org", "https://tiles.stadiamaps.com"
     policy.form_action :self
     policy.frame_ancestors :none
     policy.img_src :self, :data, :blob, "https://tiles.openfreemap.org", "https://tiles.stadiamaps.com"
     policy.object_src :none
     policy.script_src :self
-    policy.style_src :self, :unsafe_inline
+    policy.style_src :self, :unsafe_inline, "https://fonts.googleapis.com"
     policy.style_src_attr :unsafe_inline
     policy.worker_src :self, :blob
   end
