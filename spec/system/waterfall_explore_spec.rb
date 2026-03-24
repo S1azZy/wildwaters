@@ -101,16 +101,35 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-filter-band")
     expect(page).to have_css(".explore-filter-row[data-desktop-layout='single-row']")
     expect(page).to have_css(".explore-filter-form[data-desktop-wrap='never']")
-    expect(page).to have_css(".explore-filter-band [data-explore-map-target='filters']")
-    expect(page).to have_css(".explore-filter-band [data-explore-map-target='search']")
     expect(page).to have_css(".explore-map-shell--viewport-fit[data-explore-map-target='shell']")
   end
 
-  it "renders the basemap style dropdown" do
+  it "renders the search and filter controls inside the filter bar" do
     visit_page
 
-    expect(page).to have_css("summary", text: I18n.t("waterfalls.index.map_styles.menu_label"))
-    expect(page).to have_css("details[data-explore-map-target='styleMenu']")
+    expect(page).to have_css(".explore-filter-band [data-explore-map-target='filters']")
+    expect(page).to have_css(".explore-filter-band [data-explore-map-target='search']")
+    expect(page).not_to have_button(I18n.t("waterfalls.index.filters.apply"))
+  end
+
+  it "renders the basemap style control on top of the map" do
+    visit_page
+
+    expect(page).to have_css(".explore-map-toolbar")
+    expect(page).to have_css(".explore-map-shell details[data-explore-map-target='styleMenu']")
+    expect(page).to have_css(".explore-map-shell summary", text: I18n.t("waterfalls.index.map_styles.menu_label"))
+  end
+
+  it "renders custom zoom controls inside the shared map toolbar" do
+    visit_page
+
+    expect(page).to have_css(".explore-map-toolbar button[aria-label='Zoom in']")
+    expect(page).to have_css(".explore-map-toolbar button[aria-label='Zoom out']")
+  end
+
+  it "renders the basemap style options for all supported map views" do
+    visit_page
+
     expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='liberty']", visible: false)
     expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='bright']", visible: false)
     expect(page).to have_css("[data-explore-map-target='styleButton'][data-style-id='positron']", visible: false)

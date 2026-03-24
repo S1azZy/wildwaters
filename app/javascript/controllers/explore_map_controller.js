@@ -87,6 +87,16 @@ export default class extends Controller {
     this.resizeMap()
   }
 
+  zoomIn(event) {
+    event?.preventDefault()
+    this.map?.zoomIn()
+  }
+
+  zoomOut(event) {
+    event?.preventDefault()
+    this.map?.zoomOut()
+  }
+
   disconnect() {
     clearTimeout(this.filterTimer)
     this.abortController?.abort()
@@ -177,10 +187,6 @@ export default class extends Controller {
       attributionControl: false
     })
 
-    this.map.addControl(
-      new maplibregl.NavigationControl({ showCompass: false }),
-      "bottom-right"
-    )
     this.map.addControl(
       new maplibregl.AttributionControl({ compact: true }),
       "bottom-right"
