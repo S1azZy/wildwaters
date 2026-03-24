@@ -130,14 +130,14 @@
     </div>
 
     <div class="explore-map-toolbar absolute right-4 top-4 z-20">
-      <div class="explore-map-toolbar-panel flex flex-col items-center gap-3 rounded-[1.9rem] bg-white/92 p-2.5 shadow-[0_18px_42px_rgba(15,23,42,0.14)] backdrop-blur">
+      <div class="flex flex-col items-center gap-2.5">
         <details class="explore-map-style-menu relative" data-explore-map-target="styleMenu">
           <summary class="explore-map-style-toggle explore-map-toolbar-button flex cursor-pointer list-none items-center justify-center" aria-label="<%= t("waterfalls.index.map_styles.menu_label") %>">
-            <span class="explore-map-style-toggle-icon" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
+            <svg class="h-[1.3rem] w-[1.3rem] text-slate-700" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 3.6 4.8 6.9 12 10.2l7.2-3.3z" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" />
+              <path d="M4.8 11.1 12 14.4l7.2-3.3" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M4.8 15.3 12 18.6l7.2-3.3" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
             <span class="sr-only"><%= t("waterfalls.index.map_styles.menu_label") %></span>
           </summary>
 
@@ -164,11 +164,15 @@
         </details>
 
         <button type="button" class="explore-map-toolbar-button" data-action="explore-map#zoomIn" aria-label="Zoom in">
-          <span class="text-[2rem] font-light leading-none text-slate-800" aria-hidden="true">+</span>
+          <svg class="h-[1.25rem] w-[1.25rem] text-slate-800" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+          </svg>
         </button>
 
         <button type="button" class="explore-map-toolbar-button" data-action="explore-map#zoomOut" aria-label="Zoom out">
-          <span class="text-[2rem] font-light leading-none text-slate-800" aria-hidden="true">-</span>
+          <svg class="h-[1.25rem] w-[1.25rem] text-slate-800" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+          </svg>
         </button>
       </div>
     </div>
