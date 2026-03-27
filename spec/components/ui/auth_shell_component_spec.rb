@@ -9,9 +9,7 @@ RSpec.describe Ui::AuthShellComponent, type: :component do
       description: "Return to your saved map.",
       alternate_prompt: "Need an account?",
       alternate_label: "Sign up",
-      alternate_path: "/registration/new",
-      footer_author: "Designed by Wild Waters",
-      footer_note: "A quiet footer placeholder."
+      alternate_path: "/registration/new"
     }.merge(overrides)
   end
 
@@ -33,7 +31,7 @@ RSpec.describe Ui::AuthShellComponent, type: :component do
     )
   end
 
-  it "renders the shared auth shell with panel content and alternate action" do
+  it "renders the shared auth shell with panel content and alternate action", :aggregate_failures do
     render_component do |shell|
       shell.with_panel do
         '<div class="panel-body">Panel body</div>'.html_safe
@@ -44,7 +42,7 @@ RSpec.describe Ui::AuthShellComponent, type: :component do
     expect(page).to have_css("[data-ui='auth-card']", text: "Basecamp access")
     expect(page).to have_css(".panel-body", text: "Panel body")
     expect(page).to have_link("Sign up", href: "/registration/new")
-    expect(page).to have_css("[data-ui='auth-footer']", text: "Designed by Wild Waters")
+    expect(page).not_to have_css("[data-ui='auth-footer']")
   end
 
   it "supports the recovery variant label" do

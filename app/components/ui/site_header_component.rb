@@ -42,10 +42,7 @@ module Ui
 
     def navigation_items
       [
-        navigation_item(:explore, labels.fetch(:explore), explore_path),
-        navigation_item(:map, labels.fetch(:map), map_path),
-        navigation_item(:activity, labels.fetch(:activity), activity_path),
-        navigation_item(:profile, labels.fetch(:profile), profile_path)
+        navigation_item(:explore, labels.fetch(:explore), explore_path)
       ]
     end
 
@@ -85,9 +82,6 @@ module Ui
 
     def current?(key, path)
       return false if path.blank?
-      if key == :profile && !authenticated && normalized_path(current_path) == normalized_path(sign_in_path)
-        return false
-      end
 
       return normalized_path(current_path) == normalized_path(path) if key == :explore
 

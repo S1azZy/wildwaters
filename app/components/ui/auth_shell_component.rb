@@ -10,9 +10,7 @@ module Ui
                 :description,
                 :alternate_prompt,
                 :alternate_label,
-                :alternate_path,
-                :footer_author,
-                :footer_note
+                :alternate_path
 
     def initialize(
       variant:,
@@ -21,9 +19,7 @@ module Ui
       description:,
       alternate_prompt:,
       alternate_label:,
-      alternate_path:,
-      footer_author:,
-      footer_note:
+      alternate_path:
     )
       @variant = normalize_option(variant, allowed: VARIANTS, error_prefix: "Unknown auth shell variant")
       @eyebrow = eyebrow
@@ -32,8 +28,6 @@ module Ui
       @alternate_prompt = alternate_prompt
       @alternate_label = alternate_label
       @alternate_path = alternate_path
-      @footer_author = footer_author
-      @footer_note = footer_note
     end
 
     def shell_class

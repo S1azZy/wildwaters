@@ -6,7 +6,6 @@ RSpec.describe "Authentication", type: :request do
     expect(body).to include(title)
     expect(body).to include(prompt)
     expect(body).to include(link)
-    expect(body).to include(I18n.t("auth.shared.footer.author"))
     expect(body).to include(I18n.t("auth.fields.locale")) if include_locale
   end
 
@@ -24,6 +23,26 @@ RSpec.describe "Authentication", type: :request do
         prompt: ERB::Util.html_escape(I18n.t("auth.sessions.new.sign_up_prompt")),
         link: I18n.t("auth.sessions.new.sign_up_link")
       )
+    end
+
+    context "when the user is already authenticated" do
+      let(:user_identity) { create(:user_identity, email: "user@example.com") }
+
+      before do
+        user_identity
+        post session_path, params: {
+          session: {
+            email: "user@example.com",
+            password: "Password123!"
+          }
+        }
+      end
+
+      it "redirects to the explore homepage" do
+        perform_request
+
+        expect(response).to redirect_to(root_path)
+      end
     end
   end
 
@@ -144,10 +163,10 @@ RSpec.describe "Authentication", type: :request do
       user_identity
     end
 
-    it "signs in and redirects to the dashboard" do
+    it "signs in and redirects to the explore homepage" do
       expect { perform_request }.to change(Session, :count).by(1)
 
-      expect(response).to redirect_to(dashboard_path)
+      expect(response).to redirect_to(root_path)
     end
 
     context "when credentials are invalid" do

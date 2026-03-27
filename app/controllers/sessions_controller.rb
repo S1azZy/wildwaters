@@ -13,7 +13,7 @@ class SessionsController < ApplicationController
 
       issue_session_for!(user, user_identity)
 
-      redirect_to dashboard_path, notice: t("auth.sessions.create.success")
+      redirect_to root_path, notice: t("auth.sessions.create.success")
     else
       @error_code = result.failure[:code]
       flash.now[:alert] = t("auth.sessions.create.failure")
@@ -35,6 +35,6 @@ class SessionsController < ApplicationController
   end
 
   def redirect_authenticated_user
-    redirect_to dashboard_path if authenticated?
+    redirect_to root_path if authenticated?
   end
 end

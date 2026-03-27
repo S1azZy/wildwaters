@@ -580,14 +580,10 @@ export default class extends Controller {
     }
 
     const footer = document.createElement("div")
-    footer.className = "mt-5 flex items-center justify-between gap-3 border-t border-stone-200/80 pt-4"
-
-    const mode = document.createElement("span")
-    mode.className = "text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-slate-400"
-    mode.textContent = this.listModeValue
+    footer.className = "mt-5 flex items-center gap-3 border-t border-stone-200/80 pt-4"
 
     const actions = document.createElement("div")
-    actions.className = "flex items-center gap-2"
+    actions.className = "ml-auto flex items-center gap-2"
 
     const locate = document.createElement("button")
     locate.type = "button"
@@ -604,7 +600,7 @@ export default class extends Controller {
     details.textContent = this.detailsLabelValue
 
     actions.append(locate, details)
-    footer.append(mode, actions)
+    footer.append(actions)
 
     article.append(header)
 
