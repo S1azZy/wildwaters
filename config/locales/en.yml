@@ -145,6 +145,8 @@ en:
         search_hint: "Search within the currently loaded cards by waterfall name, summary, or region."
         search_placeholder: "Search the current list"
       heading: "Find your next waterfall"
+      rail_toggle: "Explore waterfalls"
+      end_of_list: "End of list"
       list_heading: "Visible waterfalls"
       list_hint: "Move the map or refine the filters to change the list."
       list_mode: "Map + list"
