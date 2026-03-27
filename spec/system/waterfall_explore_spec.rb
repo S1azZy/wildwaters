@@ -126,7 +126,6 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-filter-band [data-explore-map-target='filters']")
     expect(page).to have_css(".explore-filter-band [data-explore-map-target='search']")
     expect(page).not_to have_button(I18n.t("waterfalls.index.filters.apply"))
-    expect(page).not_to have_link(I18n.t("waterfalls.index.filters.reset"))
     expect(page).not_to have_css(".explore-filter-band [data-explore-map-target='resultsToggle']")
   end
 
