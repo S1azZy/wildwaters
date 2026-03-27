@@ -53,9 +53,7 @@ module Ui
       return guest_actions unless authenticated
 
       [
-        action_item(:notifications, labels.fetch(:notifications), nil, kind: :icon_button),
-        action_item(:settings, labels.fetch(:settings), nil, kind: :icon_button),
-        action_item(:profile, labels.fetch(:profile), dashboard_path, kind: :avatar_link)
+        action_item(:profile, labels.fetch(:profile), dashboard_path, kind: :button)
       ]
     end
 
@@ -87,6 +85,9 @@ module Ui
 
     def current?(key, path)
       return false if path.blank?
+      if key == :profile && !authenticated && normalized_path(current_path) == normalized_path(sign_in_path)
+        return false
+      end
 
       return normalized_path(current_path) == normalized_path(path) if key == :explore
 

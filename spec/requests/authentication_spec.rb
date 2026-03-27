@@ -1,6 +1,84 @@
 require "rails_helper"
 
 RSpec.describe "Authentication", type: :request do
+  def expect_auth_shell_response!(body, title:, prompt:, link:, include_locale: false)
+    expect(body).to include("data-ui=\"auth-shell\"")
+    expect(body).to include(title)
+    expect(body).to include(prompt)
+    expect(body).to include(link)
+    expect(body).to include(I18n.t("auth.shared.footer.author"))
+    expect(body).to include(I18n.t("auth.fields.locale")) if include_locale
+  end
+
+  describe "GET /session/new" do
+    subject(:perform_request) { get new_session_path }
+
+    it "renders the sign-in page with its recovery and registration links" do
+      perform_request
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t("auth.sessions.new.forgot_password"))
+      expect_auth_shell_response!(
+        response.body,
+        title: I18n.t("auth.sessions.new.heading"),
+        prompt: ERB::Util.html_escape(I18n.t("auth.sessions.new.sign_up_prompt")),
+        link: I18n.t("auth.sessions.new.sign_up_link")
+      )
+    end
+  end
+
+  describe "GET /registration/new" do
+    subject(:perform_request) { get new_registration_path }
+
+    it "renders the sign-up page with its locale field and sign-in link" do
+      perform_request
+
+      expect(response).to have_http_status(:ok)
+      expect_auth_shell_response!(
+        response.body,
+        title: I18n.t("auth.registrations.new.heading"),
+        prompt: I18n.t("auth.registrations.new.sign_in_prompt"),
+        link: I18n.t("auth.registrations.new.sign_in_link"),
+        include_locale: true
+      )
+    end
+  end
+
+  describe "GET /password-reset/new" do
+    subject(:perform_request) { get new_password_reset_path }
+
+    it "renders the password reset request page inside the shared auth shell" do
+      perform_request
+
+      expect(response).to have_http_status(:ok)
+      expect_auth_shell_response!(
+        response.body,
+        title: I18n.t("auth.password_resets.new.heading"),
+        prompt: I18n.t("auth.password_resets.new.sign_in_prompt"),
+        link: I18n.t("auth.password_resets.new.sign_in_link")
+      )
+    end
+  end
+
+  describe "GET /password-reset/:token" do
+    subject(:perform_request) { get password_reset_token_path(token) }
+
+    let(:token) { "example-token" }
+
+    it "renders the password reset form inside the shared auth shell" do
+      perform_request
+
+      expect(response).to have_http_status(:ok)
+      expect_auth_shell_response!(
+        response.body,
+        title: I18n.t("auth.password_resets.edit.heading"),
+        prompt: I18n.t("auth.password_resets.edit.sign_in_prompt"),
+        link: I18n.t("auth.password_resets.edit.sign_in_link")
+      )
+      expect(response.body).to include(I18n.t("auth.password_resets.edit.submit"))
+    end
+  end
+
   describe "GET /dashboard" do
     subject(:perform_request) { get dashboard_path }
 

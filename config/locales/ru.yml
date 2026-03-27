@@ -12,20 +12,33 @@ ru:
       settings: "Настройки"
       sign_in: "Войти"
   auth:
+    shared:
+      footer:
+        author: "A. Tselovalnikov"
+        note: "Спокойная временная подпись для будущего футера атласа."
     fields:
       email: "Email"
+      email_placeholder: "name@example.com"
       locale: "Язык"
       password: "Пароль"
+      password_placeholder: "••••••••"
       password_confirmation: "Подтверждение пароля"
+    locales:
+      en: "English"
+      ru: "Русский"
     registrations:
       create:
         success: "Добро пожаловать в Wild Waters."
       new:
+        card_heading: "Соберите спокойную точку старта"
+        card_supporting: "Сохраняйте водопады, отзывы и будущие маршрутные заметки в одном месте с самого первого входа."
+        eyebrow: "Новый аккаунт"
         heading: "Создайте аккаунт"
+        locale_hint: "Выберите язык, на котором хотите видеть интерфейс в первую очередь."
         sign_in_link: "Войти"
         sign_in_prompt: "Уже есть аккаунт?"
         submit: "Создать аккаунт"
-        subheading: "Сохраняйте водопады, отзывы и будущие приключения."
+        subheading: "Подготовьте свою базу для сохранённых водопадов, заметок и следующего холодного маршрута."
         title: "Регистрация"
     sessions:
       create:
@@ -34,19 +47,27 @@ ru:
       destroy:
         success: "Вы вышли из аккаунта."
       new:
+        card_heading: "Вернитесь к сохранённой карте"
+        card_supporting: "Продолжите планирование с теми же маршрутами, закладками и идеями для холодной воды, которые уже ждут вас."
+        eyebrow: "С возвращением"
         forgot_password: "Забыли пароль?"
         heading: "Вход"
-        sign_up_link: "Создать аккаунт"
+        sign_up_link: "Зарегистрироваться"
         sign_up_prompt: "Нет аккаунта?"
         submit: "Войти"
-        subheading: "Продолжайте путешествие по Wild Waters."
+        subheading: "Вернитесь к сохранённым водопадам, маршрутам и спокойной стороне атласа."
         title: "Вход"
       require_authentication: "Войдите, чтобы продолжить."
     password_resets:
       create:
         success: "Если такой email существует, мы отправили инструкции для сброса пароля."
       edit:
+        card_heading: "Зафиксируйте новый маршрут доступа"
+        card_supporting: "Задайте новый пароль и вернитесь к сохранённым картам, водопадам и заметкам."
+        eyebrow: "Безопасный доступ"
         heading: "Задайте новый пароль"
+        sign_in_link: "Вернуться ко входу"
+        sign_in_prompt: "Нужна страница входа?"
         submit: "Обновить пароль"
         subheading: "Установите новый пароль для аккаунта Wild Waters."
         title: "Сброс пароля"
@@ -57,6 +78,9 @@ ru:
         instructions: "Перейдите по ссылке ниже, чтобы задать новый пароль."
         subject: "Сброс пароля Wild Waters"
       new:
+        card_heading: "Верните доступ к своим маршрутам"
+        card_supporting: "Мы отправим одноразовую ссылку, чтобы вы могли вернуться к сохранённым водопадам и планам."
+        eyebrow: "Восстановление доступа"
         heading: "Сброс пароля"
         sign_in_link: "Вернуться ко входу"
         sign_in_prompt: "Вспомнили пароль?"

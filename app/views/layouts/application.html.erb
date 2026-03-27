@@ -26,7 +26,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen text-neutral-900 antialiased">
+  <body class="<%= [ "min-h-screen text-neutral-900 antialiased", (yield(:body_class) if content_for?(:body_class)) ].compact.join(" ") %>">
     <div class="site-shell">
       <%= render Ui::SiteHeaderComponent.new(
             labels: {
