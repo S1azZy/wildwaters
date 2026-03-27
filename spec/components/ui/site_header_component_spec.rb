@@ -88,14 +88,12 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       )
     end
 
-    it "returns authenticated utility controls when the user is signed in" do
+    it "returns a single profile action when the user is signed in" do
       component = build_component(current_path: "/dashboard", authenticated: true, profile_path: "/dashboard")
 
       expect(component.utility_actions).to eq(
         [
-          { key: :notifications, label: "Notifications", path: nil, kind: :icon_button },
-          { key: :settings, label: "Settings", path: nil, kind: :icon_button },
-          { key: :profile, label: "Profile", path: "/dashboard", kind: :avatar_link }
+          { key: :profile, label: "Profile", path: "/dashboard", kind: :button }
         ]
       )
     end
@@ -146,15 +144,14 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
       expect(page).not_to have_link("Create account", href: "/registration/new")
     end
 
-    it "renders authenticated utility icons and avatar" do
+    it "renders a single authenticated profile action" do
       render_inline(build_component(current_path: "/dashboard", authenticated: true, profile_path: "/dashboard"))
 
       expect(page).to have_css("[data-ui='site-header-actions']")
       expect(page).to have_css("[data-ui='site-header-auth-actions']")
-      expect(page).to have_css("[data-ui='icon-button'][aria-label='Notifications']")
-      expect(page).to have_css("[data-ui='icon-button'][aria-label='Settings']")
       expect(page).to have_link("Profile", href: "/dashboard")
-      expect(page).to have_css("[data-ui='site-header-avatar']")
+      expect(page).not_to have_css("[data-ui='icon-button']")
+      expect(page).not_to have_css("[data-ui='site-header-avatar']")
     end
   end
 end

@@ -40,20 +40,33 @@ en:
       settings: "Settings"
       sign_in: "Log in"
   auth:
+    shared:
+      footer:
+        author: "A. Tselovalnikov"
+        note: "A quiet footer placeholder for the rest of the atlas."
     fields:
       email: "Email"
+      email_placeholder: "name@example.com"
       locale: "Language"
       password: "Password"
+      password_placeholder: "••••••••"
       password_confirmation: "Confirm password"
+    locales:
+      en: "English"
+      ru: "Russian"
     registrations:
       create:
         success: "Welcome to Wild Waters."
       new:
+        card_heading: "Shape a calm starting point"
+        card_supporting: "Keep your saved waterfalls, reviews, and future route notes in one place from the first session."
+        eyebrow: "New account"
         heading: "Create your account"
+        locale_hint: "Choose the language you want to see across the app first."
         sign_in_link: "Sign in"
         sign_in_prompt: "Already have an account?"
         submit: "Create account"
-        subheading: "Start saving waterfalls, reviews, and future adventures."
+        subheading: "Set up your basecamp for saved waterfalls, field notes, and the next cold-water detour."
         title: "Sign up"
     sessions:
       create:
@@ -62,19 +75,27 @@ en:
       destroy:
         success: "Signed out successfully."
       new:
+        card_heading: "Return to your saved map"
+        card_supporting: "Pick up your planning flow with the same routes, bookmarks, and cold-water ideas waiting where you left them."
+        eyebrow: "Welcome back"
         forgot_password: "Forgot your password?"
         heading: "Sign in"
-        sign_up_link: "Create an account"
-        sign_up_prompt: "Need an account?"
+        sign_up_link: "Sign up"
+        sign_up_prompt: "Don't have an account?"
         submit: "Sign in"
-        subheading: "Continue your Wild Waters journey."
+        subheading: "Return to your saved waterfalls, route ideas, and the quiet side of the atlas."
         title: "Sign in"
       require_authentication: "Please sign in to continue."
     password_resets:
       create:
         success: "If that email exists, we've sent password reset instructions."
       edit:
+        card_heading: "Lock in the next route"
+        card_supporting: "Choose a fresh password before you head back into saved map views and trip notes."
+        eyebrow: "Secure access"
         heading: "Choose a new password"
+        sign_in_link: "Back to sign in"
+        sign_in_prompt: "Need the sign-in page instead?"
         submit: "Update password"
         subheading: "Set a fresh password for your Wild Waters account."
         title: "Reset password"
@@ -85,6 +106,9 @@ en:
         instructions: "Use the link below to choose a new password."
         subject: "Reset your Wild Waters password"
       new:
+        card_heading: "Recover your route log"
+        card_supporting: "We'll send a one-time reset link so you can get back to saved waterfalls and planning notes."
+        eyebrow: "Account recovery"
         heading: "Reset your password"
         sign_in_link: "Back to sign in"
         sign_in_prompt: "Remembered it?"

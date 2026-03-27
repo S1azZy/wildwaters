@@ -40,4 +40,25 @@ RSpec.describe "Design system shell", type: :system do
       text: I18n.t("auth.password_resets.create.success")
     )
   end
+
+  it "renders the auth shell and footer on the sign-in page" do
+    visit new_session_path
+
+    expect(page).to have_css("[data-ui='auth-shell'][data-variant='session']")
+    expect(page).to have_css("[data-ui='auth-card']")
+    expect(page).to have_css("[data-ui='auth-footer']", text: I18n.t("auth.shared.footer.author"))
+  end
+
+  it "shows the profile action in the header after a successful sign-in" do
+    create(:user_identity, email: "user@example.com")
+
+    visit new_session_path
+    fill_in I18n.t("auth.fields.email"), with: "user@example.com"
+    fill_in I18n.t("auth.fields.password"), with: "Password123!"
+    click_button I18n.t("auth.sessions.new.submit")
+
+    expect(page).to have_current_path(dashboard_path)
+    expect(page).to have_link(I18n.t("layouts.header.profile"), href: dashboard_path)
+    expect(page).not_to have_link(I18n.t("layouts.header.sign_in"), href: new_session_path)
+  end
 end

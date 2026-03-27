@@ -1,41 +1,57 @@
 <% content_for :title, t("auth.registrations.new.title") %>
+<% content_for :main_class, "auth-main flex-1 px-0 py-0" %>
+<% content_for :body_class, "auth-page auth-page--registration" %>
 
-<div class="mx-auto w-full max-w-md">
-  <h1 class="text-2xl font-semibold"><%= t("auth.registrations.new.heading") %></h1>
-  <p class="mt-2 text-sm text-slate-600"><%= t("auth.registrations.new.subheading") %></p>
+<%
+  auth_shell = Ui::AuthShellComponent.new(
+    variant: :registration,
+    eyebrow: t("auth.registrations.new.eyebrow"),
+    title: t("auth.registrations.new.heading"),
+    description: t("auth.registrations.new.subheading"),
+    alternate_prompt: t("auth.registrations.new.sign_in_prompt"),
+    alternate_label: t("auth.registrations.new.sign_in_link"),
+    alternate_path: new_session_path,
+    footer_author: t("auth.shared.footer.author"),
+    footer_note: t("auth.shared.footer.note")
+  )
+%>
 
-  <%= form_with url: registration_path, scope: :registration, class: "mt-8 space-y-4" do |form| %>
-    <div>
-      <%= form.label :email, t("auth.fields.email"), class: "mb-1 block text-sm font-medium" %>
-      <%= form.email_field :email, value: params.dig(:registration, :email), autocomplete: "email", class: "w-full rounded border px-3 py-2" %>
+<% auth_shell.with_panel do %>
+  <%= form_with url: registration_path, scope: :registration, class: "space-y-5" do |form| %>
+    <div class="auth-form__intro">
+      <p class="auth-form__heading"><%= t("auth.registrations.new.card_heading") %></p>
+      <p class="auth-form__supporting"><%= t("auth.registrations.new.card_supporting") %></p>
     </div>
 
-    <div>
-      <%= form.label :password, t("auth.fields.password"), class: "mb-1 block text-sm font-medium" %>
-      <%= form.password_field :password, autocomplete: "new-password", class: "w-full rounded border px-3 py-2" %>
+    <div class="space-y-1.5">
+      <%= form.label :email, t("auth.fields.email"), class: "auth-form__label" %>
+      <%= form.email_field :email, value: params.dig(:registration, :email), autocomplete: "email", class: "auth-form__input", placeholder: t("auth.fields.email_placeholder") %>
     </div>
 
-    <div>
-      <%= form.label :password_confirmation, t("auth.fields.password_confirmation"), class: "mb-1 block text-sm font-medium" %>
-      <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "w-full rounded border px-3 py-2" %>
+    <div class="space-y-1.5">
+      <%= form.label :password, t("auth.fields.password"), class: "auth-form__label" %>
+      <%= form.password_field :password, autocomplete: "new-password", class: "auth-form__input", placeholder: t("auth.fields.password_placeholder") %>
     </div>
 
-    <div>
-      <%= form.label :locale, t("auth.fields.locale"), class: "mb-1 block text-sm font-medium" %>
-      <%= form.select :locale, I18n.available_locales.map { |locale| [ locale.to_s.upcase, locale ] }, { selected: params.dig(:registration, :locale) || I18n.default_locale }, class: "w-full rounded border px-3 py-2" %>
+    <div class="space-y-1.5">
+      <%= form.label :password_confirmation, t("auth.fields.password_confirmation"), class: "auth-form__label" %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "auth-form__input", placeholder: t("auth.fields.password_placeholder") %>
+    </div>
+
+    <div class="space-y-1.5">
+      <%= form.label :locale, t("auth.fields.locale"), class: "auth-form__label" %>
+      <%= form.select :locale, I18n.available_locales.map { |locale| [ t("auth.locales.#{locale}"), locale ] }, { selected: params.dig(:registration, :locale) || I18n.default_locale }, class: "auth-form__select" %>
+      <p class="auth-form__supporting"><%= t("auth.registrations.new.locale_hint") %></p>
     </div>
 
     <% if @errors.present? %>
-      <div class="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+      <div class="auth-form__error" role="alert">
         <%= @errors.to_h.values.flatten.join(", ") %>
       </div>
     <% end %>
 
-    <%= form.submit t("auth.registrations.new.submit"), class: "w-full rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white" %>
+    <%= form.submit t("auth.registrations.new.submit"), class: "auth-form__submit" %>
   <% end %>
+<% end %>
 
-  <p class="mt-4 text-sm text-slate-600">
-    <%= t("auth.registrations.new.sign_in_prompt") %>
-    <%= link_to t("auth.registrations.new.sign_in_link"), new_session_path, class: "font-medium text-slate-900 underline" %>
-  </p>
-</div>
+<%= render auth_shell %>
