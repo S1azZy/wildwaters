@@ -85,6 +85,9 @@ module Ui
 
     def current?(key, path)
       return false if path.blank?
+      if key == :profile && !authenticated && normalized_path(current_path) == normalized_path(sign_in_path)
+        return false
+      end
 
       return normalized_path(current_path) == normalized_path(path) if key == :explore
 

@@ -75,6 +75,14 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
         ]
       )
     end
+
+    it "does not mark profile current for guests on the sign-in page" do
+      component = build_component(current_path: "/session/new", authenticated: false, profile_path: "/session/new")
+
+      expect(component.navigation_items).to include(
+        { key: :profile, label: "Profile", path: "/session/new", current: false }
+      )
+    end
   end
 
   describe "#utility_actions" do
