@@ -13,9 +13,9 @@ RSpec.describe "Design system shell", type: :system do
     visit root_path
 
     expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.explore"))
-    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.map"))
-    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.activity"))
-    expect(page).to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.profile"))
+    expect(page).not_to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.map"))
+    expect(page).not_to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.activity"))
+    expect(page).not_to have_css("[data-ui='site-header-nav-item']", text: I18n.t("layouts.header.profile"))
   end
 
   it "renders the shared guest header navigation and actions" do
@@ -41,12 +41,28 @@ RSpec.describe "Design system shell", type: :system do
     )
   end
 
-  it "renders the auth shell and footer on the sign-in page" do
+  it "renders the auth shell on the sign-in page without a footer" do
     visit new_session_path
 
     expect(page).to have_css("[data-ui='auth-shell'][data-variant='session']")
     expect(page).to have_css("[data-ui='auth-card']")
-    expect(page).to have_css("[data-ui='auth-footer']", text: I18n.t("auth.shared.footer.author"))
+    expect(page).not_to have_css("[data-ui='auth-footer']")
+  end
+
+  it "renders the auth shell on the sign-up page without a footer" do
+    visit new_registration_path
+
+    expect(page).to have_css("[data-ui='auth-shell'][data-variant='registration']")
+    expect(page).to have_css("[data-ui='auth-card']")
+    expect(page).not_to have_css("[data-ui='auth-footer']")
+  end
+
+  it "renders the auth shell on the recovery page without a footer" do
+    visit new_password_reset_path
+
+    expect(page).to have_css("[data-ui='auth-shell'][data-variant='recovery']")
+    expect(page).to have_css("[data-ui='auth-card']")
+    expect(page).not_to have_css("[data-ui='auth-footer']")
   end
 
   it "shows the profile action in the header after a successful sign-in" do
@@ -57,7 +73,7 @@ RSpec.describe "Design system shell", type: :system do
     fill_in I18n.t("auth.fields.password"), with: "Password123!"
     click_button I18n.t("auth.sessions.new.submit")
 
-    expect(page).to have_current_path(dashboard_path)
+    expect(page).to have_current_path(root_path)
     expect(page).to have_link(I18n.t("layouts.header.profile"), href: dashboard_path)
     expect(page).not_to have_link(I18n.t("layouts.header.sign_in"), href: new_session_path)
   end

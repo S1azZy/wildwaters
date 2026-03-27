@@ -75,12 +75,16 @@ RSpec.describe "Waterfall explore", type: :system do
     overflow_waterfalls
   end
 
-  it "renders the public header links" do
+  it "renders the public header links", :aggregate_failures do
     visit_page
 
     expect(page).to have_current_path(root_path)
     expect(page).to have_css("[data-ui='site-header-brand']", text: I18n.t("layouts.header.brand_name"))
     expect(page).to have_css("[data-ui='site-header-primary-nav']")
+    expect(page).to have_link(I18n.t("layouts.header.explore"))
+    expect(page).not_to have_link(I18n.t("layouts.header.map"))
+    expect(page).not_to have_link(I18n.t("layouts.header.activity"))
+    expect(page).not_to have_link(I18n.t("layouts.header.profile"))
     expect(page).to have_css("[data-ui='site-header-actions']")
     expect(page).to have_link(I18n.t("layouts.header.sign_in"))
     expect(page).not_to have_link(I18n.t("layouts.header.create_account"))
@@ -180,6 +184,7 @@ RSpec.describe "Waterfall explore", type: :system do
     visit_page
 
     expect(page).to have_css("[data-explore-map-target='list'][data-card-class-template]")
+    expect(page).not_to have_text(I18n.t("waterfalls.index.list_mode"))
   end
 
   it "renders a collapsible results panel that is hidden by default" do

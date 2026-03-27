@@ -42,10 +42,7 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
 
       expect(component.navigation_items).to eq(
         [
-          { key: :explore, label: "Explore", path: "/", current: true },
-          { key: :map, label: "Map", path: nil, current: false },
-          { key: :activity, label: "Activity", path: nil, current: false },
-          { key: :profile, label: "Profile", path: "/profile", current: false }
+          { key: :explore, label: "Explore", path: "/", current: true }
         ]
       )
     end
@@ -55,32 +52,18 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
 
       expect(component.navigation_items).to eq(
         [
-          { key: :explore, label: "Explore", path: "/", current: true },
-          { key: :map, label: "Map", path: nil, current: false },
-          { key: :activity, label: "Activity", path: nil, current: false },
-          { key: :profile, label: "Profile", path: "/profile", current: false }
+          { key: :explore, label: "Explore", path: "/", current: true }
         ]
       )
     end
 
-    it "marks the profile nav item current when its path matches" do
+    it "keeps only the explore nav item in the public header" do
       component = build_component(current_path: "/profile", authenticated: false)
 
       expect(component.navigation_items).to eq(
         [
-          { key: :explore, label: "Explore", path: "/", current: false },
-          { key: :map, label: "Map", path: nil, current: false },
-          { key: :activity, label: "Activity", path: nil, current: false },
-          { key: :profile, label: "Profile", path: "/profile", current: true }
+          { key: :explore, label: "Explore", path: "/", current: false }
         ]
-      )
-    end
-
-    it "does not mark profile current for guests on the sign-in page" do
-      component = build_component(current_path: "/session/new", authenticated: false, profile_path: "/session/new")
-
-      expect(component.navigation_items).to include(
-        { key: :profile, label: "Profile", path: "/session/new", current: false }
       )
     end
   end
@@ -138,9 +121,9 @@ RSpec.describe Ui::SiteHeaderComponent, type: :component do
 
       expect(page).to have_link("Explore", href: "/")
       expect(page).to have_css(".site-header-nav-link--prominent", text: "Explore")
-      expect(page).to have_css("[data-ui='site-header-nav-item']", text: "Map")
-      expect(page).to have_css("[data-ui='site-header-nav-item']", text: "Activity")
-      expect(page).to have_css("[data-ui='site-header-nav-item']", text: "Profile")
+      expect(page).not_to have_css("[data-ui='site-header-nav-item']", text: "Map")
+      expect(page).not_to have_css("[data-ui='site-header-nav-item']", text: "Activity")
+      expect(page).not_to have_css("[data-ui='site-header-nav-item']", text: "Profile")
     end
 
     it "renders the guest action cluster" do

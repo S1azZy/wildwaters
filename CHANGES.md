@@ -1,6 +1,8 @@
 # Changes
 
 ## 2026-03-27
+- Simplified the shared header navigation to keep only Explore on the left, retained the authenticated Profile action on the right, removed the waterfall card `Map + list` label, and dropped the placeholder auth footer from the shared auth shell.
+- Changed successful sign-ins to return users to the public homepage instead of the dashboard while preserving existing sign-out and auth-required flows.
 - Refreshed the current outdated set again by moving Rails to `8.1.3`, updating `action_text-trix`, `ffi`, `json`, `parser`, and `thruster`, and vendoring `MapLibre GL JS/CSS` `5.21.1`.
 - Redesigned only the sign-in and sign-up pages into a shared premium auth shell with calm full-page gradients, a floating card treatment, localized alternate auth links, and a small placeholder author footer while preserving the existing routes and auth behavior.
 - Suppressed resize-induced `moveend` reloads when opening or closing the explore rail so the waterfall cards no longer flicker from an unnecessary list re-render.
