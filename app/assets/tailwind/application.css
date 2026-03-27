@@ -475,14 +475,11 @@
   }
 
   .explore-results-overlay {
-<<<<<<< HEAD
     width: auto;
     min-height: 0;
     border-color: rgba(255, 255, 255, 0.78);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 241, 232, 0.9));
     box-shadow: 0 20px 56px rgba(15, 23, 42, 0.11);
-=======
->>>>>>> 648a14d (refine: unify explore rail toggle)
     transition:
       max-height 260ms cubic-bezier(0.22, 1, 0.36, 1),
       opacity 220ms ease-out,
@@ -570,14 +567,11 @@
     background: rgba(241, 245, 249, 0.98);
   }
 
-<<<<<<< HEAD
   .explore-scrollbar {
     overscroll-behavior: contain;
     scrollbar-gutter: stable both-edges;
   }
 
-=======
->>>>>>> 648a14d (refine: unify explore rail toggle)
   @media (prefers-reduced-motion: reduce) {
     .explore-results-shell,
     .explore-results-overlay,
@@ -635,7 +629,6 @@
       row-gap: 0.75rem;
       align-items: center;
     }
-<<<<<<< HEAD
   }
 
   @media (min-width: 640px) {
@@ -663,8 +656,6 @@
     .auth-footer {
       animation-delay: 160ms;
     }
-=======
->>>>>>> 648a14d (refine: unify explore rail toggle)
   }
 
   @supports (height: 100dvh) {

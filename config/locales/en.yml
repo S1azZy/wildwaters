@@ -191,7 +191,6 @@ en:
       no_javascript: "JavaScript is disabled, so the map is paused. The waterfall list and filters still work as a regular catalog."
       published_only: "Published only"
       result_suffix: "shown"
-      rail_toggle: "Explore waterfalls"
       subheading: "A growing collection of remarkable cascades, trail approaches, and natural swimming spots."
       title: "Waterfalls"
       visible_label: "visible"
