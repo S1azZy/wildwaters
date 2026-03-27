@@ -1,6 +1,7 @@
 # Changes
 
 ## 2026-03-27
+- Refreshed the current outdated set again by moving Rails to `8.1.3`, updating `action_text-trix`, `ffi`, `json`, `parser`, and `thruster`, and vendoring `MapLibre GL JS/CSS` `5.21.1`.
 - Redesigned only the sign-in and sign-up pages into a shared premium auth shell with calm full-page gradients, a floating card treatment, localized alternate auth links, and a small placeholder author footer while preserving the existing routes and auth behavior.
 - Suppressed resize-induced `moveend` reloads when opening or closing the explore rail so the waterfall cards no longer flicker from an unnecessary list re-render.
 - Removed transient explore-map refresh/status UI so the map and results rail no longer flash short-lived messages or end labels during routine list updates.
