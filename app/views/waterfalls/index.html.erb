@@ -60,8 +60,6 @@
                   explore_map_initial_longitude_value: "115.1889",
                   explore_map_initial_latitude_value: "-8.2601",
                   explore_map_initial_zoom_value: "7.4",
-                  explore_map_loading_label_value: t("waterfalls.index.loading"),
-                  explore_map_list_hint_value: t("waterfalls.index.list_hint"),
                   explore_map_list_mode_value: t("waterfalls.index.list_mode"),
                   explore_map_panel_open_class_value: "is-expanded",
                   explore_map_empty_label_value: t("waterfalls.index.empty"),
@@ -116,11 +114,6 @@
         </div>
       <% end %>
 
-      <div class="explore-filter-utility flex items-center gap-2.5 xl:justify-self-end">
-        <button type="button" class="explore-results-toggle inline-flex min-h-[2.85rem] items-center justify-center rounded-full border px-4 text-[0.92rem] font-semibold transition hover:border-stone-300" data-action="explore-map#toggleResults" data-explore-map-target="resultsToggle" aria-expanded="false" aria-controls="explore-results-panel">
-          <%= t("waterfalls.index.list_heading") %>
-        </button>
-      </div>
     </div>
   </div>
 
@@ -177,42 +170,28 @@
       </div>
     </div>
 
-    <aside id="explore-results-panel" class="explore-results-overlay is-collapsed absolute inset-x-3 top-3 z-20 flex max-h-[calc(100%-1.5rem)] flex-col overflow-hidden rounded-[1.6rem] backdrop-blur sm:inset-x-4 sm:top-4 lg:left-5 lg:top-5 lg:w-[24rem] lg:max-h-[calc(100%-2.5rem)] lg:inset-x-auto" data-explore-map-target="resultsPanel">
-      <div class="border-b border-stone-200/90 px-5 pb-4 pt-5">
-        <div class="flex flex-wrap items-start justify-between gap-4">
-          <div class="space-y-2">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-emerald-900/55"><%= t("waterfalls.index.eyebrow") %></p>
-            <div class="space-y-2">
-              <h1 class="max-w-sm font-serif text-3xl leading-none text-slate-950 sm:text-[2.45rem]"><%= t("waterfalls.index.heading") %></h1>
-              <p class="max-w-md text-sm leading-6 text-slate-600"><%= t("waterfalls.index.subheading") %></p>
-            </div>
-          </div>
+    <aside class="explore-results-shell absolute left-3 top-3 z-20 max-w-[calc(100%-1.5rem)] pointer-events-auto sm:left-4 sm:top-4 sm:max-w-[calc(100%-2rem)] lg:left-5 lg:top-5 lg:max-w-[24rem]" data-results-shell data-results-state="collapsed">
+      <button type="button" class="explore-results-toggle flex min-h-[4.05rem] w-full items-center justify-between gap-4 px-5 text-left transition" data-action="explore-map#toggleResults" data-explore-map-target="resultsToggle" aria-expanded="false" aria-controls="explore-results-panel">
+        <span class="truncate whitespace-nowrap text-[1.02rem] font-semibold tracking-[-0.025em] text-slate-950 sm:text-[1.08rem]"><%= t("waterfalls.index.rail_toggle") %></span>
+        <span class="explore-results-toggle-chevron flex h-[2.55rem] w-[2.55rem] shrink-0 items-center justify-center rounded-full border-[3px] border-blue-400/85 bg-stone-100/94 text-slate-800 shadow-[0_10px_24px_rgba(59,130,246,0.18)]">
+          <svg class="h-[0.98rem] w-[0.98rem]" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 9.5 12 15.5 18 9.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </button>
 
-          <div class="flex flex-wrap gap-2">
-            <p class="rounded-full bg-stone-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-stone-50 shadow-[0_12px_30px_rgba(15,23,42,0.18)]">
-              <span data-explore-map-target="resultCount"><%= @waterfalls.size %></span>
-              <%= t("waterfalls.index.result_suffix") %>
-            </p>
-            <button type="button" class="inline-flex items-center rounded-full border border-stone-200 bg-white px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-slate-600 transition hover:border-stone-300 hover:text-slate-950" data-action="explore-map#toggleResults">
-              <%= t("waterfalls.index.actions.details") %>
-            </button>
-          </div>
+      <aside id="explore-results-panel" class="explore-results-overlay is-collapsed flex flex-col overflow-hidden lg:w-[24rem]" data-explore-map-target="resultsPanel">
+      <div class="border-b border-stone-200/90 px-5 py-4" data-explore-map-target="resultsHeader">
+        <div class="flex items-center justify-between gap-3">
+          <p class="min-w-0 text-sm font-semibold text-slate-900" aria-live="polite">
+            <span data-explore-map-target="resultCount"><%= @waterfalls.size %></span>
+            <%= t("waterfalls.index.result_suffix") %>
+          </p>
+
         </div>
       </div>
 
-      <div class="flex items-center justify-between gap-3 border-b border-stone-200/90 px-5 py-4">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500"><%= t("waterfalls.index.list_heading") %></p>
-          <p class="mt-1 text-sm text-slate-500" data-explore-map-target="status" aria-live="polite"><%= t("waterfalls.index.list_hint") %></p>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <span class="hidden rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-emerald-900" data-explore-map-target="loading"><%= t("waterfalls.index.loading") %></span>
-          <span class="rounded-full bg-stone-100 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500"><%= t("waterfalls.index.list_mode") %></span>
-        </div>
-      </div>
-
-      <div class="explore-scrollbar flex-1 overflow-y-auto px-4 py-4">
+      <div class="explore-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-4" data-explore-map-target="resultsScroll">
         <div class="grid gap-4" data-explore-map-target="list" data-card-class-template="<%= waterfall_card_class %>" aria-live="polite">
           <%= render partial: "waterfall_card", collection: @waterfalls, as: :waterfall, locals: { card_surface_class: waterfall_card_class } %>
         </div>
@@ -220,12 +199,11 @@
         <p class="hidden rounded-[1.75rem] border border-dashed border-stone-300 bg-white/80 px-5 py-8 text-center text-sm leading-6 text-slate-500" data-explore-map-target="empty">
           <%= t("waterfalls.index.empty") %>
         </p>
-      </div>
-    </aside>
 
-    <div class="pointer-events-none absolute inset-x-4 top-32 z-20 hidden justify-center sm:top-36" data-explore-map-target="mapState">
-      <div class="max-w-sm rounded-full border border-white/18 bg-black/35 px-4 py-3 text-center text-sm leading-6 text-white/86 shadow-[0_18px_80px_rgba(0,0,0,0.28)] backdrop-blur"></div>
-    </div>
+        <div class="mt-4 h-5 shrink-0" data-explore-map-target="endCap" aria-hidden="true"></div>
+      </div>
+      </aside>
+    </aside>
 
     <noscript>
       <div class="absolute inset-x-4 bottom-4 z-20 rounded-[1.5rem] border border-white/15 bg-black/35 px-4 py-4 text-sm leading-6 text-white/84 shadow-[0_18px_80px_rgba(0,0,0,0.28)]">

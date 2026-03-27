@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-03-27
+- Suppressed resize-induced `moveend` reloads when opening or closing the explore rail so the waterfall cards no longer flicker from an unnecessary list re-render.
+- Removed transient explore-map refresh/status UI so the map and results rail no longer flash short-lived messages or end labels during routine list updates.
+- Tightened the waterfall explore results rail into a viewport-bounded panel with a compact count summary, a dedicated scrolling list region, and a visible end-of-list marker while keeping the existing collapse/expand behavior.
+
 ## 2026-03-24
 - Slimmed the explore filter bar by removing its extra frame chrome, moved the map-style control into the on-map toolbar beside zoom controls, and removed the standalone refresh button from the desktop explore controls.
 - Reworked the explore screen into an AllTrails-style map-first layout with a dedicated single-band filter bar under the shared header, a collapsible de-emphasized results rail, and CSP-enabled Google font loading for the intended typography.

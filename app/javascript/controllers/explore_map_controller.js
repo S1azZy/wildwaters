@@ -17,20 +17,20 @@ export default class extends Controller {
   static targets = [
     "canvas",
     "card",
+    "endCap",
     "controlsPanel",
     "empty",
     "filters",
     "list",
-    "loading",
-    "mapState",
     "resultCount",
+    "resultsHeader",
     "resultsPanel",
+    "resultsScroll",
     "resultsToggle",
     "search",
     "shell",
     "styleButton",
-    "styleMenu",
-    "status"
+    "styleMenu"
   ]
 
   static values = {
@@ -40,9 +40,7 @@ export default class extends Controller {
     initialLatitude: Number,
     initialLongitude: Number,
     initialZoom: Number,
-    listHint: String,
     listMode: String,
-    loadingLabel: String,
     locateLabel: String,
     mapDataUrl: String,
     mapStyleUrl: String,
@@ -60,6 +58,7 @@ export default class extends Controller {
     this.selectedPublicId = null
     this.activeStyleId = this.resolveInitialStyleId()
     this.resultsOpen = false
+    this.suppressedMoveendLoadsUntil = 0
 
     if (!this.hasCanvasTarget || typeof maplibregl.Map !== "function") {
       this.renderMapUnavailable()
@@ -84,7 +83,7 @@ export default class extends Controller {
 
     this.resultsOpen = !this.resultsOpen
     this.syncResultsPanel()
-    this.resizeMap()
+    this.scheduleResultsResize()
   }
 
   zoomIn(event) {
@@ -99,6 +98,7 @@ export default class extends Controller {
 
   disconnect() {
     clearTimeout(this.filterTimer)
+    clearTimeout(this.resultsResizeTimer)
     this.abortController?.abort()
     this.resizeObserver?.disconnect()
     this.map?.remove()
@@ -197,7 +197,13 @@ export default class extends Controller {
       this.ensureMapLayers()
       this.loadFeatures({ fitToResults: !this.featuresLoaded })
     })
-    this.map.on("moveend", () => this.loadFeatures())
+    this.map.on("moveend", () => {
+      if (this.moveendLoadsSuppressed()) {
+        return
+      }
+
+      this.loadFeatures()
+    })
   }
 
   observeShellResize() {
@@ -226,6 +232,29 @@ export default class extends Controller {
     }
 
     requestAnimationFrame(() => this.map?.resize())
+  }
+
+  scheduleResultsResize() {
+    this.suppressMoveendLoadsFor(350)
+    this.resizeMap()
+    clearTimeout(this.resultsResizeTimer)
+    this.resultsResizeTimer = setTimeout(() => {
+      this.suppressMoveendLoadsFor(350)
+      this.resizeMap()
+    }, 280)
+  }
+
+  suppressMoveendLoadsFor(durationMs) {
+    const now = performance.now()
+
+    this.suppressedMoveendLoadsUntil = Math.max(
+      this.suppressedMoveendLoadsUntil,
+      now + durationMs
+    )
+  }
+
+  moveendLoadsSuppressed() {
+    return performance.now() < this.suppressedMoveendLoadsUntil
   }
 
   syncViewportOffset() {
@@ -348,7 +377,6 @@ export default class extends Controller {
     }
 
     this.setLoading(true)
-    this.setStatus(this.loadingLabelValue)
     this.abortController?.abort()
     this.abortController = new AbortController()
 
@@ -360,7 +388,6 @@ export default class extends Controller {
 
       if (!response.ok) {
         this.showMapState(this.mapUnavailableLabelValue, { persistent: true })
-        this.setStatus(this.mapUnavailableLabelValue)
         return
       }
 
@@ -382,7 +409,6 @@ export default class extends Controller {
     } catch (error) {
       if (error.name !== "AbortError") {
         this.showMapState(this.mapUnavailableLabelValue, { persistent: true })
-        this.setStatus(this.mapUnavailableLabelValue)
       }
     } finally {
       this.setLoading(false)
@@ -451,14 +477,24 @@ export default class extends Controller {
     if (features.length === 0) {
       this.emptyTarget.classList.remove("hidden")
       this.emptyTarget.textContent = this.emptyLabelValue
+      if (this.hasEndCapTarget) {
+        this.endCapTarget.classList.add("hidden")
+      }
       return
     }
 
     this.emptyTarget.classList.add("hidden")
+    if (this.hasEndCapTarget) {
+      this.endCapTarget.classList.remove("hidden")
+    }
 
     features.forEach((feature) => {
       this.listTarget.append(this.buildCard(feature))
     })
+
+    if (this.hasResultsScrollTarget) {
+      this.resultsScrollTarget.scrollTop = 0
+    }
 
     if (this.selectedPublicId) {
       this.highlightSelectedCard(this.selectedPublicId)
@@ -466,6 +502,14 @@ export default class extends Controller {
   }
 
   syncResultsPanel() {
+    const resultsShell = this.hasResultsToggleTarget
+      ? this.resultsToggleTarget.closest("[data-results-shell]")
+      : null
+
+    if (resultsShell) {
+      resultsShell.dataset.resultsState = this.resultsOpen ? "expanded" : "collapsed"
+    }
+
     if (this.hasResultsPanelTarget) {
       this.resultsPanelTarget.dataset.resultsState = this.resultsOpen ? "expanded" : "collapsed"
       this.resultsPanelTarget.classList.toggle("is-collapsed", !this.resultsOpen)
@@ -604,7 +648,9 @@ export default class extends Controller {
 
   updateResultCount(count) {
     if (this.hasResultCountTarget) {
-      this.resultCountTarget.textContent = count
+      this.resultCountTargets.forEach((target) => {
+        target.textContent = count
+      })
     }
 
     if (this.hasHeroResultCountTarget) {
@@ -716,30 +762,12 @@ export default class extends Controller {
     return value.replaceAll("_", " ").replace(/\b\w/g, (match) => match.toUpperCase())
   }
 
-  setStatus(message) {
-    if (!this.hasStatusTarget) {
-      return
-    }
-
-    this.statusTarget.textContent = message
-  }
-
   setLoading(isLoading) {
-    if (this.hasLoadingTarget) {
-      this.loadingTarget.classList.toggle("hidden", !isLoading)
-    }
-
     if (this.hasListTarget) {
       this.listTarget.classList.toggle("opacity-60", isLoading)
     }
 
     this.element.ariaBusy = isLoading ? "true" : "false"
-
-    if (isLoading) {
-      this.showMapState(this.loadingLabelValue)
-    } else {
-      this.hideMapState()
-    }
   }
 
   showMapState(message, { persistent = false } = {}) {
@@ -775,7 +803,6 @@ export default class extends Controller {
 
     this.renderList(visibleFeatures)
     this.updateResultCount(visibleFeatures.length)
-    this.setStatus(this.statusMessage(visibleFeatures.length))
   }
 
   filteredFeatures() {
@@ -824,16 +851,6 @@ export default class extends Controller {
         card.classList.remove(...DEFAULT_SELECTED_CARD_CLASS.split(" "))
       }
     })
-  }
-
-  statusMessage(visibleCount) {
-    const totalCount = this.allFeatures.length
-
-    if (this.hasSearchTarget && this.searchTarget.value.trim().length > 0) {
-      return `${visibleCount} / ${totalCount} ${this.visibleLabelValue}`
-    }
-
-    return this.listHintValue
   }
 
   cardClassTemplate() {

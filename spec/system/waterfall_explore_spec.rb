@@ -51,12 +51,28 @@ RSpec.describe "Waterfall explore", type: :system do
       )
     )
   end
+  let!(:overflow_waterfalls) do
+    Array.new(14) do |index|
+      create(
+        :waterfall,
+        height_meters: 20 + index,
+        plunge_pool: index.even?,
+        approach_difficulty: %w[easy moderate hard].fetch(index % 3),
+        spot: create(
+          :spot,
+          :published,
+          name: "Overflow Waterfall #{index + 1}"
+        )
+      )
+    end
+  end
 
   before do
     sekumpul_waterfall
     nungnung_waterfall
     tegenungan_waterfall
     draft_waterfall
+    overflow_waterfalls
   end
 
   it "renders the public header links" do
@@ -110,6 +126,7 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-filter-band [data-explore-map-target='filters']")
     expect(page).to have_css(".explore-filter-band [data-explore-map-target='search']")
     expect(page).not_to have_button(I18n.t("waterfalls.index.filters.apply"))
+    expect(page).not_to have_css(".explore-filter-band [data-explore-map-target='resultsToggle']")
   end
 
   it "renders the basemap style control on top of the map" do
@@ -161,12 +178,46 @@ RSpec.describe "Waterfall explore", type: :system do
   it "renders a collapsible results panel that is hidden by default" do
     visit_page
 
-    expect(page).to have_css("[data-explore-map-target='resultsToggle']")
+    expect(page).to have_css(".explore-map-shell [data-explore-map-target='resultsToggle']")
     expect(page).to have_css("[data-explore-map-target='resultsToggle'][aria-expanded='false']")
     expect(page).to have_css("[data-explore-map-target='resultsPanel'].is-collapsed", visible: false)
     expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{sekumpul_waterfall.spot.public_id}']")
     expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{nungnung_waterfall.spot.public_id}']")
     expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{tegenungan_waterfall.spot.public_id}']")
+  end
+
+  it "uses the main rail toggle as the only expand and collapse control" do
+    visit_page
+    list = page.find(:css, "[data-explore-map-target='list']", visible: false)
+    rendered_count = list.all(:css, "article[data-public-id]", visible: false).size
+    header = page.find(:css, "[data-explore-map-target='resultsHeader']", visible: false)
+
+    expect(page).to have_css(".explore-map-shell [data-explore-map-target='resultsToggle'][data-action='explore-map#toggleResults'][aria-controls='explore-results-panel'][aria-expanded='false']")
+    expect(page).to have_css("button[data-action='explore-map#toggleResults']", count: 1)
+    expect(header).to have_text("#{rendered_count} #{I18n.t('waterfalls.index.result_suffix')}")
+    expect(header).to have_no_css("button", visible: false)
+  end
+
+  it "renders a compact results rail structure with a dedicated scroll region" do
+    visit_page
+    list = page.find(:css, "[data-explore-map-target='list']", visible: false)
+    rendered_count = list.all(:css, "article[data-public-id]", visible: false).size
+
+    expect(page).to have_css("[data-explore-map-target='resultsPanel']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='resultsHeader']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='resultsScroll']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='resultsHeader'] [data-explore-map-target='resultCount']", text: rendered_count.to_s, visible: false)
+    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{overflow_waterfalls.last.spot.public_id}']", visible: false)
+  end
+
+  it "keeps a calm rail ending without a visible end label" do
+    visit_page
+    end_cap = page.find(:css, "[data-explore-map-target='endCap']", visible: false)
+
+    expect(end_cap).to be_present
+    expect(page).not_to have_text(I18n.t("waterfalls.index.end_of_list", default: "End of list"))
+    expect(page).not_to have_css("[data-explore-map-target='loading']", visible: false)
+    expect(page).not_to have_css("[data-explore-map-target='status']", visible: false)
   end
 
   it "does not render draft waterfalls in the public explore rail" do
