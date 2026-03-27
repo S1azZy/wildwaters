@@ -144,6 +144,13 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-map-toolbar button[aria-label='Zoom out']")
   end
 
+  it "renders the collapsible explore rail toggle on top of the map" do
+    visit_page
+
+    expect(page).to have_css(".explore-map-shell [data-explore-map-target='resultsToggle']", text: I18n.t("waterfalls.index.rail_toggle"))
+    expect(page).to have_css(".explore-map-shell [data-explore-map-target='resultsToggle'][aria-expanded='false']")
+  end
+
   it "renders the basemap style options for all supported map views" do
     visit_page
 
