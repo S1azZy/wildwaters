@@ -1,5 +1,9 @@
 # Changes
 
+## 2026-03-28
+- Refined ADR 0003 before merge by making `regions` product-oriented with `region_kind`, keeping exact admin levels in import normalization only, clarifying `region_names` as names/aliases rather than generic translations, tightening import-run/link invariants, and adding explicit guidance for reparenting, missing-upstream records, and a more conservative MVP rollout.
+- Added ADR 0003 to define a dedicated import subsystem with source provenance, licensing metadata, async run tracking, domain-specific region linking, multilingual `region_names`, and a balanced MVP region ingestion strategy centered on GeoNames with geoBoundaries and Wikidata enrichment.
+
 ## 2026-03-27
 - Simplified the shared header navigation to keep only Explore on the left, retained the authenticated Profile action on the right, removed the waterfall card `Map + list` label, and dropped the placeholder auth footer from the shared auth shell.
 - Changed successful sign-ins to return users to the public homepage instead of the dashboard while preserving existing sign-out and auth-required flows.
