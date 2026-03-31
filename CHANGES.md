@@ -1,5 +1,9 @@
 # Changes
 
+## 2026-03-31
+- Implemented ADR 0003 stage 1 backend import flow with `Imports` models, a GeoNames region connector, canonical region dataset/application interactors, a synchronous `Imports::RunSourceJob`, evolved `Region` and `Regions::CreateRegion` for `region_kind`, `country_code`, `center`, and `region_names`, and seed ingestion that now bootstraps demo regions through the import pipeline.
+- Added a real GeoNames dump path for stage 1 via extracted `allCountries` and optional `alternateNamesV2` files, plus a rake task to upsert source config and run a country-scoped region import from local dump files.
+
 ## 2026-03-28
 - Refined ADR 0003 before merge by making `regions` product-oriented with `region_kind`, keeping exact admin levels in import normalization only, clarifying `region_names` as names/aliases rather than generic translations, tightening import-run/link invariants, and adding explicit guidance for reparenting, missing-upstream records, and a more conservative MVP rollout.
 - Added ADR 0003 to define a dedicated import subsystem with source provenance, licensing metadata, async run tracking, domain-specific region linking, multilingual `region_names`, and a balanced MVP region ingestion strategy centered on GeoNames with geoBoundaries and Wikidata enrichment.

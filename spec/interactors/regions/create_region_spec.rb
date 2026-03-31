@@ -6,14 +6,15 @@ RSpec.describe Regions::CreateRegion, type: :interactor do
   let(:input) do
     {
       name:,
-      region_type:,
+      region_kind:,
       parent_id:,
+      country_code: "ID",
       summary: "Editorial summary",
       description: "Longer editorial description"
     }
   end
   let(:name) { "Bali" }
-  let(:region_type) { "admin_area" }
+  let(:region_kind) { "area" }
   let(:parent_id) { nil }
 
   describe "#call" do
@@ -25,23 +26,38 @@ RSpec.describe Regions::CreateRegion, type: :interactor do
       expect { result }.to change(Region, :count).by(1)
     end
 
+    it "creates a primary region name for search readiness" do
+      expect { result }.to change(RegionName, :count).by(1)
+    end
+
     it "creates the self closure row" do
       expect { result }.to change(RegionClosure, :count).by(1)
     end
 
-    it "generates a public_id and slug" do
+    it "generates a public_id, slug, and country code" do
       result
 
       expect(result.value![:region]).to have_attributes(
         public_id: be_present,
-        slug: "bali"
+        slug: "bali",
+        country_code: "ID"
+      )
+    end
+
+    it "persists the canonical primary name row" do
+      result
+
+      expect(result.value![:region].region_names.find_by!(name_role: "primary")).to have_attributes(
+        name: "Bali",
+        normalized_name: "bali",
+        searchable: true
       )
     end
 
     context "when creating a child region" do
-      let(:parent) { create(:region, name: "Indonesia", slug: "indonesia", region_type: "country") }
+      let(:parent) { create(:region, name: "Indonesia", slug: "indonesia", region_kind: "country") }
       let(:name) { "Ubud" }
-      let(:region_type) { "locality" }
+      let(:region_kind) { "locality" }
       let(:parent_id) { parent.id }
 
       before do

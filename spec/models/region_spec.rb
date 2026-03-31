@@ -8,18 +8,20 @@ RSpec.describe Region, type: :model do
     it { is_expected.to have_many(:children).class_name("Region").with_foreign_key(:parent_id).dependent(:nullify) }
     it { is_expected.to have_many(:ancestor_closures).class_name("RegionClosure").with_foreign_key(:descendant_id).dependent(:destroy) }
     it { is_expected.to have_many(:descendant_closures).class_name("RegionClosure").with_foreign_key(:ancestor_id).dependent(:destroy) }
+    it { is_expected.to have_many(:region_names).dependent(:destroy) }
+    it { is_expected.to have_many(:source_links).class_name("Imports::RegionSourceLink").dependent(:destroy) }
   end
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:slug) }
-    it { is_expected.to validate_presence_of(:region_type) }
+    it { is_expected.to validate_presence_of(:region_kind) }
     it { is_expected.to validate_presence_of(:status) }
     it { is_expected.to validate_uniqueness_of(:public_id) }
   end
 
   it "generates a public_id before validation" do
-    region = described_class.new(name: "Bali", slug: "bali", region_type: "country", status: "active")
+    region = described_class.new(name: "Bali", slug: "bali", region_kind: "country", status: "active")
 
     region.validate
 
@@ -52,5 +54,13 @@ RSpec.describe Region, type: :model do
 
     expect(region).not_to be_valid
     expect(region.errors[:slug]).to include("has already been taken")
+  end
+
+  it "normalizes the country code before validation" do
+    region = build(:region, country_code: " id ")
+
+    region.validate
+
+    expect(region.country_code).to eq("ID")
   end
 end

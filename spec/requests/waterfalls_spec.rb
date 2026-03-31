@@ -117,16 +117,16 @@ RSpec.describe "Waterfalls", type: :request do
   describe "GET /waterfalls with explore filters" do
     subject(:perform_request) { get waterfalls_path, params: }
 
-    let(:bali) { create_region(name: "Bali", slug: "bali", region_type: Region::REGION_TYPES[:admin_area]) }
+    let(:bali) { create_region(name: "Bali", slug: "bali", region_kind: Region::REGION_KINDS[:area]) }
     let(:north_bali) do
       create_region(
         name: "North Bali",
         slug: "north-bali",
-        region_type: Region::REGION_TYPES[:locality],
+        region_kind: Region::REGION_KINDS[:locality],
         parent_id: bali.id
       )
     end
-    let(:lombok) { create_region(name: "Lombok", slug: "lombok", region_type: Region::REGION_TYPES[:admin_area]) }
+    let(:lombok) { create_region(name: "Lombok", slug: "lombok", region_kind: Region::REGION_KINDS[:area]) }
     let!(:sekumpul) do
       create(
         :waterfall,
@@ -254,16 +254,16 @@ RSpec.describe "Waterfalls", type: :request do
   describe "GET /waterfalls/map_data" do
     subject(:perform_request) { get map_data_waterfalls_path, params:, as: :json }
 
-    let(:bali) { create_region(name: "Bali", slug: "bali", region_type: Region::REGION_TYPES[:admin_area]) }
+    let(:bali) { create_region(name: "Bali", slug: "bali", region_kind: Region::REGION_KINDS[:area]) }
     let(:north_bali) do
       create_region(
         name: "North Bali",
         slug: "north-bali",
-        region_type: Region::REGION_TYPES[:locality],
+        region_kind: Region::REGION_KINDS[:locality],
         parent_id: bali.id
       )
     end
-    let(:lombok) { create_region(name: "Lombok", slug: "lombok", region_type: Region::REGION_TYPES[:admin_area]) }
+    let(:lombok) { create_region(name: "Lombok", slug: "lombok", region_kind: Region::REGION_KINDS[:area]) }
     let!(:sekumpul) do
       create(
         :waterfall,
@@ -446,12 +446,12 @@ RSpec.describe "Waterfalls", type: :request do
       end
   end
 
-  def create_region(name:, slug:, region_type:, parent_id: nil)
+  def create_region(name:, slug:, region_kind:, parent_id: nil)
     result = Regions::CreateRegion.call(
       input: {
         name:,
         slug:,
-        region_type:,
+        region_kind:,
         parent_id:
       }
     )

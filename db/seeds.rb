@@ -1,19 +1,85 @@
 return if Rails.env.production?
 
-def find_or_create_region(name:, region_type:, external_ref:, parent_id: nil)
-  existing_region = Region.find_by(external_ref:)
-  return existing_region if existing_region
+GEONAMES_REGION_SOURCE_KEY = "geonames_regions".freeze
+GEONAMES_REGION_RECORDS = [
+  {
+    record_kind: "region",
+    external_uid: "1643084",
+    external_url: "https://www.geonames.org/1643084",
+    name: "Indonesia",
+    ascii_name: "Indonesia",
+    region_kind: "country",
+    country_code: "ID",
+    parent_external_uid: nil,
+    latitude: -2.5,
+    longitude: 118.0,
+    alternate_names: [
+      { language_code: "ru", name: "Индонезия", name_role: "preferred" }
+    ]
+  },
+  {
+    record_kind: "region",
+    external_uid: "1650535",
+    external_url: "https://www.geonames.org/1650535",
+    name: "Bali",
+    ascii_name: "Bali",
+    region_kind: "area",
+    country_code: "ID",
+    parent_external_uid: "1643084",
+    latitude: -8.4095,
+    longitude: 115.1889,
+    alternate_names: [
+      { language_code: "ru", name: "Бали", name_role: "preferred" }
+    ]
+  },
+  {
+    record_kind: "region",
+    external_uid: "1645528",
+    external_url: "https://www.geonames.org/1645528",
+    name: "North Bali",
+    ascii_name: "North Bali",
+    region_kind: "locality",
+    country_code: "ID",
+    parent_external_uid: "1650535",
+    latitude: -8.1694,
+    longitude: 115.1806,
+    alternate_names: [
+      { language_code: "ru", name: "Северный Бали", name_role: "preferred" }
+    ]
+  }
+].freeze
 
-  result = Regions::CreateRegion.call(
-    input: {
-      name:,
-      region_type:,
-      parent_id:,
-      external_ref:
-    }
+def seed_geonames_regions
+  source = Imports::Source.find_or_initialize_by(key: GEONAMES_REGION_SOURCE_KEY)
+  source.assign_attributes(
+    target_kind: "region",
+    source_role: Imports::Source::SOURCE_ROLES[:canonical_identity],
+    fetch_mode: Imports::Source::FETCH_MODES[:manual_file],
+    enabled: true,
+    license_key: "geonames",
+    license_url: "https://www.geonames.org/export/",
+    attribution_text: "GeoNames",
+    display_policy: Imports::Source::DISPLAY_POLICIES[:public_display_allowed],
+    config: { "seeded" => true }
   )
+  source.save!
 
-  result.value![:region]
+  Imports::RunSourceJob.perform_now(
+    source_key: source.key,
+    mode: Imports::Run::MODES[:full],
+    initiated_by: "seed",
+    records: GEONAMES_REGION_RECORDS
+  )
+end
+
+def find_imported_region!(source_key:, external_uid:)
+  Region
+    .joins(source_links: { import_source_record: :import_source })
+    .find_by!(
+      import_sources: { key: source_key },
+      import_source_records: { external_uid: external_uid },
+      region_source_links: { primary_identity: true }
+    )
 end
 
 def seed_waterfall(region:, slug:, name:, summary:, description:, latitude:, longitude:, height_meters:, plunge_pool:, flow_seasonality:, approach_difficulty:, published:)
@@ -39,29 +105,10 @@ def seed_waterfall(region:, slug:, name:, summary:, description:, latitude:, lon
   waterfall.save!
 end
 
-macroregion = find_or_create_region(
-  name: "Southeast Asia",
-  region_type: Region::REGION_TYPES[:macroregion],
-  external_ref: "seed:southeast-asia"
-)
-country = find_or_create_region(
-  name: "Indonesia",
-  region_type: Region::REGION_TYPES[:country],
-  parent_id: macroregion.id,
-  external_ref: "seed:indonesia"
-)
-bali = find_or_create_region(
-  name: "Bali",
-  region_type: Region::REGION_TYPES[:admin_area],
-  parent_id: country.id,
-  external_ref: "seed:bali"
-)
-north_bali = find_or_create_region(
-  name: "North Bali",
-  region_type: Region::REGION_TYPES[:locality],
-  parent_id: bali.id,
-  external_ref: "seed:north-bali"
-)
+seed_geonames_regions
+
+bali = find_imported_region!(source_key: GEONAMES_REGION_SOURCE_KEY, external_uid: "1650535")
+north_bali = find_imported_region!(source_key: GEONAMES_REGION_SOURCE_KEY, external_uid: "1645528")
 
 seed_waterfall(
   region: north_bali,

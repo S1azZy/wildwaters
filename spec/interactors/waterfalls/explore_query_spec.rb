@@ -3,9 +3,9 @@ require "rails_helper"
 RSpec.describe Waterfalls::ExploreQuery, type: :interactor do
   subject(:result) { described_class.call(**call_args) }
 
-  let(:bali) { create_region(name: "Bali", region_type: Region::REGION_TYPES[:admin_area]) }
+  let(:bali) { create_region(name: "Bali", region_kind: Region::REGION_KINDS[:area]) }
   let(:north_bali) do
-    create_region(name: "North Bali", region_type: Region::REGION_TYPES[:locality], parent_id: bali.id)
+    create_region(name: "North Bali", region_kind: Region::REGION_KINDS[:locality], parent_id: bali.id)
   end
   let!(:matching_waterfall) do
     create(
@@ -210,11 +210,11 @@ RSpec.describe Waterfalls::ExploreQuery, type: :interactor do
     RGeo::Geographic.spherical_factory(srid: 4326).point(longitude, latitude)
   end
 
-  def create_region(name:, region_type:, parent_id: nil)
+  def create_region(name:, region_kind:, parent_id: nil)
     result = Regions::CreateRegion.call(
       input: {
         name:,
-        region_type:,
+        region_kind:,
         parent_id:
       }
     )
