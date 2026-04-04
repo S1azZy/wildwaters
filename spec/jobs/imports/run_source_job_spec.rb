@@ -1,66 +1,54 @@
 require "rails_helper"
 
+class ImportResult
+  def failure?
+  end
+
+  def failure
+  end
+end
+
 RSpec.describe Imports::RunSourceJob, type: :job do
+  let(:import_interactor) { Imports::Regions::ImportDataset }
+
   it "delegates region imports to the dataset interactor" do
-    result = instance_double("ImportResult", failure?: false)
     records = [ { external_uid: "1643084" } ]
+    allow(import_interactor).to receive(:call).and_return(instance_double(ImportResult, failure?: false))
 
-    expect(Imports::Regions::ImportDataset).to receive(:call).with(
-      input: {
-        source_key: "geonames_regions",
-        mode: "full",
-        initiated_by: "seed",
-        records:
-      }
-    ).and_return(result)
+    described_class.perform_now(source_key: "geonames_regions", mode: "full", initiated_by: "seed", records:)
 
-    described_class.perform_now(
-      source_key: "geonames_regions",
-      mode: "full",
-      initiated_by: "seed",
-      records:
+    expect(import_interactor).to have_received(:call).with(
+      input: { source_key: "geonames_regions", mode: "full", initiated_by: "seed", records: }
     )
   end
 
   it "raises a sanitized error when the import fails" do
-    result = instance_double(
-      "ImportResult",
+    allow(import_interactor).to receive(:call).and_return(instance_double(
+      ImportResult,
       failure?: true,
       failure: {
         code: :source_disabled,
         errors: { source_key: [ "is disabled" ] }
       }
-    )
-
-    allow(Imports::Regions::ImportDataset).to receive(:call).and_return(result)
+    ))
 
     expect do
-      described_class.perform_now(
-        source_key: "geonames_regions",
-        mode: "full",
-        initiated_by: "seed",
-        records: []
-      )
+      described_class.perform_now(source_key: "geonames_regions", mode: "full", initiated_by: "seed", records: [])
     end.to raise_error(StandardError, "Import failed for geonames_regions: source_disabled")
   end
 
   it "passes nil records for source-driven dump imports" do
-    result = instance_double("ImportResult", failure?: false)
+    allow(import_interactor).to receive(:call).and_return(instance_double(ImportResult, failure?: false))
 
-    expect(Imports::Regions::ImportDataset).to receive(:call).with(
+    described_class.perform_now(source_key: "geonames_regions", mode: "full", initiated_by: "manual", records: nil)
+
+    expect(import_interactor).to have_received(:call).with(
       input: {
         source_key: "geonames_regions",
         mode: "full",
         initiated_by: "manual",
         records: nil
       }
-    ).and_return(result)
-
-    described_class.perform_now(
-      source_key: "geonames_regions",
-      mode: "full",
-      initiated_by: "manual",
-      records: nil
     )
   end
 end

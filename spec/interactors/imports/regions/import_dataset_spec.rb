@@ -101,19 +101,7 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
   end
 
   it "attaches to an existing structurally matching region tree without creating duplicates" do
-    indonesia = create(:region, name: "Indonesia", slug: "indonesia", region_kind: "country", country_code: nil)
-    create(:region_closure, ancestor: indonesia, descendant: indonesia, depth: 0)
-
-    bali = create(
-      :region,
-      name: "Bali",
-      slug: "bali",
-      region_kind: "area",
-      country_code: nil,
-      parent: indonesia
-    )
-    create(:region_closure, ancestor: bali, descendant: bali, depth: 0)
-    create(:region_closure, ancestor: indonesia, descendant: bali, depth: 1)
+    indonesia, bali = seed_structurally_matching_regions
 
     expect { result }.not_to change(Region, :count)
 
@@ -124,24 +112,10 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
 
   it "supports canonical reparenting through the region-domain sync path" do
     result
+    expect { reimport_bali_without_parent }.not_to change(Region, :count)
 
-    changed_dataset = [
-      dataset.first,
-      dataset.second.merge(parent_external_uid: nil)
-    ]
-
-    expect do
-      described_class.call(input: input.merge(records: changed_dataset))
-    end.not_to change(Region, :count)
-
-    bali = Region.find_by!(slug: "bali")
-
-    expect(bali.parent).to be_nil
-    expect(bali.ancestor_closures.order(:depth).pluck(:ancestor_id, :depth)).to eq(
-      [
-        [ bali.id, 0 ]
-      ]
-    )
+    expect(bali_region.reload.parent).to be_nil
+    expect(bali_region.ancestor_closures.order(:depth).pluck(:ancestor_id, :depth)).to eq([ [ bali_region.id, 0 ] ])
   end
 
   it "advances last_changed_at and writes snapshots when a source payload changes" do
@@ -149,35 +123,12 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
       result
     end
 
-    bali_source_record = Imports::SourceRecord.find_by!(external_uid: "1650535")
     first_changed_at = bali_source_record.last_changed_at
+    update_bali_alternate_names
 
-    travel 5.minutes do
-      changed_dataset = [
-        dataset.first,
-        dataset.second.merge(
-          alternate_names: [
-            { language_code: "ru", name: "Остров Бали", name_role: "preferred" }
-          ]
-        )
-      ]
-
-      described_class.call(input: input.merge(records: changed_dataset))
-    end
-
-    bali_source_record.reload
-
-    expect(bali_source_record.last_changed_at).to be > first_changed_at
+    expect(bali_source_record.reload.last_changed_at).to be > first_changed_at
     expect(bali_source_record.record_snapshots.order(:captured_at).count).to eq(2)
-    expect(bali_source_record.record_snapshots.last.payload.fetch("alternate_names")).to eq(
-      [
-        {
-          "language_code" => "ru",
-          "name" => "Остров Бали",
-          "name_role" => "preferred"
-        }
-      ]
-    )
+    expect(bali_source_record.record_snapshots.last.payload.fetch("alternate_names")).to eq([ changed_bali_alternate_name ])
   end
 
   it "marks records as missing upstream on a repeated full import without deleting matched regions" do
@@ -323,10 +274,7 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
       expect(ordino_area.region_kind).to eq("area")
       expect(ordino_locality.parent).to eq(ordino_area)
       expect(ordino_locality.region_kind).to eq("locality")
-      expect(country.region_names.find_by!(language_code: "ru", name: "Андорра")).to have_attributes(
-        name_role: "preferred",
-        searchable: true
-      )
+      expect(andorra_ru_name).to have_attributes(name_role: "preferred", searchable: true)
     end
 
     it "remains idempotent on repeated runs of the real fixture" do
@@ -344,5 +292,46 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
         described_class.call(input: input.merge(records: nil))
       ).to be_success
     end
+  end
+
+  def seed_structurally_matching_regions
+    indonesia = create(:region, name: "Indonesia", slug: "indonesia", region_kind: "country", country_code: nil)
+    create(:region_closure, ancestor: indonesia, descendant: indonesia, depth: 0)
+
+    bali = create(:region, name: "Bali", slug: "bali", region_kind: "area", country_code: nil, parent: indonesia)
+    create(:region_closure, ancestor: bali, descendant: bali, depth: 0)
+    create(:region_closure, ancestor: indonesia, descendant: bali, depth: 1)
+
+    [ indonesia, bali ]
+  end
+
+  def reimport_bali_without_parent
+    described_class.call(input: input.merge(records: [ dataset.first, dataset.second.merge(parent_external_uid: nil) ]))
+  end
+
+  def update_bali_alternate_names
+    travel 5.minutes do
+      described_class.call(input: input.merge(records: [ dataset.first, dataset.second.merge(alternate_names: [ changed_bali_alternate_name.symbolize_keys ]) ]))
+    end
+  end
+
+  def changed_bali_alternate_name
+    {
+      "language_code" => "ru",
+      "name" => "Остров Бали",
+      "name_role" => "preferred"
+    }
+  end
+
+  def bali_source_record
+    Imports::SourceRecord.find_by!(external_uid: "1650535")
+  end
+
+  def bali_region
+    Region.find_by!(slug: "bali")
+  end
+
+  def andorra_ru_name
+    country.region_names.find_by!(language_code: "ru", name: "Андорра")
   end
 end

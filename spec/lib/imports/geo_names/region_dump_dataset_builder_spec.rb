@@ -14,6 +14,9 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
       languages: [ "ru" ]
     }
   end
+  let(:country) { records.find { |record| record[:external_uid] == "3041565" } }
+  let(:ordino_area) { records.find { |record| record[:external_uid] == "3039676" } }
+  let(:ordino_locality) { records.find { |record| record[:external_uid] == "3039678" } }
 
   before do
     all_countries_path.dirname.mkpath
@@ -40,13 +43,7 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
 
   it "builds normalized region records from extracted GeoNames files" do
     expect(records.map { |record| record[:external_uid] }).to eq(%w[1643084 1650535])
-
-    expect(records.second).to include(
-      name: "Bali",
-      region_kind: "area",
-      country_code: "ID",
-      parent_external_uid: "1643084"
-    )
+    expect(records.second).to include(name: "Bali", region_kind: "area", country_code: "ID", parent_external_uid: "1643084")
     expect(records.map { |record| record[:name] }).not_to include("Singaraja")
   end
 
@@ -57,9 +54,6 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
   end
 
   context "with the official GeoNames Andorra fixtures" do
-    let(:country) { records.find { |record| record[:external_uid] == "3041565" } }
-    let(:ordino_area) { records.find { |record| record[:external_uid] == "3039676" } }
-    let(:ordino_locality) { records.find { |record| record[:external_uid] == "3039678" } }
     let(:config) do
       {
         all_countries_path: "spec/fixtures/imports/geonames/country_AD.txt",
@@ -74,35 +68,15 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
     end
 
     it "maps the official country and hierarchy records into the normalized dataset" do
-      expect(country).to include(
-        name: "Principality of Andorra",
-        region_kind: "country",
-        parent_external_uid: nil
-      )
-      expect(ordino_area).to include(
-        name: "Ordino",
-        region_kind: "area",
-        parent_external_uid: "3041565"
-      )
-      expect(ordino_locality).to include(
-        name: "Ordino",
-        region_kind: "locality",
-        parent_external_uid: "3039676"
-      )
+      expect(country).to include(name: "Principality of Andorra", region_kind: "country", parent_external_uid: nil)
+      expect(ordino_area).to include(name: "Ordino", region_kind: "area", parent_external_uid: "3041565")
+      expect(ordino_locality).to include(name: "Ordino", region_kind: "locality", parent_external_uid: "3039676")
     end
 
     it "extracts multilingual alternate names from the official alternate-names fixture" do
       expect(country[:alternate_names]).to include(
-        {
-          language_code: "en",
-          name: "Andorra",
-          name_role: "preferred"
-        },
-        {
-          language_code: "ru",
-          name: "Андорра",
-          name_role: "preferred"
-        }
+        { language_code: "en", name: "Andorra", name_role: "preferred" },
+        { language_code: "ru", name: "Андорра", name_role: "preferred" }
       )
     end
   end

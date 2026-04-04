@@ -42,26 +42,10 @@ RSpec.describe Imports::GeoNames::RegionRecordConnector do
   end
 
   it "normalizes canonical and alternate names for import application" do
-    bali_record = records.last
-
-    expect(bali_record).to include(
-      name: "Bali",
-      ascii_name: "Bali",
-      country_code: "ID",
-      region_kind: "area",
-      parent_external_uid: "1643084"
-    )
-    expect(bali_record[:alternate_names]).to contain_exactly(
-      {
-        language_code: "ru",
-        name: "Бали",
-        name_role: "preferred"
-      },
-      {
-        language_code: nil,
-        name: "Bali Island",
-        name_role: "alias"
-      }
+    expect(records.last).to include(name: "Bali", ascii_name: "Bali", country_code: "ID", region_kind: "area", parent_external_uid: "1643084")
+    expect(records.last[:alternate_names]).to contain_exactly(
+      { language_code: "ru", name: "Бали", name_role: "preferred" },
+      { language_code: nil, name: "Bali Island", name_role: "alias" }
     )
   end
 end

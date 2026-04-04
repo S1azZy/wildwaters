@@ -54,20 +54,15 @@ RSpec.describe Regions::SyncImportedRegion, type: :interactor do
     child_region.reload
 
     expect(region.parent).to eq(new_parent)
-    expect(region.ancestor_closures.order(:depth).pluck(:ancestor_id, :depth)).to eq(
-      [
-        [ region.id, 0 ],
-        [ new_parent.id, 1 ],
-        [ country.id, 2 ]
-      ]
-    )
-    expect(child_region.ancestor_closures.order(:depth).pluck(:ancestor_id, :depth)).to eq(
-      [
-        [ child_region.id, 0 ],
-        [ region.id, 1 ],
-        [ new_parent.id, 2 ],
-        [ country.id, 3 ]
-      ]
-    )
+    expect(region.ancestor_closures.order(:depth).pluck(:ancestor_id, :depth)).to eq(region_closure_path)
+    expect(child_region.ancestor_closures.order(:depth).pluck(:ancestor_id, :depth)).to eq(child_region_closure_path)
+  end
+
+  def region_closure_path
+    [ [ region.id, 0 ], [ new_parent.id, 1 ], [ country.id, 2 ] ]
+  end
+
+  def child_region_closure_path
+    [ [ child_region.id, 0 ], [ region.id, 1 ], [ new_parent.id, 2 ], [ country.id, 3 ] ]
   end
 end

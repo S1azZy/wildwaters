@@ -31,22 +31,9 @@ RSpec.describe Imports::GeoNames::RegionDumpDownloader do
   end
 
   it "downloads, extracts, and combines the requested country dumps" do
-    expect(result).to include(
-      all_countries_path: destination_dir.join("all_countries.txt").to_s,
-      alternate_names_path: destination_dir.join("alternate_names.txt").to_s
-    )
-    expect(File.read(result.fetch(:all_countries_path))).to eq(
-      <<~TEXT
-        3041565\tPrincipality of Andorra
-        3017382\tFrance
-      TEXT
-    )
-    expect(File.read(result.fetch(:alternate_names_path))).to eq(
-      <<~TEXT
-        1561412\t3041565\tru\tАндорра\t1
-        1375070\t3017382\tru\tФранция\t1
-      TEXT
-    )
+    expect(result).to include(all_countries_path: all_countries_output_path, alternate_names_path: alternate_names_output_path)
+    expect(File.read(result.fetch(:all_countries_path))).to eq(expected_country_dump_contents)
+    expect(File.read(result.fetch(:alternate_names_path))).to eq(expected_alternate_names_contents)
   end
 
   context "when alternate names are disabled" do
@@ -128,5 +115,27 @@ RSpec.describe Imports::GeoNames::RegionDumpDownloader do
     else
       raise "unexpected filename #{filename}"
     end
+  end
+
+  def all_countries_output_path
+    destination_dir.join("all_countries.txt").to_s
+  end
+
+  def alternate_names_output_path
+    destination_dir.join("alternate_names.txt").to_s
+  end
+
+  def expected_country_dump_contents
+    <<~TEXT
+      3041565\tPrincipality of Andorra
+      3017382\tFrance
+    TEXT
+  end
+
+  def expected_alternate_names_contents
+    <<~TEXT
+      1561412\t3041565\tru\tАндорра\t1
+      1375070\t3017382\tru\tФранция\t1
+    TEXT
   end
 end
