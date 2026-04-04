@@ -1,4 +1,7 @@
 ru:
+  admin:
+    authorization:
+      required: "У вас нет доступа к этой странице."
   layouts:
     header:
       activity: "Активность"

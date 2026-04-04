@@ -30,8 +30,8 @@ services:
       RAILS_ENV: development
       DB_HOST: db
       DB_PORT: 5432
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
     ports:
       - "3000:3000"
     volumes:
@@ -43,6 +43,29 @@ services:
       timeout: 5s
       retries: 5
       start_period: 45s
+    depends_on:
+      db:
+        condition: service_healthy
+
+  jobs:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        RUBY_VERSION: "4.0.2"
+    command: >
+      bash -lc "bundle install &&
+      bin/rails db:prepare &&
+      bin/jobs"
+    environment:
+      RAILS_ENV: development
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    volumes:
+      - .:/app
+      - bundle_data:/usr/local/bundle
     depends_on:
       db:
         condition: service_healthy

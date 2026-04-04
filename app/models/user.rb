@@ -12,6 +12,10 @@ class User < ApplicationRecord
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :locale, presence: true, inclusion: { in: I18n.available_locales.map(&:to_s) }
 
+  def admin?
+    role == "admin"
+  end
+
   def suspended?
     status == "suspended"
   end

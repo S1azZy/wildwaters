@@ -1,6 +1,7 @@
 # Changes
 
 ## 2026-04-04
+- Added the default Solid Queue operations stack: `mission_control-jobs` mounted behind admin-only app auth at `/admin/jobs`, dedicated queue database wiring for development/test/production, generated queue runtime config, and a separate Docker `jobs` service for local workers/scheduler checks.
 - Removed default demo seeding from `db:prepare`, emptied `db/seeds.rb`, and made GeoNames import the only documented path for loading region data into a fresh environment.
 - Fixed CI eager-load boot failures by disabling autoload-path insertion into `$LOAD_PATH` and by aligning the GeoNames import support files with Zeitwerk's `Imports::GeoNames` naming so system and bin specs load correctly under `CI=1`.
 - Completed the GeoNames region import slice from ADR 0003 by reconciling omitted records as `missing_upstream` on repeated full/replay runs while preserving matched `Region` rows and provenance links, and by persisting accurate per-run stats on import failures.
