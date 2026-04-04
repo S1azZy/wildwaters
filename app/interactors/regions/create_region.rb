@@ -5,12 +5,14 @@ module Regions
     class ValidationContract < ApplicationContract
       params do
         required(:name).filled(:string)
-        required(:region_type).filled(:string)
+        required(:region_kind).filled(:string)
         optional(:parent_id).maybe(:string)
         optional(:slug).maybe(:string)
+        optional(:country_code).maybe(:string)
         optional(:summary).maybe(:string)
         optional(:description).maybe(:string)
-        optional(:external_ref).maybe(:string)
+        optional(:latitude).maybe(:float)
+        optional(:longitude).maybe(:float)
       end
     end
 
@@ -18,6 +20,7 @@ module Regions
       in_transaction do
         parent = yield find_parent(input[:parent_id])
         region = yield create_region(parent)
+        yield create_primary_name(region)
         yield create_closure_rows(region, parent)
 
         Success(region:)
@@ -43,16 +46,30 @@ module Regions
         parent:,
         name: input[:name],
         slug: input[:slug] || input[:name],
-        region_type: input[:region_type],
+        region_kind: input[:region_kind],
+        country_code: input[:country_code],
         summary: input[:summary],
         description: input[:description],
-        external_ref: input[:external_ref],
+        center: build_center,
         status: Region::STATUSES[:active]
       )
 
       return Success(region) if region.save
 
       fail_with(code: :validation_error, errors: region.errors.to_hash)
+    end
+
+    def create_primary_name(region)
+      region_name = region.region_names.new(
+        name: region.name,
+        name_role: RegionName::NAME_ROLES[:primary],
+        preferred: true,
+        searchable: true
+      )
+
+      return Success(region_name) if region_name.save
+
+      fail_with(code: :validation_error, errors: region_name.errors.to_hash)
     end
 
     def create_closure_rows(region, parent)
@@ -84,6 +101,12 @@ module Regions
       RegionClosure.insert_all!(rows)
 
       Success()
+    end
+
+    def build_center
+      return if input[:latitude].blank? || input[:longitude].blank?
+
+      Region.spatial_factory.point(input[:longitude], input[:latitude])
     end
   end
 end

@@ -18,7 +18,7 @@ RSpec.describe Spots::CreateWaterfall, type: :interactor do
       status: "draft"
     }
   end
-  let(:region) { create(:region, name: "Bali", slug: "bali", region_type: "admin_area") }
+  let(:region) { create(:region, name: "Bali", slug: "bali", region_kind: "area") }
   let(:name) { "Tegenungan Waterfall" }
 
   describe "#call" do

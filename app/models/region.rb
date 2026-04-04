@@ -1,10 +1,9 @@
 class Region < ApplicationRecord
   PUBLIC_ID_LENGTH = 12
 
-  REGION_TYPES = {
-    macroregion: "macroregion",
+  REGION_KINDS = {
     country: "country",
-    admin_area: "admin_area",
+    area: "area",
     locality: "locality",
     park: "park",
     custom: "custom"
@@ -20,27 +19,33 @@ class Region < ApplicationRecord
   has_many :spots, dependent: :restrict_with_exception
   has_many :ancestor_closures, class_name: "RegionClosure", foreign_key: :descendant_id, inverse_of: :descendant, dependent: :destroy
   has_many :descendant_closures, class_name: "RegionClosure", foreign_key: :ancestor_id, inverse_of: :ancestor, dependent: :destroy
+  has_many :region_names, dependent: :destroy
+  has_many :source_links, class_name: "Imports::RegionSourceLink", dependent: :destroy
 
   has_many :ancestors, -> { order("region_closures.depth ASC") }, through: :ancestor_closures, source: :ancestor
   has_many :descendants, -> { order("region_closures.depth ASC") }, through: :descendant_closures, source: :descendant
 
-  enum :region_type, REGION_TYPES, prefix: true
+  enum :region_kind, REGION_KINDS, prefix: true
   enum :status, STATUSES, prefix: true
 
   scope :ordered_for_explore, -> { status_active.order(:name) }
 
   normalizes :name, with: ->(value) { value.to_s.squish.presence }
   normalizes :slug, with: ->(value) { value.to_s.parameterize.presence }
-  normalizes :external_ref, with: ->(value) { value.to_s.strip.presence }
+  normalizes :country_code, with: ->(value) { value.to_s.strip.upcase.presence }
 
   validates :public_id, presence: true, uniqueness: true
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: { scope: :parent_id }
-  validates :region_type, presence: true, inclusion: { in: REGION_TYPES.values }
+  validates :region_kind, presence: true, inclusion: { in: REGION_KINDS.values }
   validates :status, presence: true, inclusion: { in: STATUSES.values }
-  validates :external_ref, uniqueness: true, allow_nil: true
+  validates :country_code, format: { with: /\A[A-Z]{2}\z/ }, allow_nil: true
 
   before_validation :ensure_public_id, on: :create
+
+  def self.spatial_factory
+    @spatial_factory ||= RGeo::Geographic.spherical_factory(srid: 4326)
+  end
 
   private
 

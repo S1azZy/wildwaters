@@ -10,6 +10,7 @@ module Wildwaters
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
+    config.add_autoload_paths_to_load_path = false
     config.active_record.schema_format = :sql
     config.i18n.available_locales = %i[en ru]
     config.i18n.default_locale = :en

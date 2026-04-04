@@ -52,7 +52,8 @@ It intentionally does not yet contain:
 2. Run `bundle install`.
 3. Start PostgreSQL/PostGIS with `docker compose up -d db`.
 4. Create and prepare the database with `bin/rails db:prepare`.
-5. Run the app with `bin/dev` or `docker compose up web`.
+5. Import real region data through the GeoNames task if you need catalog geography.
+6. Run the app with `bin/dev` or `docker compose up web`.
 
 ## Common commands
 
@@ -72,6 +73,61 @@ It intentionally does not yet contain:
 - `make verify` — fuller local verification
 - `make ci` — run the full CI entrypoint locally in the app container
 - `make migration NAME=CreateUsers` — generate a migration skeleton
+
+## GeoNames Import
+
+The repository supports two GeoNames region import paths:
+
+- local-file mode with extracted dump files you already have
+- network mode that downloads official GeoNames country dumps, prepares local artifacts, and runs the existing import pipeline
+
+Recommended operator flow for the first real import:
+
+```bash
+docker compose exec web bash -lc \
+  "COUNTRY_CODES=AD \
+   LANGUAGES=en,ru \
+   INITIATED_BY=manual \
+   bundle exec rake imports:geonames:regions_from_network"
+```
+
+What the command does:
+
+- downloads official GeoNames country dumps for the requested ISO country codes
+- downloads country-scoped alternate names unless `DOWNLOAD_ALTERNATE_NAMES=0`
+- writes prepared artifacts under `tmp/imports/geonames/<source_key>/`
+- upserts the `geonames_regions` source config
+- runs the existing region import into PostgreSQL
+
+`bin/rails db:prepare` only prepares the schema. It does not load demo seeds.
+
+Default MVP import slice:
+
+- `PCLI` — country
+- `ADM1` — first-level administrative areas
+- `PPLA` and `PPLC` — administrative seats and capitals
+
+If you need a wider slice for a one-off import, override `FEATURE_CODES`.
+
+Useful environment variables:
+
+- `COUNTRY_CODES=AD,FR` — required ISO country codes to import
+- `LANGUAGES=en,ru` — alternate-name languages to keep during import
+- `SOURCE_KEY=geonames_regions` — import source key
+- `DOWNLOAD_DIR=tmp/imports/geonames/custom` — where prepared dump artifacts should be stored
+- `DOWNLOAD_ALTERNATE_NAMES=0` — skip alternate names download if you only need the base dump
+- `MODE=full` — import mode passed into `import_runs`
+- `INITIATED_BY=manual` — audit label for the run
+
+If you already have extracted files locally, keep using the existing task:
+
+```bash
+docker compose exec web bash -lc \
+  "COUNTRY_CODES=AD \
+   ALL_COUNTRIES_PATH=tmp/imports/geonames/geonames_regions/all_countries.txt \
+   ALTERNATE_NAMES_PATH=tmp/imports/geonames/geonames_regions/alternate_names.txt \
+   bundle exec rake imports:geonames:regions"
+```
 
 ## Notes
 
