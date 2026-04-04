@@ -115,7 +115,7 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
     create(:region_closure, ancestor: bali, descendant: bali, depth: 0)
     create(:region_closure, ancestor: indonesia, descendant: bali, depth: 1)
 
-    expect { result }.to change(Region, :count).by(0)
+    expect { result }.not_to change(Region, :count)
 
     expect(Imports::RegionSourceLink.count).to eq(2)
     expect(Region.find_by!(slug: "bali").id).to eq(bali.id)
@@ -178,6 +178,34 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
         }
       ]
     )
+  end
+
+  it "marks records as missing upstream on a repeated full import without deleting matched regions" do
+    result
+
+    bali_source_record = Imports::SourceRecord.find_by!(external_uid: "1650535")
+    bali_region = bali_source_record.region_source_link.region
+
+    rerun_result = described_class.call(input: input.merge(records: [ dataset.first ]))
+
+    expect(rerun_result).to be_success
+    expect(bali_source_record.reload).to have_attributes(
+      status: Imports::SourceRecord::STATUSES[:missing_upstream],
+      last_import_run: rerun_result.value!.fetch(:run)
+    )
+    expect(bali_source_record.region_source_link.region).to eq(bali_region)
+    expect(Region.find(bali_region.id)).to eq(bali_region)
+  end
+
+  it "does not mark omitted records as missing on incremental reruns" do
+    result
+
+    bali_source_record = Imports::SourceRecord.find_by!(external_uid: "1650535")
+
+    rerun_result = described_class.call(input: input.merge(mode: "incremental", records: [ dataset.first ]))
+
+    expect(rerun_result).to be_success
+    expect(bali_source_record.reload.status).to eq(Imports::SourceRecord::STATUSES[:matched])
   end
 
   context "when the source is disabled" do
@@ -249,6 +277,72 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
       expect(Region.find_by!(slug: "bali").country_code).to eq("ID")
       expect(Region.find_by!(slug: "singaraja").parent.slug).to eq("bali")
       expect(RegionName.find_by!(name: "Бали").language_code).to eq("ru")
+    end
+  end
+
+  context "when loading the official GeoNames Andorra fixtures" do
+    let(:expected_record_count) { 73 }
+    let(:input) do
+      {
+        source_key: source.key,
+        mode: "full",
+        initiated_by: "fixture"
+      }
+    end
+    let(:country) { Imports::SourceRecord.find_by!(external_uid: "3041565").region_source_link.region }
+    let(:ordino_area) { Imports::SourceRecord.find_by!(external_uid: "3039676").region_source_link.region }
+    let(:ordino_locality) { Imports::SourceRecord.find_by!(external_uid: "3039678").region_source_link.region }
+
+    before do
+      source.update!(
+        fetch_mode: "dump",
+        config: {
+          "all_countries_path" => "spec/fixtures/imports/geonames/country_AD.txt",
+          "alternate_names_path" => "spec/fixtures/imports/geonames/alternate_names_AD.txt",
+          "country_codes" => [ "AD" ],
+          "languages" => [ "en", "ru", "ca", "fr", "es" ]
+        }
+      )
+    end
+
+    it "imports the real fixture through the existing dump pipeline" do
+      expect { result }.to change(Region, :count).by(expected_record_count)
+        .and change(Imports::SourceRecord, :count).by(expected_record_count)
+        .and change(Imports::RegionSourceLink, :count).by(expected_record_count)
+    end
+
+    it "preserves the expected Andorra hierarchy from the official fixture" do
+      result
+
+      expect(country).to have_attributes(
+        name: "Principality of Andorra",
+        region_kind: "country",
+        parent: nil
+      )
+      expect(ordino_area.parent).to eq(country)
+      expect(ordino_area.region_kind).to eq("area")
+      expect(ordino_locality.parent).to eq(ordino_area)
+      expect(ordino_locality.region_kind).to eq("locality")
+      expect(country.region_names.find_by!(language_code: "ru", name: "Андорра")).to have_attributes(
+        name_role: "preferred",
+        searchable: true
+      )
+    end
+
+    it "remains idempotent on repeated runs of the real fixture" do
+      result
+
+      expect { described_class.call(input:) }.to change(Imports::Run, :count).by(1)
+      expect([ Region.count, Imports::SourceRecord.count, Imports::RegionSourceLink.count ]).to eq(
+        [ expected_record_count, expected_record_count, expected_record_count ]
+      )
+      expect(Imports::SourceRecord.where(status: Imports::SourceRecord::STATUSES[:missing_upstream]).count).to eq(0)
+    end
+
+    it "accepts an explicit nil records value for dump-driven execution paths" do
+      expect(
+        described_class.call(input: input.merge(records: nil))
+      ).to be_success
     end
   end
 end

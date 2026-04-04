@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-04-04
+- Completed the GeoNames region import slice from ADR 0003 by reconciling omitted records as `missing_upstream` on repeated full/replay runs while preserving matched `Region` rows and provenance links, and by persisting accurate per-run stats on import failures.
+- Added official GeoNames Andorra fixtures under `spec/fixtures/imports/geonames/` and extended the import/builder specs to exercise the real upstream dump format, multilingual alternate names, parent-first hierarchy import, and repeatable reruns.
+- Added a primary network-loading path for GeoNames region imports: the app can now download official country dumps and country-scoped alternate names from GeoNames, prepare local artifacts under `tmp/imports/geonames/`, upsert the source config, and run the existing import pipeline through a dedicated rake task.
+
 ## 2026-03-31
 - Implemented ADR 0003 stage 1 backend import flow with `Imports` models, a GeoNames region connector, canonical region dataset/application interactors, a synchronous `Imports::RunSourceJob`, evolved `Region` and `Regions::CreateRegion` for `region_kind`, `country_code`, `center`, and `region_names`, and seed ingestion that now bootstraps demo regions through the import pipeline.
 - Added a real GeoNames dump path for stage 1 via extracted `allCountries` and optional `alternateNamesV2` files, plus a rake task to upsert source config and run a country-scoped region import from local dump files.

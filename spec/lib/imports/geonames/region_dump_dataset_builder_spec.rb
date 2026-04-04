@@ -66,4 +66,55 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
       described_class.call(config: { languages: [ "ru" ] })
     end.to raise_error(ArgumentError, "all_countries_path is required")
   end
+
+  context "with the official GeoNames Andorra fixtures" do
+    let(:country) { records.find { |record| record[:external_uid] == "3041565" } }
+    let(:ordino_area) { records.find { |record| record[:external_uid] == "3039676" } }
+    let(:ordino_locality) { records.find { |record| record[:external_uid] == "3039678" } }
+    let(:config) do
+      {
+        all_countries_path: "spec/fixtures/imports/geonames/country_AD.txt",
+        alternate_names_path: "spec/fixtures/imports/geonames/alternate_names_AD.txt",
+        country_codes: [ "AD" ],
+        languages: [ "en", "ru" ]
+      }
+    end
+
+    it "loads the real GeoNames fixture size through the dump builder" do
+      expect(records.size).to eq(73)
+    end
+
+    it "maps the official country and hierarchy records into the normalized dataset" do
+      expect(country).to include(
+        name: "Principality of Andorra",
+        region_kind: "country",
+        parent_external_uid: nil
+      )
+      expect(ordino_area).to include(
+        name: "Ordino",
+        region_kind: "area",
+        parent_external_uid: "3041565"
+      )
+      expect(ordino_locality).to include(
+        name: "Ordino",
+        region_kind: "locality",
+        parent_external_uid: "3039676"
+      )
+    end
+
+    it "extracts multilingual alternate names from the official alternate-names fixture" do
+      expect(country[:alternate_names]).to include(
+        {
+          language_code: "en",
+          name: "Andorra",
+          name_role: "preferred"
+        },
+        {
+          language_code: "ru",
+          name: "Андорра",
+          name_role: "preferred"
+        }
+      )
+    end
+  end
 end

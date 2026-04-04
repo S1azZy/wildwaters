@@ -1,4 +1,6 @@
 require Rails.root.join("app/lib/imports/geonames/region_dump_dataset_builder")
+require Rails.root.join("app/lib/imports/geonames/region_record_connector")
+require "set"
 
 module Imports
   module Regions
@@ -10,7 +12,7 @@ module Imports
           required(:source_key).filled(:string)
           required(:mode).filled(:string)
           required(:initiated_by).filled(:string)
-          optional(:records).array(:hash)
+          optional(:records).maybe(:array)
         end
       end
 
@@ -18,15 +20,23 @@ module Imports
         source = yield find_source
         records = yield normalize_records(source)
         run = yield create_run(source:, record_count: records.size)
-        stats = { "processed_count" => 0, "record_count" => records.size, "created_region_count" => 0 }
+        stats = {
+          "processed_count" => 0,
+          "record_count" => records.size,
+          "created_region_count" => 0,
+          "missing_upstream_count" => 0
+        }
 
         records.each do |record|
           apply_result = Imports::Regions::ApplySourceRecord.call(input: { source:, run:, record: })
-          return fail_run(run:, error: apply_result.failure) if apply_result.failure?
+          return fail_run(run:, error: apply_result.failure, stats:) if apply_result.failure?
 
           stats["processed_count"] += 1
           stats["created_region_count"] += 1 if apply_result.value!.fetch(:created_region)
         end
+
+        reconcile_result = reconcile_missing_upstream_records(source:, run:, records:, stats:)
+        return fail_run(run:, error: reconcile_result.failure, stats:) if reconcile_result.failure?
 
         complete_run(source:, run:, stats:)
       rescue ActiveRecord::RecordNotUnique
@@ -87,16 +97,44 @@ module Imports
         Success(run:)
       end
 
-      def fail_run(run:, error:)
+      def fail_run(run:, error:, stats:)
         run.update!(
           status: Imports::Run::STATUSES[:failed],
           finished_at: Time.current,
           error_class: error[:code].to_s,
           error_message: error[:errors].presence&.to_json,
-          stats: run.stats.merge("processed_count" => run.stats.fetch("processed_count", 0))
+          stats:
         )
 
         Failure(error)
+      end
+
+      def reconcile_missing_upstream_records(source:, run:, records:, stats:)
+        return Success() unless reconcile_missing_upstream?
+
+        seen_external_uids_by_kind = records.each_with_object(Hash.new { |hash, key| hash[key] = Set.new }) do |record, memo|
+          memo[record.fetch(:record_kind)] << record.fetch(:external_uid)
+        end
+
+        missing_upstream_count = 0
+
+        source.source_records.find_each do |source_record|
+          next if seen_external_uids_by_kind.fetch(source_record.record_kind, Set.new).include?(source_record.external_uid)
+
+          source_record.update!(
+            status: Imports::SourceRecord::STATUSES[:missing_upstream],
+            last_import_run: run
+          )
+          missing_upstream_count += 1
+        end
+
+        stats["missing_upstream_count"] = missing_upstream_count
+
+        Success()
+      end
+
+      def reconcile_missing_upstream?
+        input[:mode].in?([ Imports::Run::MODES[:full], Imports::Run::MODES[:replay] ])
       end
     end
   end
