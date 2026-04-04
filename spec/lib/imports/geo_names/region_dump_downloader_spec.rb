@@ -1,5 +1,5 @@
 require "rails_helper"
-require Rails.root.join("app/lib/imports/geonames/region_dump_downloader")
+require Rails.root.join("app/lib/imports/geo_names/region_dump_downloader")
 
 RSpec.describe Imports::GeoNames::RegionDumpDownloader do
   subject(:result) do

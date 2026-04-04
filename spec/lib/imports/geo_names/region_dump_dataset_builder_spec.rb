@@ -1,5 +1,5 @@
 require "rails_helper"
-require Rails.root.join("app/lib/imports/geonames/region_dump_dataset_builder")
+require Rails.root.join("app/lib/imports/geo_names/region_dump_dataset_builder")
 
 RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
   subject(:records) { described_class.call(config:) }

@@ -1,6 +1,7 @@
 # Changes
 
 ## 2026-04-04
+- Fixed CI eager-load boot failures by disabling autoload-path insertion into `$LOAD_PATH` and by aligning the GeoNames import support files with Zeitwerk's `Imports::GeoNames` naming so system and bin specs load correctly under `CI=1`.
 - Completed the GeoNames region import slice from ADR 0003 by reconciling omitted records as `missing_upstream` on repeated full/replay runs while preserving matched `Region` rows and provenance links, and by persisting accurate per-run stats on import failures.
 - Added official GeoNames Andorra fixtures under `spec/fixtures/imports/geonames/` and extended the import/builder specs to exercise the real upstream dump format, multilingual alternate names, parent-first hierarchy import, and repeatable reruns.
 - Added a primary network-loading path for GeoNames region imports: the app can now download official country dumps and country-scoped alternate names from GeoNames, prepare local artifacts under `tmp/imports/geonames/`, upsert the source config, and run the existing import pipeline through a dedicated rake task.
