@@ -39,7 +39,7 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
   end
 
   it "builds normalized region records from extracted GeoNames files" do
-    expect(records.map { |record| record[:external_uid] }).to eq(%w[1643084 1650535 1651111])
+    expect(records.map { |record| record[:external_uid] }).to eq(%w[1643084 1650535])
 
     expect(records.second).to include(
       name: "Bali",
@@ -47,18 +47,7 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
       country_code: "ID",
       parent_external_uid: "1643084"
     )
-    expect(records.third).to include(
-      name: "Singaraja",
-      region_kind: "locality",
-      parent_external_uid: "1650535"
-    )
-    expect(records.third[:alternate_names]).to contain_exactly(
-      {
-        language_code: "ru",
-        name: "Сингараджа",
-        name_role: "alias"
-      }
-    )
+    expect(records.map { |record| record[:name] }).not_to include("Singaraja")
   end
 
   it "fails clearly when required config is missing" do
@@ -81,7 +70,7 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
     end
 
     it "loads the real GeoNames fixture size through the dump builder" do
-      expect(records.size).to eq(73)
+      expect(records.size).to eq(15)
     end
 
     it "maps the official country and hierarchy records into the normalized dataset" do

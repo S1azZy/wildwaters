@@ -6,16 +6,8 @@ module Imports
       SUPPORTED_FEATURE_CODES = %w[
         PCLI
         ADM1
-        ADM2
-        ADM3
-        ADM4
-        PPL
         PPLA
-        PPLA2
-        PPLA3
-        PPLA4
         PPLC
-        PRK
       ].freeze
 
       class << self

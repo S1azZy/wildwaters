@@ -98,6 +98,14 @@ What the command does:
 - upserts the `geonames_regions` source config
 - runs the existing region import into PostgreSQL
 
+Default MVP import slice:
+
+- `PCLI` — country
+- `ADM1` — first-level administrative areas
+- `PPLA` and `PPLC` — administrative seats and capitals
+
+If you need a wider slice for a one-off import, override `FEATURE_CODES`.
+
 Useful environment variables:
 
 - `COUNTRY_CODES=AD,FR` — required ISO country codes to import

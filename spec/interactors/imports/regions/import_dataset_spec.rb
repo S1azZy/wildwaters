@@ -272,16 +272,16 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
       alternate_names_path.delete if alternate_names_path.exist?
     end
 
-    it "imports through the existing pipeline when records are omitted" do
+    it "imports the default MVP feature-code slice through the existing pipeline when records are omitted" do
       expect(result).to be_success
       expect(Region.find_by!(slug: "bali").country_code).to eq("ID")
-      expect(Region.find_by!(slug: "singaraja").parent.slug).to eq("bali")
       expect(RegionName.find_by!(name: "Бали").language_code).to eq("ru")
+      expect(Region.find_by(slug: "singaraja")).to be_nil
     end
   end
 
   context "when loading the official GeoNames Andorra fixtures" do
-    let(:expected_record_count) { 73 }
+    let(:expected_record_count) { 15 }
     let(:input) do
       {
         source_key: source.key,
