@@ -28,6 +28,9 @@
 #       enabled: "ON"
 
 en:
+  admin:
+    authorization:
+      required: "You are not allowed to access that page."
   layouts:
     header:
       activity: "Activity"
