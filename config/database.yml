@@ -1,48 +1,51 @@
+<% require Rails.root.join("config/configs/boot_config") %>
+<% BootConfig.load_from_env! %>
+<% database_config = BootConfig.config.database %>
 default: &default
   adapter: postgis
   encoding: unicode
   seeds: false
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  host: <%= ENV.fetch("DB_HOST", "127.0.0.1") %>
-  port: <%= ENV.fetch("DB_PORT", 5432) %>
-  username: <%= ENV.fetch("DB_USER", "postgres") %>
-  password: <%= ENV.fetch("DB_PASSWORD", "postgres") %>
+  pool: <%= database_config.pool %>
+  max_connections: <%= database_config.max_connections %>
+  host: <%= database_config.host %>
+  port: <%= database_config.port %>
+  username: <%= database_config.username %>
+  password: <%= database_config.password %>
 
 development:
   primary: &primary_development
     <<: *default
-    database: <%= ENV.fetch("DB_NAME", "wildwaters_development") %>
+    database: <%= database_config.development.primary_name %>
   queue:
     <<: *primary_development
-    database: <%= ENV.fetch("DB_QUEUE_NAME", "wildwaters_development_queue") %>
+    database: <%= database_config.development.queue_name %>
     migrations_paths: db/queue_migrate
 
 test:
   primary: &primary_test
     <<: *default
-    database: <%= ENV.fetch("DB_TEST_NAME", "wildwaters_test") %>
+    database: <%= database_config.test.primary_name %>
   queue:
     <<: *primary_test
-    database: <%= ENV.fetch("DB_TEST_QUEUE_NAME", "wildwaters_test_queue") %>
+    database: <%= database_config.test.queue_name %>
     migrations_paths: db/queue_migrate
 
 production:
   primary: &primary_production
     <<: *default
-    host: <%= ENV.fetch("DB_HOST", "db") %>
-    database: <%= ENV.fetch("DB_NAME", "wildwaters_production") %>
-    username: <%= ENV.fetch("DB_USER", "wildwaters") %>
-    password: <%= ENV["WILDWATERS_DATABASE_PASSWORD"] %>
+    host: <%= database_config.production.host %>
+    database: <%= database_config.production.primary_name %>
+    username: <%= database_config.production.username %>
+    password: <%= database_config.production_password %>
   cache:
     <<: *primary_production
-    database: <%= ENV.fetch("DB_CACHE_NAME", "wildwaters_production_cache") %>
+    database: <%= database_config.production.cache_name %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: <%= ENV.fetch("DB_QUEUE_NAME", "wildwaters_production_queue") %>
+    database: <%= database_config.production.queue_name %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: <%= ENV.fetch("DB_CABLE_NAME", "wildwaters_production_cable") %>
+    database: <%= database_config.production.cable_name %>
     migrations_paths: db/cable_migrate

@@ -1,6 +1,7 @@
 # Changes
 
 ## 2026-04-24
+- Added explicit dry-configurable/dotenv application configuration with typed `BootConfig` and `ApplicationConfig`, centralized ENV loading, example env files, and GeoNames import defaults backed by the new config layer.
 - Added ADR 0004 to define the target GeoNames queued import orchestration with `import_run_items`, environment-backed defaults, run parameter snapshots, per-country Solid Queue jobs, partial retry, and country-scoped reconciliation.
 - Refreshed the current dependency freshness set by vendoring `MapLibre GL JS/CSS` `5.24.0`.
 

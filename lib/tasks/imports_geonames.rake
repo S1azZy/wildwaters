@@ -45,22 +45,24 @@ module GeoNamesImportTasks
   end
 
   def normalized_country_codes
-    ENV.fetch("COUNTRY_CODES").split(",").map { |value| value.strip.upcase }.reject(&:blank?)
+    geonames_config.country_codes.presence || raise(KeyError, "key not found: \"GEONAMES_COUNTRY_CODES\"")
   end
 
   def normalized_languages
-    ENV.fetch("LANGUAGES", "en,ru").split(",").map { |value| value.strip.downcase }.reject(&:blank?)
+    geonames_config.languages
   end
 
   def normalized_feature_codes
-    ENV.fetch(
-      "FEATURE_CODES",
-      Imports::GeoNames::RegionDumpDatasetBuilder::SUPPORTED_FEATURE_CODES.join(",")
-    ).split(",").map { |value| value.strip }.reject(&:blank?)
+    geonames_config.feature_codes
   end
 
   def include_alternate_names?
-    ENV.fetch("DOWNLOAD_ALTERNATE_NAMES", "1") != "0"
+    geonames_config.download_alternate_names
+  end
+
+  def geonames_config
+    ApplicationConfig.load_from_env!
+    ApplicationConfig.config.imports.geonames
   end
 end
 
@@ -69,14 +71,14 @@ namespace :imports do
     desc "Import region hierarchy from extracted GeoNames dump files"
     task regions: :environment do
       source = GeoNamesImportTasks.run_region_import!(
-        source_key: ENV.fetch("SOURCE_KEY", "geonames_regions"),
+        source_key: GeoNamesImportTasks.geonames_config.source_key,
         country_codes: GeoNamesImportTasks.normalized_country_codes,
         languages: GeoNamesImportTasks.normalized_languages,
         feature_codes: GeoNamesImportTasks.normalized_feature_codes,
-        initiated_by: ENV.fetch("INITIATED_BY", "manual"),
-        mode: ENV.fetch("MODE", Imports::Run::MODES[:full]),
-        all_countries_path: ENV.fetch("ALL_COUNTRIES_PATH"),
-        alternate_names_path: ENV["ALTERNATE_NAMES_PATH"].presence
+        initiated_by: GeoNamesImportTasks.geonames_config.initiated_by,
+        mode: GeoNamesImportTasks.geonames_config.mode,
+        all_countries_path: GeoNamesImportTasks.geonames_config.all_countries_path || ENV.fetch("ALL_COUNTRIES_PATH"),
+        alternate_names_path: GeoNamesImportTasks.geonames_config.alternate_names_path.presence
       )
 
       puts "Imported GeoNames regions for #{GeoNamesImportTasks.normalized_country_codes.join(', ')} via source #{source.key}"
@@ -85,8 +87,8 @@ namespace :imports do
     desc "Download official GeoNames country dumps, prepare local artifacts, and import region hierarchy"
     task regions_from_network: :environment do
       country_codes = GeoNamesImportTasks.normalized_country_codes
-      source_key = ENV.fetch("SOURCE_KEY", "geonames_regions")
-      download_dir = ENV.fetch("DOWNLOAD_DIR", "tmp/imports/geonames/#{source_key}")
+      source_key = GeoNamesImportTasks.geonames_config.source_key
+      download_dir = GeoNamesImportTasks.geonames_config.download_dir
       downloaded_paths = Imports::GeoNames::RegionDumpDownloader.call(
         country_codes:,
         destination_dir: download_dir,
@@ -98,8 +100,8 @@ namespace :imports do
         country_codes:,
         languages: GeoNamesImportTasks.normalized_languages,
         feature_codes: GeoNamesImportTasks.normalized_feature_codes,
-        initiated_by: ENV.fetch("INITIATED_BY", "manual"),
-        mode: ENV.fetch("MODE", Imports::Run::MODES[:full]),
+        initiated_by: GeoNamesImportTasks.geonames_config.initiated_by,
+        mode: GeoNamesImportTasks.geonames_config.mode,
         all_countries_path: downloaded_paths.fetch(:all_countries_path),
         alternate_names_path: downloaded_paths[:alternate_names_path]
       )

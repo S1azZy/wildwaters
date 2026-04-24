@@ -6,6 +6,12 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+require_relative "configs/boot_config"
+require_relative "configs/application_config"
+
+BootConfig.load_from_env!
+ApplicationConfig.load_from_env!
+
 module Wildwaters
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
