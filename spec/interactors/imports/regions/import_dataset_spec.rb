@@ -159,6 +159,15 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
     expect(bali_source_record.reload.status).to eq(Imports::SourceRecord::STATUSES[:matched])
   end
 
+  it "limits missing-upstream reconciliation to the requested country shard" do
+    old_ad_record = create_old_source_record(external_uid: "old-ad", country_code: "AD")
+    old_fr_record = create_old_source_record(external_uid: "old-fr", country_code: "FR")
+
+    expect(import_ad_shard).to be_success
+    expect(old_ad_record.reload.status).to eq(Imports::SourceRecord::STATUSES[:missing_upstream])
+    expect(old_fr_record.reload.status).to eq(Imports::SourceRecord::STATUSES[:matched])
+  end
+
   context "when the source is disabled" do
     before do
       source.update!(enabled: false)
@@ -329,6 +338,45 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
 
   def bali_region
     Region.find_by!(slug: "bali")
+  end
+
+  def create_old_source_record(external_uid:, country_code:)
+    create(
+      :imports_source_record,
+      import_source: source,
+      last_import_run: nil,
+      external_uid:,
+      status: Imports::SourceRecord::STATUSES[:matched],
+      normalized_payload: { "country_code" => country_code }
+    )
+  end
+
+  def import_ad_shard
+    shard_run = create(:imports_run, import_source: source, mode: Imports::Run::MODES[:full])
+
+    described_class.call(
+      input: input.merge(
+        import_run_id: shard_run.id,
+        reconciliation_country_code: "AD",
+        records: [ andorra_country_record ]
+      )
+    )
+  end
+
+  def andorra_country_record
+    {
+      record_kind: "region",
+      external_uid: "3041565",
+      external_url: "https://www.geonames.org/3041565",
+      name: "Principality of Andorra",
+      ascii_name: "Andorra",
+      region_kind: "country",
+      country_code: "AD",
+      parent_external_uid: nil,
+      latitude: 42.5,
+      longitude: 1.5,
+      alternate_names: []
+    }
   end
 
   def andorra_ru_name

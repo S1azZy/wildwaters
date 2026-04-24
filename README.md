@@ -76,28 +76,25 @@ It intentionally does not yet contain:
 
 ## GeoNames Import
 
-The repository supports two GeoNames region import paths:
-
-- local-file mode with extracted dump files you already have
-- network mode that downloads official GeoNames country dumps, prepares local artifacts, and runs the existing import pipeline
-
-Recommended operator flow for the first real import:
+The recommended operator flow enqueues one GeoNames import run with one queued item per country:
 
 ```bash
-docker compose exec web bash -lc \
-  "COUNTRY_CODES=AD \
-   LANGUAGES=en,ru \
-   INITIATED_BY=manual \
-   bundle exec rake imports:geonames:regions_from_network"
+GEONAMES_COUNTRIES=AD GEONAMES_LANGUAGES=en,ru make import_geonames
 ```
 
 What the command does:
 
-- downloads official GeoNames country dumps for the requested ISO country codes
-- downloads country-scoped alternate names unless `DOWNLOAD_ALTERNATE_NAMES=0`
-- writes prepared artifacts under `tmp/imports/geonames/<source_key>/`
-- upserts the `geonames_regions` source config
-- runs the existing region import into PostgreSQL
+- creates one `import_run` for the requested import
+- snapshots effective GeoNames settings on the run
+- creates one `import_run_item` per ISO country code
+- enqueues country item jobs through Active Job / Solid Queue
+- writes country artifacts under `tmp/imports/geonames/<import_run_id>/<country_code>/`
+
+Retry failed country items for an existing run:
+
+```bash
+make import_geonames_retry_failed RUN_ID=123
+```
 
 `bin/rails db:prepare` only prepares the schema. It does not load demo seeds.
 

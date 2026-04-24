@@ -13,10 +13,12 @@ module Imports
       running: "running",
       succeeded: "succeeded",
       failed: "failed",
+      partially_failed: "partially_failed",
       cancelled: "cancelled"
     }.freeze
 
     belongs_to :import_source, class_name: "Imports::Source", inverse_of: :runs
+    has_many :items, class_name: "Imports::RunItem", foreign_key: :import_run_id, dependent: :destroy, inverse_of: :import_run
     has_many :source_records, class_name: "Imports::SourceRecord", foreign_key: :last_import_run_id, dependent: :nullify, inverse_of: :last_import_run
     has_many :record_snapshots, class_name: "Imports::RecordSnapshot", foreign_key: :import_run_id, dependent: :restrict_with_exception, inverse_of: :import_run
 

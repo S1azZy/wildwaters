@@ -3,7 +3,7 @@ SHELL := /bin/bash
 COMPOSE := docker compose
 APP := $(COMPOSE) run --rm web
 
-.PHONY: setup install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor bundle-outdated importmap-outdated maplibre-outdated outdated
+.PHONY: setup install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated importmap-outdated maplibre-outdated outdated
 
 setup:
 	$(COMPOSE) up --build -d
@@ -66,6 +66,15 @@ doctor:
 	@docker compose version
 	@docker info --format '{{.ServerVersion}}'
 	$(APP) bash -lc "ruby -v && bundle -v && bin/rails about"
+
+import_geonames:
+	$(APP) bin/rails imports:geonames:enqueue
+
+import_geonames_retry_failed:
+ifndef RUN_ID
+	$(error RUN_ID is required, for example: make import_geonames_retry_failed RUN_ID=123)
+endif
+	$(APP) bin/rails imports:geonames:retry_failed RUN_ID=$(RUN_ID)
 
 bundle-outdated:
 	$(APP) bundle outdated

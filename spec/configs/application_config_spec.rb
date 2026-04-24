@@ -27,6 +27,8 @@ RSpec.describe ApplicationConfig do
         expect(described_class.config.imports.geonames.languages).to eq(%w[en ru])
         expect(described_class.config.imports.geonames.feature_codes).to eq(%w[PCLI ADM1])
         expect(described_class.config.imports.geonames.download_alternate_names).to be(false)
+        expect(described_class.config.imports.geonames.default_mode).to eq(Imports::Run::MODES[:replay])
+        expect(described_class.config.imports.geonames.queue).to eq("imports")
       end
     end
   end
@@ -45,10 +47,12 @@ RSpec.describe ApplicationConfig do
       "APP_PORT" => "3443",
       "APP_PROTOCOL" => "https",
       "GEONAMES_SOURCE_KEY" => "custom_geonames",
-      "GEONAMES_COUNTRY_CODES" => "ad, fr",
+      "GEONAMES_COUNTRIES" => "ad, fr",
       "GEONAMES_LANGUAGES" => "en, RU",
       "GEONAMES_FEATURE_CODES" => "PCLI, ADM1",
       "GEONAMES_DOWNLOAD_ALTERNATE_NAMES" => "0",
+      "GEONAMES_DEFAULT_MODE" => "replay",
+      "GEONAMES_QUEUE" => "imports",
       "GEONAMES_DOWNLOAD_DIR" => "tmp/imports/geonames/custom",
       &
     )
