@@ -1,5 +1,3 @@
-<% require Rails.root.join("config/configs/boot_config") %>
-<% BootConfig.load_from_env! %>
 <% database_config = BootConfig.config.database %>
 default: &default
   adapter: postgis
@@ -13,39 +11,26 @@ default: &default
   password: <%= database_config.password %>
 
 development:
-  primary: &primary_development
+  primary: &primary
     <<: *default
-    database: <%= database_config.development.primary_name %>
-  queue:
-    <<: *primary_development
-    database: <%= database_config.development.queue_name %>
+    database: <%= database_config.name %>
+  queue: &queue
+    <<: *primary
+    database: <%= database_config.queue_name %>
     migrations_paths: db/queue_migrate
 
 test:
-  primary: &primary_test
-    <<: *default
-    database: <%= database_config.test.primary_name %>
-  queue:
-    <<: *primary_test
-    database: <%= database_config.test.queue_name %>
-    migrations_paths: db/queue_migrate
+  primary: *primary
+  queue: *queue
 
 production:
-  primary: &primary_production
-    <<: *default
-    host: <%= database_config.production.host %>
-    database: <%= database_config.production.primary_name %>
-    username: <%= database_config.production.username %>
-    password: <%= database_config.production_password %>
+  primary: *primary
   cache:
-    <<: *primary_production
-    database: <%= database_config.production.cache_name %>
+    <<: *primary
+    database: <%= database_config.cache_name %>
     migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: <%= database_config.production.queue_name %>
-    migrations_paths: db/queue_migrate
+  queue: *queue
   cable:
-    <<: *primary_production
-    database: <%= database_config.production.cable_name %>
+    <<: *primary
+    database: <%= database_config.cable_name %>
     migrations_paths: db/cable_migrate

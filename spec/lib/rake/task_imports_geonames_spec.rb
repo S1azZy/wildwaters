@@ -16,23 +16,23 @@ RSpec.describe Rake::Task do
     described_class["imports:geonames:regions"].reenable
     task.reenable if described_class.task_defined?("imports:geonames:regions_from_network")
     configure_import_env
+    load Rails.root.join("config/initializers/01_settings.rb")
     allow(Imports::GeoNames::RegionDumpDownloader).to receive(:call).and_return(downloaded_paths)
     allow(Imports::RunSourceJob).to receive(:perform_now)
   end
 
   after do
     %w[
-      SOURCE_KEY
-      COUNTRY_CODES
-      LANGUAGES
-      FEATURE_CODES
-      MODE
-      INITIATED_BY
-      ALL_COUNTRIES_PATH
-      ALTERNATE_NAMES_PATH
-      DOWNLOAD_DIR
-      DOWNLOAD_ALTERNATE_NAMES
+      GEONAMES_SOURCE_KEY
+      GEONAMES_COUNTRY_CODES
+      GEONAMES_LANGUAGES
+      GEONAMES_FEATURE_CODES
+      GEONAMES_ALL_COUNTRIES_PATH
+      GEONAMES_ALTERNATE_NAMES_PATH
+      GEONAMES_DOWNLOAD_DIR
+      GEONAMES_DOWNLOAD_ALTERNATE_NAMES
     ].each { |key| ENV.delete(key) }
+    load Rails.root.join("config/initializers/01_settings.rb")
   end
 
   it "downloads GeoNames dumps, configures the source, and runs the import" do
@@ -44,11 +44,10 @@ RSpec.describe Rake::Task do
   end
 
   def configure_import_env
-    ENV["COUNTRY_CODES"] = "AD,FR"
-    ENV["LANGUAGES"] = "en,ru"
-    ENV["SOURCE_KEY"] = "geonames_regions"
-    ENV["DOWNLOAD_DIR"] = "tmp/imports/geonames/test"
-    ENV["INITIATED_BY"] = "operator"
+    ENV["GEONAMES_COUNTRY_CODES"] = "AD,FR"
+    ENV["GEONAMES_LANGUAGES"] = "en,ru"
+    ENV["GEONAMES_SOURCE_KEY"] = "geonames_regions"
+    ENV["GEONAMES_DOWNLOAD_DIR"] = "tmp/imports/geonames/test"
   end
 
   def expect_downloader_to_have_run
@@ -72,7 +71,7 @@ RSpec.describe Rake::Task do
     expect(Imports::RunSourceJob).to have_received(:perform_now).with(
       source_key: "geonames_regions",
       mode: Imports::Run::MODES[:full],
-      initiated_by: "operator",
+      initiated_by: task.name,
       records: nil
     )
   end

@@ -2,12 +2,12 @@ require "rails_helper"
 
 RSpec.describe BootConfig do
   after do
-    described_class.load_from_env!
+    load_settings!
   end
 
   it "loads typed runtime settings from environment overrides" do
     with_boot_env do
-      described_class.load_from_env!
+      load_settings!
 
       aggregate_failures do
         expect(described_class.config.system.ci).to be(true)
@@ -22,27 +22,29 @@ RSpec.describe BootConfig do
 
   it "loads typed database settings from environment overrides" do
     with_boot_env do
-      described_class.load_from_env!
+      load_settings!
 
       aggregate_failures do
         expect(described_class.config.database.host).to eq("postgres")
         expect(described_class.config.database.port).to eq(5544)
         expect(described_class.config.database.username).to eq("wild")
-        expect(described_class.config.database.production_password).to eq("production-secret")
-        expect(described_class.config.database.development.primary_name).to eq("wildwaters_dev")
-        expect(described_class.config.database.test.primary_name).to eq("wildwaters_spec")
+        expect(described_class.config.database.password).to eq("secret")
+        expect(described_class.config.database.name).to eq("wildwaters_current")
+        expect(described_class.config.database.queue_name).to eq("wildwaters_current_queue")
       end
     end
   end
 
-  it "keeps production database defaults separate from local database defaults" do
-    with_env("DB_USER" => nil, "DB_HOST" => nil) do
-      described_class.load_from_env!
+  it "loads database defaults from the settings initializer" do
+    with_env(default_database_env) do
+      load_settings!
 
-      expect(described_class.config.database.username).to eq("postgres")
-      expect(described_class.config.database.production.username).to eq("wildwaters")
-      expect(described_class.config.database.host).to eq("127.0.0.1")
-      expect(described_class.config.database.production.host).to eq("db")
+      aggregate_failures do
+        expect(described_class.config.database.username).to eq("postgres")
+        expect(described_class.config.database.host).to eq("127.0.0.1")
+        expect(described_class.config.database.name).to eq("wildwaters_development")
+        expect(described_class.config.database.queue_name).to eq("wildwaters_development_queue")
+      end
     end
   end
 
@@ -60,14 +62,24 @@ RSpec.describe BootConfig do
       "DB_PORT" => "5544",
       "DB_USER" => "wild",
       "DB_PASSWORD" => "secret",
-      "DB_NAME" => "wildwaters_dev",
-      "DB_QUEUE_NAME" => "wildwaters_dev_queue",
-      "DB_TEST_NAME" => "wildwaters_spec",
-      "DB_TEST_QUEUE_NAME" => "wildwaters_spec_queue",
+      "DB_NAME" => "wildwaters_current",
+      "DB_QUEUE_NAME" => "wildwaters_current_queue",
       "DB_CACHE_NAME" => "wildwaters_cache",
       "DB_CABLE_NAME" => "wildwaters_cable",
-      "WILDWATERS_DATABASE_PASSWORD" => "production-secret",
       &
     )
+  end
+
+  def default_database_env
+    {
+      "DB_USER" => nil,
+      "DB_HOST" => nil,
+      "DB_NAME" => nil,
+      "DB_QUEUE_NAME" => nil
+    }
+  end
+
+  def load_settings!
+    load Rails.root.join("config/initializers/01_settings.rb")
   end
 end

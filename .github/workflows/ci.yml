@@ -92,7 +92,7 @@ jobs:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: wildwaters_test
-      DB_TEST_NAME: wildwaters_test
+      DB_QUEUE_NAME: wildwaters_test_queue
 
     steps:
       - name: Checkout code

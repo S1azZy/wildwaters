@@ -2,12 +2,12 @@ require "rails_helper"
 
 RSpec.describe ApplicationConfig do
   after do
-    described_class.load_from_env!
+    load_settings!
   end
 
   it "loads typed URL settings from environment overrides" do
     with_application_env do
-      described_class.load_from_env!
+      load_settings!
 
       aggregate_failures do
         expect(described_class.config.urls.host).to eq("wild.example.test")
@@ -19,7 +19,7 @@ RSpec.describe ApplicationConfig do
 
   it "loads typed GeoNames import settings from environment overrides" do
     with_application_env do
-      described_class.load_from_env!
+      load_settings!
 
       aggregate_failures do
         expect(described_class.config.imports.geonames.source_key).to eq("custom_geonames")
@@ -27,14 +27,13 @@ RSpec.describe ApplicationConfig do
         expect(described_class.config.imports.geonames.languages).to eq(%w[en ru])
         expect(described_class.config.imports.geonames.feature_codes).to eq(%w[PCLI ADM1])
         expect(described_class.config.imports.geonames.download_alternate_names).to be(false)
-        expect(described_class.config.imports.geonames.mode).to eq("replay")
       end
     end
   end
 
   it "allows configured storage service names" do
     with_env("ACTIVE_STORAGE_SERVICE" => "amazon") do
-      described_class.load_from_env!
+      load_settings!
 
       expect(described_class.config.storage.service).to eq(:amazon)
     end
@@ -51,9 +50,11 @@ RSpec.describe ApplicationConfig do
       "GEONAMES_FEATURE_CODES" => "PCLI, ADM1",
       "GEONAMES_DOWNLOAD_ALTERNATE_NAMES" => "0",
       "GEONAMES_DOWNLOAD_DIR" => "tmp/imports/geonames/custom",
-      "GEONAMES_INITIATED_BY" => "scheduler",
-      "GEONAMES_MODE" => "replay",
       &
     )
+  end
+
+  def load_settings!
+    load Rails.root.join("config/initializers/01_settings.rb")
   end
 end
