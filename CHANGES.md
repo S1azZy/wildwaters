@@ -1,5 +1,8 @@
 # Changes
 
+## 2026-04-24
+- Refreshed the current dependency freshness set by vendoring `MapLibre GL JS/CSS` `5.24.0`.
+
 ## 2026-04-04
 - Added the default Solid Queue operations stack: `mission_control-jobs` mounted behind admin-only app auth at `/admin/jobs`, dedicated queue database wiring for development/test/production, generated queue runtime config, and a separate Docker `jobs` service for local workers/scheduler checks.
 - Removed default demo seeding from `db:prepare`, emptied `db/seeds.rb`, and made GeoNames import the only documented path for loading region data into a fresh environment.
