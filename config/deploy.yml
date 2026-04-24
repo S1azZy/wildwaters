@@ -21,4 +21,4 @@ env:
     RAILS_ENV: production
   secret:
     - RAILS_MASTER_KEY
-    - WILDWATERS_DATABASE_PASSWORD
+    - DB_PASSWORD

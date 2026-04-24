@@ -1,48 +1,36 @@
+<% database_config = BootConfig.config.database %>
 default: &default
   adapter: postgis
   encoding: unicode
   seeds: false
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  host: <%= ENV.fetch("DB_HOST", "127.0.0.1") %>
-  port: <%= ENV.fetch("DB_PORT", 5432) %>
-  username: <%= ENV.fetch("DB_USER", "postgres") %>
-  password: <%= ENV.fetch("DB_PASSWORD", "postgres") %>
+  pool: <%= database_config.pool %>
+  max_connections: <%= database_config.max_connections %>
+  host: <%= database_config.host %>
+  port: <%= database_config.port %>
+  username: <%= database_config.username %>
+  password: <%= database_config.password %>
 
 development:
-  primary: &primary_development
+  primary: &primary
     <<: *default
-    database: <%= ENV.fetch("DB_NAME", "wildwaters_development") %>
-  queue:
-    <<: *primary_development
-    database: <%= ENV.fetch("DB_QUEUE_NAME", "wildwaters_development_queue") %>
+    database: <%= database_config.name %>
+  queue: &queue
+    <<: *primary
+    database: <%= database_config.queue_name %>
     migrations_paths: db/queue_migrate
 
 test:
-  primary: &primary_test
-    <<: *default
-    database: <%= ENV.fetch("DB_TEST_NAME", "wildwaters_test") %>
-  queue:
-    <<: *primary_test
-    database: <%= ENV.fetch("DB_TEST_QUEUE_NAME", "wildwaters_test_queue") %>
-    migrations_paths: db/queue_migrate
+  primary: *primary
+  queue: *queue
 
 production:
-  primary: &primary_production
-    <<: *default
-    host: <%= ENV.fetch("DB_HOST", "db") %>
-    database: <%= ENV.fetch("DB_NAME", "wildwaters_production") %>
-    username: <%= ENV.fetch("DB_USER", "wildwaters") %>
-    password: <%= ENV["WILDWATERS_DATABASE_PASSWORD"] %>
+  primary: *primary
   cache:
-    <<: *primary_production
-    database: <%= ENV.fetch("DB_CACHE_NAME", "wildwaters_production_cache") %>
+    <<: *primary
+    database: <%= database_config.cache_name %>
     migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: <%= ENV.fetch("DB_QUEUE_NAME", "wildwaters_production_queue") %>
-    migrations_paths: db/queue_migrate
+  queue: *queue
   cable:
-    <<: *primary_production
-    database: <%= ENV.fetch("DB_CABLE_NAME", "wildwaters_production_cable") %>
+    <<: *primary
+    database: <%= database_config.cable_name %>
     migrations_paths: db/cable_migrate
