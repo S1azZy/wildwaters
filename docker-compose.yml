@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
       args:
-        RUBY_VERSION: "4.0.2"
+        RUBY_VERSION: "4.0.3"
     command: >
       bash -lc "bundle install &&
       bin/rails db:prepare &&
@@ -52,7 +52,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
       args:
-        RUBY_VERSION: "4.0.2"
+        RUBY_VERSION: "4.0.3"
     command: >
       bash -lc "bundle install &&
       bin/rails db:prepare &&

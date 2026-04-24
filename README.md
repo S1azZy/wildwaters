@@ -20,7 +20,7 @@ Product:
 
 ## Stack
 
-- Ruby `4.0.2`
+- Ruby `4.0.3`
 - Rails `8.1.x`
 - PostgreSQL `18` + PostGIS
 - Hotwire (`Turbo + Stimulus`)
