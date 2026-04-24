@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require "yaml"
 
 class DevcontainerConfiguration
 end
@@ -8,23 +9,40 @@ end
 RSpec.describe DevcontainerConfiguration do
   let(:root) { Pathname(__dir__).join("../..").expand_path }
   let(:devcontainer_path) { root.join(".devcontainer/devcontainer.json") }
+  let(:devcontainer_compose_path) { root.join(".devcontainer/docker-compose.yml") }
   let(:codex_config_path) { root.join(".codex/config.toml") }
   let(:post_create_path) { root.join(".devcontainer/post-create.sh") }
   let(:dockerfile_dev_path) { root.join("Dockerfile.dev") }
+  let(:dockerfile_devcontainer_path) { root.join("Dockerfile.devcontainer") }
   let(:devcontainer_config) { JSON.parse(devcontainer_path.read) }
+  let(:devcontainer_compose) { YAML.safe_load(devcontainer_compose_path.read) }
   let(:post_create) { post_create_path.read }
 
   it "runs from the Rails compose service" do
     expect(devcontainer_config).to include(
-      "dockerComposeFile" => "../docker-compose.yml",
       "service" => "web",
       "workspaceFolder" => "/app",
       "shutdownAction" => "stopCompose",
     )
 
+    expect(devcontainer_config.fetch("dockerComposeFile")).to eq(
+      [ "../docker-compose.yml", "docker-compose.yml" ],
+    )
     expect(devcontainer_config.fetch("runServices")).to contain_exactly("db", "jobs")
     expect(devcontainer_config.fetch("forwardPorts")).to include(3000, 5432)
     expect(devcontainer_config.fetch("postCreateCommand")).to eq(".devcontainer/post-create.sh")
+  end
+
+  it "keeps the regular dev image minimal while using a separate agent image for devcontainer" do
+    dockerfile = dockerfile_dev_path.read
+    devcontainer_dockerfile = dockerfile_devcontainer_path.read
+
+    expect(devcontainer_compose.dig("services", "web", "build", "dockerfile")).to eq("Dockerfile.devcontainer")
+    expect(devcontainer_compose.dig("services", "web", "build", "context")).to eq(".")
+    expect(dockerfile).not_to include("cli.github.com/packages")
+    expect(dockerfile).not_to include("npm install -g @openai/codex")
+    expect(devcontainer_dockerfile).to include("cli.github.com/packages")
+    expect(devcontainer_dockerfile).to include("npm install -g @openai/codex")
   end
 
   it "mounts local developer credentials without committing secrets" do
@@ -56,7 +74,7 @@ RSpec.describe DevcontainerConfiguration do
   end
 
   it "installs the agent and GitHub tools in the development image" do
-    dockerfile = dockerfile_dev_path.read
+    dockerfile = dockerfile_devcontainer_path.read
 
     expect(dockerfile).to include("cli.github.com/packages")
     expect(dockerfile).to include("bubblewrap")

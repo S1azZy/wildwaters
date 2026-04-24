@@ -1,6 +1,9 @@
 {
   "name": "Wild Waters",
-  "dockerComposeFile": "../docker-compose.yml",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.yml"
+  ],
   "service": "web",
   "workspaceFolder": "/app",
   "runServices": [
