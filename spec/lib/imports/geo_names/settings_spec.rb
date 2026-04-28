@@ -12,7 +12,6 @@ RSpec.describe Imports::GeoNames::Settings do
         "GEONAMES_FEATURE_CODES" => "PCLI, adm1",
         "GEONAMES_DOWNLOAD_ALTERNATE_NAMES" => "0",
         "GEONAMES_DEFAULT_MODE" => "replay",
-        "GEONAMES_QUEUE" => "imports",
         "GEONAMES_DOWNLOAD_DIR" => "tmp/imports/geonames/custom"
       ) do
         load Rails.root.join("config/initializers/01_settings.rb")
@@ -32,7 +31,6 @@ RSpec.describe Imports::GeoNames::Settings do
         feature_codes: %w[PCLI ADM1],
         download_alternate_names: false,
         mode: Imports::Run::MODES[:replay],
-        queue: "imports",
         download_dir: "tmp/imports/geonames/custom",
         initiated_by: "imports:geonames:enqueue"
       )

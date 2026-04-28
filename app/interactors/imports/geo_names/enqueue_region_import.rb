@@ -3,64 +3,73 @@ module Imports
     class EnqueueRegionImport < ApplicationInteractor
       option :input
 
+      class ValidationContract < ApplicationContract
+        params do
+          required(:source_key).filled(:string)
+          required(:countries).filled(:array)
+          required(:languages).filled(:array)
+          required(:feature_codes).filled(:array)
+          required(:download_alternate_names).filled(:bool)
+          required(:mode).filled(:string)
+          required(:download_dir).filled(:string)
+          required(:initiated_by).filled(:string)
+        end
+      end
+
       def call
-        source = nil
+        source = yield find_source
         run = nil
         items = []
 
-        ActiveRecord::Base.transaction do
-          source = upsert_source!
-          run = create_run!(source:)
-          items = create_items!(run:)
+        in_transaction do
+          run = yield create_run!(source:)
+          items = yield create_items!(run:)
         end
 
-        items.each { |item| ImportRunItemJob.set(queue: queue).perform_later(item.id) }
+        items.each { |item| ImportRunItemJob.perform_later(item.id) }
 
         Success(run:, items:)
-      rescue ActiveRecord::RecordNotUnique
-        fail_with(code: :run_already_active, errors: { source_key: [ "already has an active run" ] })
       end
 
       private
 
-      def upsert_source!
-        Imports::Source.find_or_initialize_by(key: source_key).tap do |source|
-          source.assign_attributes(
-            target_kind: "region",
-            source_role: Imports::Source::SOURCE_ROLES[:canonical_identity],
-            fetch_mode: Imports::Source::FETCH_MODES[:dump],
-            enabled: true,
-            license_key: "geonames",
-            license_url: "https://www.geonames.org/export/",
-            attribution_text: "GeoNames",
-            display_policy: Imports::Source::DISPLAY_POLICIES[:public_display_allowed]
-          )
-          source.config ||= {}
-          source.save!
-        end
+      def find_source
+        source = Imports::Source.find_by(key: source_key)
+        return Success(source) if source
+
+        fail_with(code: :source_not_found, errors: { source_key: [ "not found" ] })
       end
 
       def create_run!(source:)
-        source.runs.create!(
-          mode: mode,
-          status: Imports::Run::STATUSES[:running],
-          started_at: Time.current,
-          initiated_by: initiated_by,
-          params: run_params,
-          stats: { "total_item_count" => country_codes.size }
-        )
+        run =
+          source.runs.create!(
+            mode: mode,
+            status: Imports::Run::STATUSES[:running],
+            started_at: Time.current,
+            initiated_by: initiated_by,
+            params: run_params,
+            stats: { "total_item_count" => country_codes.size }
+          )
+
+        Success(run)
+      rescue ActiveRecord::RecordNotUnique
+        fail_with(code: :run_already_active, errors: { source_key: [ "already has an active run" ] })
       end
 
       def create_items!(run:)
-        country_codes.map do |country_code|
-          run.items.create!(
-            item_kind: "country",
-            item_key: country_code,
-            country_code:,
-            status: Imports::RunItem::STATUSES[:queued],
-            params: item_params(run:, country_code:)
-          )
-        end
+        items =
+          country_codes.map do |country_code|
+            run.items.create!(
+              item_kind: "country",
+              item_key: country_code,
+              status: Imports::RunItem::STATUSES[:queued],
+              params: item_params(run:, country_code:)
+            )
+          end
+
+        Success(items)
+      rescue ActiveRecord::RecordNotUnique
+        fail_with(code: :run_item_already_exists, errors: { item_key: [ "already exists for this run" ] })
       end
 
       def item_params(run:, country_code:)
@@ -79,7 +88,6 @@ module Imports
           "feature_codes" => feature_codes,
           "download_alternate_names" => download_alternate_names,
           "mode" => mode,
-          "queue" => queue,
           "download_dir" => download_dir
         }
       end
@@ -106,10 +114,6 @@ module Imports
 
       def mode
         input.fetch(:mode)
-      end
-
-      def queue
-        input.fetch(:queue)
       end
 
       def download_dir

@@ -1,7 +1,5 @@
 module Imports
   class RunItem < ApplicationRecord
-    self.table_name = "import_run_items"
-
     STATUSES = {
       queued: "queued",
       running: "running",

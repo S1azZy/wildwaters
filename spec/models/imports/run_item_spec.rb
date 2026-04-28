@@ -5,11 +5,14 @@ RSpec.describe Imports::RunItem, type: :model do
 
   it { is_expected.to belong_to(:import_run).class_name("Imports::Run").inverse_of(:items) }
 
-  it "supports the queued country item state required by GeoNames orchestration" do
+  it "keeps source-specific shard attributes in params instead of dedicated columns" do
+    expect(described_class.column_names).not_to include("country_code")
+  end
+
+  it "supports generic queued import work items" do
     expect(run_item).to have_attributes(
       item_kind: "country",
       item_key: "AD",
-      country_code: "AD",
       status: Imports::RunItem::STATUSES[:queued],
       params: {},
       artifact_paths: {},
@@ -18,9 +21,9 @@ RSpec.describe Imports::RunItem, type: :model do
     )
   end
 
-  it "prevents duplicate country items within the same run" do
-    existing_item = create(:imports_run_item, item_key: "AD", country_code: "AD")
-    duplicate = build(:imports_run_item, import_run: existing_item.import_run, item_key: "AD", country_code: "AD")
+  it "prevents duplicate work items within the same run" do
+    existing_item = create(:imports_run_item, item_kind: "country", item_key: "AD")
+    duplicate = build(:imports_run_item, import_run: existing_item.import_run, item_kind: "country", item_key: "AD")
 
     expect { duplicate.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
   end

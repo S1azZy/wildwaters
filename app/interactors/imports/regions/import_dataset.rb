@@ -6,6 +6,9 @@ module Imports
   module Regions
     class ImportDataset < ApplicationInteractor
       option :input
+      option :apply_source_record, default: -> { Imports::Regions::ApplySourceRecord }
+      option :region_record_connector, default: -> { Imports::GeoNames::RegionRecordConnector }
+      option :region_dump_dataset_builder, default: -> { Imports::GeoNames::RegionDumpDatasetBuilder }
 
       class ValidationContract < ApplicationContract
         params do
@@ -30,7 +33,7 @@ module Imports
         }
 
         records.each do |record|
-          apply_result = Imports::Regions::ApplySourceRecord.call(input: { source:, run:, record: })
+          apply_result = apply_source_record.call(input: { source:, run:, record: })
           return fail_run(run:, error: apply_result.failure, stats:) if apply_result.failure?
 
           stats["processed_count"] += 1
@@ -59,7 +62,7 @@ module Imports
 
       def normalize_records(source)
         if source.key == "geonames_regions"
-          return Success(Imports::GeoNames::RegionRecordConnector.call(records: input[:records])) if input[:records].present?
+          return Success(region_record_connector.call(records: input[:records])) if input[:records].present?
           return load_geonames_dump_records(source) if source.fetch_mode_dump?
         end
 
@@ -67,9 +70,9 @@ module Imports
       end
 
       def load_geonames_dump_records(source)
-        records = Imports::GeoNames::RegionDumpDatasetBuilder.call(config: source.config)
+        records = region_dump_dataset_builder.call(config: source.config)
 
-        Success(Imports::GeoNames::RegionRecordConnector.call(records: records))
+        Success(region_record_connector.call(records: records))
       rescue ArgumentError, Errno::ENOENT => error
         fail_with(code: :invalid_source_config, errors: { config: [ error.message ] })
       end

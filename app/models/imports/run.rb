@@ -1,7 +1,5 @@
 module Imports
   class Run < ApplicationRecord
-    self.table_name = "import_runs"
-
     MODES = {
       full: "full",
       incremental: "incremental",

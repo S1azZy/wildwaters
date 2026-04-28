@@ -34,7 +34,6 @@ class ApplicationConfig
       setting :feature_codes, constructor: FeatureCodes
       setting :download_alternate_names, constructor: StringBool
       setting :default_mode, constructor: Types::String.constrained(filled: true)
-      setting :queue, constructor: Types::String.constrained(filled: true)
       setting :download_dir, constructor: Types::String.constrained(filled: true)
       setting :all_countries_path, constructor: OptionalPath
       setting :alternate_names_path, constructor: OptionalPath

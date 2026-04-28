@@ -3,29 +3,64 @@ module Imports
     class FinalizeRun < ApplicationInteractor
       option :input
 
-      def call
-        run = Imports::Run.find(input.fetch(:import_run_id))
-
-        run.with_lock do
-          run.items.reload
-          return Success(run:) if run.items.any? { |item| item.status.in?(active_item_statuses) }
-
-          stats = aggregate_stats(run.items)
-          status = run.items.any?(&:status_failed?) ? Imports::Run::STATUSES[:partially_failed] : Imports::Run::STATUSES[:succeeded]
-          now = Time.current
-
-          run.update!(
-            status:,
-            finished_at: now,
-            stats:
-          )
-          run.import_source.update!(last_successful_run_at: now) if status == Imports::Run::STATUSES[:succeeded]
+      class ValidationContract < ApplicationContract
+        params do
+          required(:import_run_id).filled(:integer)
         end
+      end
+
+      def call
+        run = yield find_run
+        run = yield finalize_run(run)
 
         Success(run:)
       end
 
       private
+
+      def find_run
+        run = Imports::Run.includes(:items, :import_source).find_by(id: input[:import_run_id])
+        return Success(run) if run
+
+        fail_with(code: :run_not_found, errors: { import_run_id: [ "not found" ] })
+      end
+
+      def finalize_run(run)
+        result = nil
+
+        run.with_lock do
+          items = run.items.reload
+          result = active_items?(items) ? Success(run) : complete_run!(run:, items:)
+        end
+
+        result
+      end
+
+      def active_items?(items)
+        items.any? { |item| item.status.in?(active_item_statuses) }
+      end
+
+      def complete_run!(run:, items:)
+        safe_call do
+          now = Time.current
+          status = final_status(items)
+
+          run.update!(
+            status:,
+            finished_at: now,
+            stats: aggregate_stats(items)
+          )
+          run.import_source.update!(last_successful_run_at: now) if status == Imports::Run::STATUSES[:succeeded]
+
+          run
+        end
+      end
+
+      def final_status(items)
+        return Imports::Run::STATUSES[:partially_failed] if items.any?(&:status_failed?)
+
+        Imports::Run::STATUSES[:succeeded]
+      end
 
       def active_item_statuses
         [ Imports::RunItem::STATUSES[:queued], Imports::RunItem::STATUSES[:running] ]

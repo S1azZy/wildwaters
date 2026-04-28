@@ -23,7 +23,6 @@ class AddImportRunItemsForGeonamesOrchestration < ActiveRecord::Migration[8.1]
         item_kind text NOT NULL,
         item_key text NOT NULL,
         status text NOT NULL,
-        country_code text,
         params jsonb NOT NULL DEFAULT '{}'::jsonb,
         artifact_paths jsonb NOT NULL DEFAULT '{}'::jsonb,
         stats jsonb NOT NULL DEFAULT '{}'::jsonb,

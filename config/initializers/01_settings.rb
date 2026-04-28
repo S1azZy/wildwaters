@@ -41,7 +41,6 @@ ApplicationConfig.configure do |config|
   config.imports.geonames.feature_codes = ENV.fetch("GEONAMES_FEATURE_CODES", "PCLI,ADM1,PPLA,PPLC")
   config.imports.geonames.download_alternate_names = ENV.fetch("GEONAMES_DOWNLOAD_ALTERNATE_NAMES", true)
   config.imports.geonames.default_mode = ENV.fetch("GEONAMES_DEFAULT_MODE", "full")
-  config.imports.geonames.queue = ENV.fetch("GEONAMES_QUEUE", "default")
   config.imports.geonames.download_dir = ENV.fetch("GEONAMES_DOWNLOAD_DIR", "tmp/imports/geonames/geonames_regions")
   config.imports.geonames.all_countries_path = ENV["GEONAMES_ALL_COUNTRIES_PATH"]
   config.imports.geonames.alternate_names_path = ENV["GEONAMES_ALTERNATE_NAMES_PATH"]

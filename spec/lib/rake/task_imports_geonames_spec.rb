@@ -13,7 +13,6 @@ RSpec.describe Rake::Task do
       feature_codes: %w[PCLI ADM1],
       download_alternate_names: true,
       mode: Imports::Run::MODES[:full],
-      queue: "imports",
       download_dir: "tmp/imports/geonames/test",
       initiated_by: "imports:geonames:enqueue"
     }
@@ -56,7 +55,6 @@ RSpec.describe Rake::Task do
       GEONAMES_DOWNLOAD_DIR
       GEONAMES_DOWNLOAD_ALTERNATE_NAMES
       GEONAMES_DEFAULT_MODE
-      GEONAMES_QUEUE
       RUN_ID
     ].each { |key| ENV.delete(key) }
     load Rails.root.join("config/initializers/01_settings.rb")
@@ -82,6 +80,5 @@ RSpec.describe Rake::Task do
     ENV["GEONAMES_LANGUAGES"] = "en,ru"
     ENV["GEONAMES_SOURCE_KEY"] = "geonames_regions"
     ENV["GEONAMES_DOWNLOAD_DIR"] = "tmp/imports/geonames/test"
-    ENV["GEONAMES_QUEUE"] = "imports"
   end
 end

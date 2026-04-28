@@ -11,7 +11,6 @@ module Imports
             feature_codes: config.feature_codes,
             download_alternate_names: config.download_alternate_names,
             mode: config.default_mode,
-            queue: config.queue,
             download_dir: config.download_dir,
             initiated_by:
           ).merge(overrides)
@@ -32,7 +31,7 @@ module Imports
         end
       end
 
-      def initialize(source_key:, countries:, languages:, feature_codes:, download_alternate_names:, mode:, queue:, download_dir:, initiated_by:)
+      def initialize(source_key:, countries:, languages:, feature_codes:, download_alternate_names:, mode:, download_dir:, initiated_by:)
         @attributes = {
           source_key:,
           countries: normalize_list(countries).map(&:upcase),
@@ -40,7 +39,6 @@ module Imports
           feature_codes: normalize_list(feature_codes).map(&:upcase),
           download_alternate_names:,
           mode:,
-          queue:,
           download_dir:,
           initiated_by:
         }

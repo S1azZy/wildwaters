@@ -4,7 +4,6 @@ FactoryBot.define do
     item_kind { "country" }
     item_key { "AD" }
     status { "queued" }
-    country_code { "AD" }
     params { {} }
     artifact_paths { {} }
     stats { {} }
