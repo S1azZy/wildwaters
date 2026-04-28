@@ -1,0 +1,53 @@
+# syntax=docker/dockerfile:1.7
+
+ARG RUBY_VERSION=4.0.3
+ARG RUBYGEMS_VERSION=4.0.10
+FROM ruby:${RUBY_VERSION}-slim
+
+WORKDIR /app
+
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+  ca-certificates \
+  curl \
+  gnupg \
+  && install -d -m 0755 /etc/apt/keyrings \
+  && install -d /usr/share/postgresql-common/pgdg \
+  && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    | gpg --dearmor -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg \
+  && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] http://apt.postgresql.org/pub/repos/apt $(. /etc/os-release && echo \"$VERSION_CODENAME\")-pgdg main" \
+    > /etc/apt/sources.list.d/pgdg.list \
+  && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    | gpg --dearmor -o /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+    > /etc/apt/sources.list.d/github-cli.list \
+  && apt-get update -qq && apt-get install -y --no-install-recommends \
+  build-essential \
+  bubblewrap \
+  git \
+  gh \
+  less \
+  libpq-dev \
+  libyaml-dev \
+  nodejs \
+  npm \
+  openssh-client \
+  pkg-config \
+  postgresql-client-18 \
+  vim-tiny \
+  zsh \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN gem update --system ${RUBYGEMS_VERSION}
+RUN npm install -g @openai/codex \
+  && npm cache clean --force
+
+ENV BUNDLE_PATH=/usr/local/bundle \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3
+
+COPY Gemfile Gemfile.lock .ruby-version ./
+RUN --mount=type=cache,target=/usr/local/bundle/cache \
+  bundle install
+
+EXPOSE 3000
