@@ -8,6 +8,14 @@ module Imports
       option :create_region, default: -> { ::Regions::CreateRegion }
       option :sync_imported_region, default: -> { ::Regions::SyncImportedRegion }
 
+      class ValidationContract < ApplicationContract
+        params do
+          required(:source).filled
+          required(:run).filled
+          required(:record).filled(:hash)
+        end
+      end
+
       def call
         in_transaction do
           source = input.fetch(:source)

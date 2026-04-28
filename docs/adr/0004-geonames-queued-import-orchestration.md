@@ -8,12 +8,12 @@
 ADR 0003 introduced the generic import subsystem and the first GeoNames region import path.
 The current implementation can load GeoNames region dumps, preserve source provenance, and apply records into the region hierarchy.
 
-However, the current operator flow is still shaped like a synchronous batch command:
+The previous operator flow was shaped like a synchronous batch command:
 
 - a rake task receives environment variables
 - network mode downloads all requested country dumps in one process
 - the task updates `import_sources.config`
-- `Imports::RunSourceJob.perform_now` runs the import synchronously
+- a Rails job runs the import synchronously
 - one import run processes the whole dataset in sequence
 
 This is acceptable for the first slice, but it does not match the desired operating model for larger or production-like imports.
@@ -96,7 +96,7 @@ The exact implementation may use a small settings object first and may adopt `dr
 
 Expected defaults include:
 
-- `GEONAMES_COUNTRIES`
+- `GEONAMES_COUNTRY_CODES`
 - `GEONAMES_LANGUAGES`
 - `GEONAMES_FEATURE_CODES`
 - `GEONAMES_DOWNLOAD_ALTERNATE_NAMES`
@@ -335,6 +335,6 @@ Implement this as a staged migration from the current flow:
 6. Make missing-upstream reconciliation country-scoped.
 7. Add retry-failed entrypoint.
 8. Update `make import_geonames` to call the shared interactor through Rails.
-9. Keep or deprecate the old synchronous rake tasks only after the queued path is verified.
+9. Remove old synchronous rake tasks once the queued path is verified.
 
 All behavior-changing implementation work must follow the project red-green test rule.

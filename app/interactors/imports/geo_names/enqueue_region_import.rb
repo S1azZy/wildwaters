@@ -18,17 +18,12 @@ module Imports
 
       def call
         source = yield find_source
-        run = nil
-        items = []
+        persisted = yield persist_run_with_items(source:)
+        items = persisted.fetch(:items)
 
-        in_transaction do
-          run = yield create_run!(source:)
-          items = yield create_items!(run:)
-        end
+        yield enqueue_items(items)
 
-        items.each { |item| ImportRunItemJob.perform_later(item.id) }
-
-        Success(run:, items:)
+        Success(run: persisted.fetch(:run), items:)
       end
 
       private
@@ -40,8 +35,23 @@ module Imports
         fail_with(code: :source_not_found, errors: { source_key: [ "not found" ] })
       end
 
-      def create_run!(source:)
-        run =
+      def persist_run_with_items(source:)
+        run = nil
+        items = []
+
+        in_transaction do
+          run = yield create_run(source:)
+          items = yield create_items(run:)
+        end
+
+        Success(run:, items:)
+      end
+
+      def create_run(source:)
+        safe_call(
+          ActiveRecord::RecordNotUnique,
+          on_error: ->(_) { fail_with(code: :run_already_active, errors: { source_key: [ "already has an active run" ] }) }
+        ) do
           source.runs.create!(
             mode: mode,
             status: Imports::Run::STATUSES[:running],
@@ -50,14 +60,14 @@ module Imports
             params: run_params,
             stats: { "total_item_count" => country_codes.size }
           )
-
-        Success(run)
-      rescue ActiveRecord::RecordNotUnique
-        fail_with(code: :run_already_active, errors: { source_key: [ "already has an active run" ] })
+        end
       end
 
-      def create_items!(run:)
-        items =
+      def create_items(run:)
+        safe_call(
+          ActiveRecord::RecordNotUnique,
+          on_error: ->(_) { fail_with(code: :run_item_already_exists, errors: { item_key: [ "already exists for this run" ] }) }
+        ) do
           country_codes.map do |country_code|
             run.items.create!(
               item_kind: "country",
@@ -66,10 +76,13 @@ module Imports
               params: item_params(run:, country_code:)
             )
           end
+        end
+      end
 
-        Success(items)
-      rescue ActiveRecord::RecordNotUnique
-        fail_with(code: :run_item_already_exists, errors: { item_key: [ "already exists for this run" ] })
+      def enqueue_items(items)
+        items.each { |item| ImportRunItemJob.perform_later(item.id) }
+
+        Success()
       end
 
       def item_params(run:, country_code:)

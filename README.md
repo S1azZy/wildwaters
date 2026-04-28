@@ -79,7 +79,7 @@ It intentionally does not yet contain:
 The recommended operator flow enqueues one GeoNames import run with one queued item per country:
 
 ```bash
-GEONAMES_COUNTRIES=AD GEONAMES_LANGUAGES=en,ru make import_geonames
+GEONAMES_COUNTRY_CODES=AD GEONAMES_LANGUAGES=en,ru make import_geonames
 ```
 
 What the command does:
@@ -115,16 +115,6 @@ Useful environment variables:
 - `DOWNLOAD_ALTERNATE_NAMES=0` — skip alternate names download if you only need the base dump
 - `MODE=full` — import mode passed into `import_runs`
 - `INITIATED_BY=manual` — audit label for the run
-
-If you already have extracted files locally, keep using the existing task:
-
-```bash
-docker compose exec web bash -lc \
-  "COUNTRY_CODES=AD \
-   ALL_COUNTRIES_PATH=tmp/imports/geonames/geonames_regions/all_countries.txt \
-   ALTERNATE_NAMES_PATH=tmp/imports/geonames/geonames_regions/alternate_names.txt \
-   bundle exec rake imports:geonames:regions"
-```
 
 ## Notes
 

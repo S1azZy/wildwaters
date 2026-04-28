@@ -27,15 +27,18 @@ module Imports
       end
 
       def requeue_failed_items(run)
-        failed_items = []
+        safe_call(
+          ActiveRecord::ActiveRecordError,
+          on_error: ->(error) { fail_with(code: :retry_failed_items_failed, errors: { base: [ error.message ] }) }
+        ) do
+          run.with_lock do
+            failed_items = run.items.status_failed.to_a
+            failed_items.each { |item| requeue_item(item) }
+            reopen_run(run)
 
-        run.with_lock do
-          failed_items = run.items.status_failed.to_a
-          failed_items.each { |item| requeue_item!(item) }
-          reopen_run!(run)
+            failed_items
+          end
         end
-
-        Success(failed_items)
       end
 
       def enqueue_items(items)
@@ -44,7 +47,7 @@ module Imports
         Success()
       end
 
-      def requeue_item!(item)
+      def requeue_item(item)
         item.update!(
           status: Imports::RunItem::STATUSES[:queued],
           started_at: nil,
@@ -54,7 +57,7 @@ module Imports
         )
       end
 
-      def reopen_run!(run)
+      def reopen_run(run)
         run.update!(
           status: Imports::Run::STATUSES[:running],
           finished_at: nil,

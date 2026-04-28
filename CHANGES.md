@@ -3,6 +3,9 @@
 ## 2026-04-24
 - Added a working Dev Container setup for agent-driven development with the existing Rails/PostGIS compose stack, mounted local Codex/GitHub/SSH authentication, project-scoped autonomous Codex sandbox settings, and a separate agent-oriented devcontainer image while keeping the regular development image minimal.
 - Implemented ADR 0004 GeoNames queued import orchestration with `import_run_items`, run parameter snapshots, per-country Active Job execution, item finalization, partial-failure run status, failed-item retry, country-scoped missing-upstream reconciliation, and `make import_geonames` / retry entrypoints.
+- Removed the legacy synchronous GeoNames import rake tasks and `Imports::RunSourceJob` so GeoNames region imports use only the queued orchestration flow.
+- Reworked GeoNames run-item processing into a flat use-case orchestrator backed by focused download, dataset-build, dataset-apply, and missing-upstream reconciliation interactors.
+- Removed the GeoNames `app/lib` layer by moving dump download/build logic and dataset normalization into the import interactors that own those steps.
 - Added explicit dry-configurable/dotenv application configuration with typed `BootConfig` and `ApplicationConfig`, centralized ENV loading, example env files, and GeoNames import defaults backed by the new config layer.
 - Added ADR 0004 to define the target GeoNames queued import orchestration with `import_run_items`, environment-backed defaults, run parameter snapshots, per-country Solid Queue jobs, partial retry, and country-scoped reconciliation.
 - Refreshed the current dependency freshness set by vendoring `MapLibre GL JS/CSS` `5.24.0`.
@@ -17,7 +20,7 @@
 - Narrowed the default GeoNames MVP import slice to `PCLI + ADM1 + PPLA/PPLC` so the region graph stays product-oriented and avoids loading deeper admin levels and generic settlements by default.
 
 ## 2026-03-31
-- Implemented ADR 0003 stage 1 backend import flow with `Imports` models, a GeoNames region connector, canonical region dataset/application interactors, a synchronous `Imports::RunSourceJob`, evolved `Region` and `Regions::CreateRegion` for `region_kind`, `country_code`, `center`, and `region_names`, and seed ingestion that now bootstraps demo regions through the import pipeline.
+- Implemented ADR 0003 stage 1 backend import flow with `Imports` models, a GeoNames region connector, canonical region dataset/application interactors, evolved `Region` and `Regions::CreateRegion` for `region_kind`, `country_code`, `center`, and `region_names`, and seed ingestion that now bootstraps demo regions through the import pipeline.
 - Added a real GeoNames dump path for stage 1 via extracted `allCountries` and optional `alternateNamesV2` files, plus a rake task to upsert source config and run a country-scoped region import from local dump files.
 
 ## 2026-03-28

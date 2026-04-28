@@ -46,7 +46,7 @@ RSpec.describe ApplicationConfig do
       "APP_PORT" => "3443",
       "APP_PROTOCOL" => "https",
       "GEONAMES_SOURCE_KEY" => "custom_geonames",
-      "GEONAMES_COUNTRIES" => "ad, fr",
+      "GEONAMES_COUNTRY_CODES" => "ad, fr",
       "GEONAMES_LANGUAGES" => "en, RU",
       "GEONAMES_FEATURE_CODES" => "PCLI, ADM1",
       "GEONAMES_DOWNLOAD_ALTERNATE_NAMES" => "0",

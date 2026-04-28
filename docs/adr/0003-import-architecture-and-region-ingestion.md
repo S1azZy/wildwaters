@@ -92,7 +92,7 @@ Use a dedicated `Imports` namespace:
 - `app/models/imports/`
 - `app/interactors/imports/`
 - `app/jobs/imports/`
-- `app/lib/imports/` for connectors and parsers only
+- `app/interactors/imports/` for import use cases and focused import steps
 
 Keep the boundaries explicit:
 
@@ -612,7 +612,7 @@ Use `Solid Queue`.
 
 Recommended job shape:
 
-- `Imports::RunSourceJob`
+- imports should enter through the shared queue orchestration flow
 - source-specific batch processing may stay inside the coordinator flow for MVP and be split into additional jobs only when runtime or volume justifies it
 
 Operational rules:

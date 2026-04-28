@@ -75,8 +75,17 @@ RSpec.describe Rake::Task do
     expect(Imports::GeoNames::RetryFailedItems).to have_received(:call).with(input: { import_run_id: 123 })
   end
 
+  it "does not define legacy synchronous GeoNames import tasks" do
+    expect(described_class.task_defined?("imports:geonames:regions")).to be(false)
+    expect(described_class.task_defined?("imports:geonames:regions_from_network")).to be(false)
+  end
+
+  it "does not define the legacy RunSourceJob constant" do
+    expect(defined?(Imports::RunSourceJob)).to be_nil
+  end
+
   def configure_import_env
-    ENV["GEONAMES_COUNTRIES"] = "AD,FR"
+    ENV["GEONAMES_COUNTRY_CODES"] = "AD,FR"
     ENV["GEONAMES_LANGUAGES"] = "en,ru"
     ENV["GEONAMES_SOURCE_KEY"] = "geonames_regions"
     ENV["GEONAMES_DOWNLOAD_DIR"] = "tmp/imports/geonames/test"
