@@ -1,7 +1,7 @@
 require "rails_helper"
 
 class ImportResult
-  def failure?
+  def success?
   end
 
   def failure
@@ -13,7 +13,7 @@ RSpec.describe Imports::RunSourceJob, type: :job do
 
   it "delegates region imports to the dataset interactor" do
     records = [ { external_uid: "1643084" } ]
-    allow(import_interactor).to receive(:call).and_return(instance_double(ImportResult, failure?: false))
+    allow(import_interactor).to receive(:call).and_return(instance_double(ImportResult, success?: true))
 
     described_class.perform_now(source_key: "geonames_regions", mode: "full", initiated_by: "seed", records:)
 
@@ -25,7 +25,7 @@ RSpec.describe Imports::RunSourceJob, type: :job do
   it "raises a sanitized error when the import fails" do
     allow(import_interactor).to receive(:call).and_return(instance_double(
       ImportResult,
-      failure?: true,
+      success?: false,
       failure: {
         code: :source_disabled,
         errors: { source_key: [ "is disabled" ] }
@@ -38,7 +38,7 @@ RSpec.describe Imports::RunSourceJob, type: :job do
   end
 
   it "passes nil records for source-driven dump imports" do
-    allow(import_interactor).to receive(:call).and_return(instance_double(ImportResult, failure?: false))
+    allow(import_interactor).to receive(:call).and_return(instance_double(ImportResult, success?: true))
 
     described_class.perform_now(source_key: "geonames_regions", mode: "full", initiated_by: "manual", records: nil)
 

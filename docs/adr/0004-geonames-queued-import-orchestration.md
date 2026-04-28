@@ -101,7 +101,6 @@ Expected defaults include:
 - `GEONAMES_FEATURE_CODES`
 - `GEONAMES_DOWNLOAD_ALTERNATE_NAMES`
 - `GEONAMES_DEFAULT_MODE`
-- `GEONAMES_QUEUE`
 
 Environment values are defaults and operator inputs, not mutable execution state for slave jobs.
 
@@ -126,7 +125,7 @@ Keep `import_sources` as stable source metadata:
 Do not mutate `import_sources.config` per run as the primary way to pass import parameters.
 Run-specific country lists, languages, feature codes, artifact paths, and options belong to the run snapshot and item rows.
 
-Add `import_run_items` for country-scoped work.
+Add `import_run_items` for generic shard-scoped work under an import run.
 
 Recommended columns:
 
@@ -135,7 +134,6 @@ Recommended columns:
 - `item_kind text not null`
 - `item_key text not null`
 - `status text not null`
-- `country_code text`
 - `params jsonb not null default '{}'::jsonb`
 - `artifact_paths jsonb not null default '{}'::jsonb`
 - `stats jsonb not null default '{}'::jsonb`
@@ -150,9 +148,9 @@ For GeoNames country imports:
 
 - `item_kind = "country"`
 - `item_key = country code`
-- `country_code = country code`
+- `params["country_code"] = country code`
 
-Enforce uniqueness for one country item per run:
+Enforce uniqueness for one work item per kind/key within a run:
 
 ```text
 unique(import_run_id, item_kind, item_key)

@@ -5,6 +5,8 @@ module Imports
   module Regions
     class ApplySourceRecord < ApplicationInteractor
       option :input
+      option :create_region, default: -> { ::Regions::CreateRegion }
+      option :sync_imported_region, default: -> { ::Regions::SyncImportedRegion }
 
       def call
         in_transaction do
@@ -88,7 +90,7 @@ module Imports
 
         return update_region(existing_region, parent_region:, record:) if existing_region
 
-        create_result = ::Regions::CreateRegion.call(
+        create_result = create_region.call(
           input: {
             name: record.fetch(:name),
             region_kind: record.fetch(:region_kind),
@@ -107,7 +109,7 @@ module Imports
       def update_region(region, parent_region:, record:)
         return fail_with(code: :region_not_found) unless region
 
-        sync_result = ::Regions::SyncImportedRegion.call(
+        sync_result = sync_imported_region.call(
           input: {
             region_id: region.id,
             parent_id: parent_region&.id,

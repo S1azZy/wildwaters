@@ -1,7 +1,5 @@
 module Imports
   class RegionSourceLink < ApplicationRecord
-    self.table_name = "region_source_links"
-
     belongs_to :region, inverse_of: :source_links
     belongs_to :import_source_record, class_name: "Imports::SourceRecord", inverse_of: :region_source_link
 

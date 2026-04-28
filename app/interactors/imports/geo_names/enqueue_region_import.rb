@@ -1,0 +1,136 @@
+module Imports
+  module GeoNames
+    class EnqueueRegionImport < ApplicationInteractor
+      option :input
+
+      class ValidationContract < ApplicationContract
+        params do
+          required(:source_key).filled(:string)
+          required(:countries).filled(:array)
+          required(:languages).filled(:array)
+          required(:feature_codes).filled(:array)
+          required(:download_alternate_names).filled(:bool)
+          required(:mode).filled(:string)
+          required(:download_dir).filled(:string)
+          required(:initiated_by).filled(:string)
+        end
+      end
+
+      def call
+        source = yield find_source
+        run = nil
+        items = []
+
+        in_transaction do
+          run = yield create_run!(source:)
+          items = yield create_items!(run:)
+        end
+
+        items.each { |item| ImportRunItemJob.perform_later(item.id) }
+
+        Success(run:, items:)
+      end
+
+      private
+
+      def find_source
+        source = Imports::Source.find_by(key: source_key)
+        return Success(source) if source
+
+        fail_with(code: :source_not_found, errors: { source_key: [ "not found" ] })
+      end
+
+      def create_run!(source:)
+        run =
+          source.runs.create!(
+            mode: mode,
+            status: Imports::Run::STATUSES[:running],
+            started_at: Time.current,
+            initiated_by: initiated_by,
+            params: run_params,
+            stats: { "total_item_count" => country_codes.size }
+          )
+
+        Success(run)
+      rescue ActiveRecord::RecordNotUnique
+        fail_with(code: :run_already_active, errors: { source_key: [ "already has an active run" ] })
+      end
+
+      def create_items!(run:)
+        items =
+          country_codes.map do |country_code|
+            run.items.create!(
+              item_kind: "country",
+              item_key: country_code,
+              status: Imports::RunItem::STATUSES[:queued],
+              params: item_params(run:, country_code:)
+            )
+          end
+
+        Success(items)
+      rescue ActiveRecord::RecordNotUnique
+        fail_with(code: :run_item_already_exists, errors: { item_key: [ "already exists for this run" ] })
+      end
+
+      def item_params(run:, country_code:)
+        run_params.merge(
+          "country_code" => country_code,
+          "countries" => [ country_code ],
+          "artifact_dir" => File.join(download_dir, run.id.to_s, country_code)
+        )
+      end
+
+      def run_params
+        @run_params ||= {
+          "source_key" => source_key,
+          "countries" => country_codes,
+          "languages" => languages,
+          "feature_codes" => feature_codes,
+          "download_alternate_names" => download_alternate_names,
+          "mode" => mode,
+          "download_dir" => download_dir
+        }
+      end
+
+      def source_key
+        input.fetch(:source_key)
+      end
+
+      def country_codes
+        @country_codes ||= normalize_list(input.fetch(:countries)).map(&:upcase)
+      end
+
+      def languages
+        @languages ||= normalize_list(input.fetch(:languages)).map(&:downcase)
+      end
+
+      def feature_codes
+        @feature_codes ||= normalize_list(input.fetch(:feature_codes)).map(&:upcase)
+      end
+
+      def download_alternate_names
+        input.fetch(:download_alternate_names)
+      end
+
+      def mode
+        input.fetch(:mode)
+      end
+
+      def download_dir
+        input.fetch(:download_dir)
+      end
+
+      def initiated_by
+        input.fetch(:initiated_by)
+      end
+
+      def normalize_list(value)
+        Array(value)
+          .flat_map { |item| item.to_s.split(",") }
+          .map(&:strip)
+          .reject(&:blank?)
+          .uniq
+      end
+    end
+  end
+end

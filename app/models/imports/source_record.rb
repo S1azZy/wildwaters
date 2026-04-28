@@ -1,7 +1,5 @@
 module Imports
   class SourceRecord < ApplicationRecord
-    self.table_name = "import_source_records"
-
     STATUSES = {
       pending: "pending",
       matched: "matched",

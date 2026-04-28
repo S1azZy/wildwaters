@@ -1,6 +1,6 @@
 module Imports
   class RunSourceJob < ApplicationJob
-    queue_as :default
+    queue_as :imports
 
     def perform(source_key:, mode:, initiated_by:, records: nil)
       result = Imports::Regions::ImportDataset.call(
@@ -12,7 +12,7 @@ module Imports
         }
       )
 
-      return if result.failure? == false
+      return if result.success?
 
       failure = result.failure
 

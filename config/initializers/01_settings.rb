@@ -36,10 +36,11 @@ ApplicationConfig.configure do |config|
   config.storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", :local)
 
   config.imports.geonames.source_key = ENV.fetch("GEONAMES_SOURCE_KEY", "geonames_regions")
-  config.imports.geonames.country_codes = ENV.fetch("GEONAMES_COUNTRY_CODES", "")
+  config.imports.geonames.country_codes = ENV.fetch("GEONAMES_COUNTRIES", "")
   config.imports.geonames.languages = ENV.fetch("GEONAMES_LANGUAGES", "en,ru")
   config.imports.geonames.feature_codes = ENV.fetch("GEONAMES_FEATURE_CODES", "PCLI,ADM1,PPLA,PPLC")
   config.imports.geonames.download_alternate_names = ENV.fetch("GEONAMES_DOWNLOAD_ALTERNATE_NAMES", true)
+  config.imports.geonames.default_mode = ENV.fetch("GEONAMES_DEFAULT_MODE", "full")
   config.imports.geonames.download_dir = ENV.fetch("GEONAMES_DOWNLOAD_DIR", "tmp/imports/geonames/geonames_regions")
   config.imports.geonames.all_countries_path = ENV["GEONAMES_ALL_COUNTRIES_PATH"]
   config.imports.geonames.alternate_names_path = ENV["GEONAMES_ALTERNATE_NAMES_PATH"]

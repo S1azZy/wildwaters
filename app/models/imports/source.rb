@@ -1,7 +1,5 @@
 module Imports
   class Source < ApplicationRecord
-    self.table_name = "import_sources"
-
     SOURCE_ROLES = {
       canonical_identity: "canonical_identity",
       name_enrichment: "name_enrichment",
