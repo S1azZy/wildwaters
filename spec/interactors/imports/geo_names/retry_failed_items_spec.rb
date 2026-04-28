@@ -15,7 +15,7 @@ RSpec.describe Imports::GeoNames::RetryFailedItems, type: :interactor do
       item_key: "AD",
       status: Imports::RunItem::STATUSES[:failed],
       attempts_count: 1,
-      error_class: "Imports::GeoNames::RegionDumpDownloader::Error",
+      error_class: "region_dump_download_failed",
       error_message: "download failed",
       finished_at: 1.hour.ago
     )

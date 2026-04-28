@@ -92,7 +92,7 @@ Use a dedicated `Imports` namespace:
 - `app/models/imports/`
 - `app/interactors/imports/`
 - `app/jobs/imports/`
-- `app/lib/imports/` for connectors and parsers only
+- `app/interactors/imports/` for import use cases and focused import steps
 
 Keep the boundaries explicit:
 

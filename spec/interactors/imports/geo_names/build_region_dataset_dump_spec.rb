@@ -1,12 +1,13 @@
 require "rails_helper"
-require Rails.root.join("app/lib/imports/geo_names/region_dump_dataset_builder")
 
-RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
-  subject(:records) { described_class.call(config:) }
+RSpec.describe Imports::GeoNames::BuildRegionDataset, type: :interactor do
+  subject(:result) { described_class.call(input:) }
+
+  let(:records) { result.value!.fetch(:records) }
 
   let(:all_countries_path) { Rails.root.join("tmp/geonames_region_dump_builder_all_countries.txt") }
   let(:alternate_names_path) { Rails.root.join("tmp/geonames_region_dump_builder_alternate_names.txt") }
-  let(:config) do
+  let(:input) do
     {
       all_countries_path: all_countries_path.to_s,
       alternate_names_path: alternate_names_path.to_s,
@@ -22,8 +23,8 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
     all_countries_path.dirname.mkpath
     all_countries_path.write(
       [
-        "1643084\tIndonesia\tIndonesia\tIndonesia\t-2.5\t118.0\tA\tPCLI\tID\t\t\t\t\t\t0\t\t\tAsia/Jakarta\t2024-01-01",
         "1650535\tBali\tBali\tBali\t-8.4095\t115.1889\tA\tADM1\tID\t\t02\t\t\t\t0\t\t\tAsia/Jakarta\t2024-01-01",
+        "1643084\tIndonesia\tIndonesia\tIndonesia\t-2.5\t118.0\tA\tPCLI\tID\t\t\t\t\t\t0\t\t\tAsia/Jakarta\t2024-01-01",
         "1651111\tSingaraja\tSingaraja\tSingaraja\t-8.112\t115.088\tP\tPPL\tID\t\t02\t\t\t\t0\t\t\tAsia/Jakarta\t2024-01-01"
       ].join("\n")
     )
@@ -42,19 +43,22 @@ RSpec.describe Imports::GeoNames::RegionDumpDatasetBuilder do
   end
 
   it "builds normalized region records from extracted GeoNames files" do
+    expect(result).to be_success
     expect(records.map { |record| record[:external_uid] }).to eq(%w[1643084 1650535])
     expect(records.second).to include(name: "Bali", region_kind: "area", country_code: "ID", parent_external_uid: "1643084")
     expect(records.map { |record| record[:name] }).not_to include("Singaraja")
   end
 
   it "fails clearly when required config is missing" do
-    expect do
-      described_class.call(config: { languages: [ "ru" ] })
-    end.to raise_error(ArgumentError, "all_countries_path is required")
+    failure = described_class.call(input: { languages: [ "ru" ], country_codes: [ "ID" ] })
+
+    expect(failure).to be_failure
+    expect(failure.failure[:code]).to eq(:validation_error)
+    expect(failure.failure[:errors]).to include(all_countries_path: [ "is missing" ])
   end
 
   context "with the official GeoNames Andorra fixtures" do
-    let(:config) do
+    let(:input) do
       {
         all_countries_path: "spec/fixtures/imports/geonames/country_AD.txt",
         alternate_names_path: "spec/fixtures/imports/geonames/alternate_names_AD.txt",

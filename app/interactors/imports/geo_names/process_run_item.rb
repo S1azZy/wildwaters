@@ -3,9 +3,10 @@ module Imports
     class ProcessRunItem < ApplicationInteractor
       option :input
 
-      option :region_dump_downloader, default: -> { Imports::GeoNames::RegionDumpDownloader }
-      option :region_dump_dataset_builder, default: -> { Imports::GeoNames::RegionDumpDatasetBuilder }
-      option :import_dataset, default: -> { Imports::Regions::ImportDataset }
+      option :download_region_dump, default: -> { Imports::GeoNames::DownloadRegionDump }
+      option :build_region_dataset, default: -> { Imports::GeoNames::BuildRegionDataset }
+      option :apply_dataset, default: -> { Imports::Regions::ApplyDataset }
+      option :reconcile_missing_upstream, default: -> { Imports::SourceRecords::ReconcileMissingUpstream }
       option :finalize_run, default: -> { Imports::GeoNames::FinalizeRun }
 
       class ValidationContract < ApplicationContract
@@ -34,71 +35,106 @@ module Imports
 
       def process_item(item)
         result = import_item(item)
-        finalize_result = finalize_terminal_item(item)
-
-        return finalize_result if finalize_result.failure?
-
-        result
-      end
-
-      def import_item(item)
-        claim_item!(item)
-        downloaded_paths = download_paths_for(item)
-        records = build_records(item:, downloaded_paths:)
-        import_records(item:, records:, downloaded_paths:)
-      rescue StandardError => error
-        fail_item!(item, error:)
-        fail_with(code: :run_item_import_failed, errors: { base: [ error.message ] })
-      end
-
-      def claim_item!(item)
-        item.with_lock do
-          item.update!(
-            status: Imports::RunItem::STATUSES[:running],
-            started_at: Time.current,
-            finished_at: nil,
-            error_class: nil,
-            error_message: nil,
-            attempts_count: item.attempts_count + 1
-          )
-        end
-      end
-
-      def download_paths_for(item)
-        region_dump_downloader.call(
-          country_codes: [ country_code_for(item) ],
-          destination_dir: artifact_dir_for(item),
-          include_alternate_names: item.params.fetch("download_alternate_names", true)
-        )
-      end
-
-      def build_records(item:, downloaded_paths:)
-        region_dump_dataset_builder.call(
-          config: item.params.merge(
-            "country_codes" => [ country_code_for(item) ],
-            "all_countries_path" => downloaded_paths.fetch(:all_countries_path),
-            "alternate_names_path" => downloaded_paths[:alternate_names_path]
-          )
-        )
-      end
-
-      def import_records(item:, records:, downloaded_paths:)
-        result = import_dataset.call(input: import_input(item:, records:))
-
-        if result.failure?
-          fail_item!(item, error: result.failure)
-        else
-          complete_item!(item, artifact_paths: downloaded_paths, stats: result.value!.fetch(:stats))
-        end
+        yield finish_item(item:, result:)
+        yield finalize_terminal_item(item)
 
         Success()
       end
 
-      def import_input(item:, records:)
+      def import_item(item)
+        yield claim_item(item)
+        downloaded_paths = yield download_paths(item)
+        records = yield build_records(item:, downloaded_paths:)
+        apply_stats = yield apply_records(item:, records:)
+        reconciliation_stats = yield reconcile_missing_records(item:, records:)
+
+        Success(
+          artifact_paths: downloaded_paths,
+          stats: apply_stats.merge(reconciliation_stats)
+        )
+      end
+
+      def claim_item(item)
+        safe_call do
+          item.with_lock do
+            item.update!(
+              status: Imports::RunItem::STATUSES[:running],
+              started_at: Time.current,
+              finished_at: nil,
+              error_class: nil,
+              error_message: nil,
+              attempts_count: item.attempts_count + 1
+            )
+          end
+        end
+      end
+
+      def download_paths(item)
+        download_region_dump.call(
+          input: {
+            country_code: country_code_for(item),
+            destination_dir: artifact_dir_for(item),
+            include_alternate_names: item.params.fetch("download_alternate_names", true)
+          }
+        )
+      end
+
+      def build_records(item:, downloaded_paths:)
+        result = build_region_dataset.call(
+          input: dataset_input(item:, downloaded_paths:)
+        )
+
+        return result if result.failure?
+
+        Success(result.value!.fetch(:records))
+      end
+
+      def apply_records(item:, records:)
+        result = apply_dataset.call(
+          input: {
+            import_run_id: item.import_run_id,
+            records:
+          }
+        )
+
+        return result if result.failure?
+
+        Success(result.value!.fetch(:stats))
+      end
+
+      def reconcile_missing_records(item:, records:)
+        result = reconcile_missing_upstream.call(
+          input: {
+            import_run_id: item.import_run_id,
+            records:,
+            country_code: country_code_for(item)
+          }
+        )
+
+        return result if result.failure?
+
+        Success(result.value!.fetch(:stats))
+      end
+
+      def finish_item(item:, result:)
+        if result.failure?
+          fail_item(item:, error: result.failure)
+        else
+          complete_item(
+            item:,
+            artifact_paths: result.value!.fetch(:artifact_paths),
+            stats: result.value!.fetch(:stats)
+          )
+        end
+      end
+
+      def dataset_input(item:, downloaded_paths:)
         {
-          import_run_id: item.import_run_id,
-          records:,
-          reconciliation_country_code: country_code_for(item)
+          country_codes: [ country_code_for(item) ],
+          languages: item.params.fetch("languages", []),
+          feature_codes: item.params.fetch("feature_codes", []),
+          all_countries_path: downloaded_paths.fetch(:all_countries_path),
+          alternate_names_path: downloaded_paths[:alternate_names_path]
         }
       end
 
@@ -114,24 +150,28 @@ module Imports
         item.params.fetch("country_code", item.item_key).to_s.upcase
       end
 
-      def complete_item!(item, artifact_paths:, stats:)
-        item.update!(
-          status: Imports::RunItem::STATUSES[:succeeded],
-          finished_at: Time.current,
-          artifact_paths: artifact_paths.stringify_keys,
-          stats:,
-          error_class: nil,
-          error_message: nil
-        )
+      def complete_item(item:, artifact_paths:, stats:)
+        safe_call do
+          item.update!(
+            status: Imports::RunItem::STATUSES[:succeeded],
+            finished_at: Time.current,
+            artifact_paths: artifact_paths.stringify_keys,
+            stats:,
+            error_class: nil,
+            error_message: nil
+          )
+        end
       end
 
-      def fail_item!(item, error:)
-        item.update!(
-          status: Imports::RunItem::STATUSES[:failed],
-          finished_at: Time.current,
-          error_class: error_class_for(error),
-          error_message: error_message_for(error)
-        )
+      def fail_item(item:, error:)
+        safe_call do
+          item.update!(
+            status: Imports::RunItem::STATUSES[:failed],
+            finished_at: Time.current,
+            error_class: error_class_for(error),
+            error_message: error_message_for(error)
+          )
+        end
       end
 
       def finalize_terminal_item(item)

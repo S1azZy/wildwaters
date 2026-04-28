@@ -4,17 +4,23 @@ RSpec.describe Imports::GeoNames::ProcessRunItem, type: :interactor do
   subject(:result) do
     described_class.call(
       input:,
-      region_dump_downloader:,
-      region_dump_dataset_builder:,
-      import_dataset:,
+      download_region_dump: steps.fetch(:download_region_dump),
+      build_region_dataset: steps.fetch(:build_region_dataset),
+      apply_dataset: steps.fetch(:apply_dataset),
+      reconcile_missing_upstream: steps.fetch(:reconcile_missing_upstream),
       finalize_run:
     )
   end
 
   let(:input) { { import_run_item_id: item.id } }
-  let(:region_dump_downloader) { class_double(Imports::GeoNames::RegionDumpDownloader, call: downloaded_paths) }
-  let(:region_dump_dataset_builder) { Imports::GeoNames::RegionDumpDatasetBuilder }
-  let(:import_dataset) { Imports::Regions::ImportDataset }
+  let(:steps) do
+    {
+      download_region_dump: step_double(success(downloaded_paths)),
+      build_region_dataset: step_double(success(records:)),
+      apply_dataset: step_double(success(stats:)),
+      reconcile_missing_upstream: step_double(success(stats: { "missing_upstream_count" => 0 }))
+    }
+  end
   let(:finalize_run) { Imports::GeoNames::FinalizeRun }
   let!(:source) do
     create(
@@ -51,21 +57,15 @@ RSpec.describe Imports::GeoNames::ProcessRunItem, type: :interactor do
       params: run.params.merge("country_code" => "AD")
     )
   end
-  let(:downloaded_paths) do
-    {
-      all_countries_path: "spec/fixtures/imports/geonames/country_AD.txt",
-      alternate_names_path: "spec/fixtures/imports/geonames/alternate_names_AD.txt"
-    }
-  end
 
   it "imports one country item into the existing run and records item artifacts and stats" do
     run_count = Imports::Run.count
 
-    expect { result }.to change(Region, :count).by(15)
+    result
 
     expect(result).to be_success
     expect(Imports::Run.count).to eq(run_count)
-    expect_downloader_to_have_run_for_item
+    expect_steps_to_have_run_for_item
     expect_item_to_be_succeeded
     expect(run.reload.status).to eq(Imports::Run::STATUSES[:succeeded])
   end
@@ -99,12 +99,16 @@ RSpec.describe Imports::GeoNames::ProcessRunItem, type: :interactor do
       expect { result }.not_to change { item.reload.attempts_count }
 
       expect(result).to be_success
-      expect(region_dump_downloader).not_to have_received(:call)
+      expect(steps.fetch(:download_region_dump)).not_to have_received(:call)
     end
   end
 
   context "when the dataset import fails" do
-    before { source.update!(enabled: false) }
+    let(:steps) do
+      super().merge(
+        apply_dataset: step_double(failure(code: :source_disabled, errors: { import_source: [ "is disabled" ] }))
+      )
+    end
 
     it "marks the item failed and finalizes the parent run without raising a job-level failure" do
       expect(result).to be_success
@@ -116,12 +120,65 @@ RSpec.describe Imports::GeoNames::ProcessRunItem, type: :interactor do
     end
   end
 
-  def expect_downloader_to_have_run_for_item
-    expect(region_dump_downloader).to have_received(:call).with(
-      country_codes: [ "AD" ],
-      destination_dir: Rails.root.join("tmp/imports/geonames", run.id.to_s, "AD").to_s,
-      include_alternate_names: true
+  def expect_steps_to_have_run_for_item
+    expect(steps.fetch(:download_region_dump)).to have_received(:call).with(
+      input: {
+        country_code: "AD",
+        destination_dir: Rails.root.join("tmp/imports/geonames", run.id.to_s, "AD").to_s,
+        include_alternate_names: true
+      }
     )
+    expect(steps.fetch(:build_region_dataset)).to have_received(:call).with(
+      input: {
+        country_codes: [ "AD" ],
+        languages: %w[en ru ca fr es],
+        feature_codes: %w[PCLI ADM1 PPLA PPLC],
+        all_countries_path: downloaded_paths.fetch(:all_countries_path),
+        alternate_names_path: downloaded_paths[:alternate_names_path]
+      }
+    )
+    expect(steps.fetch(:apply_dataset)).to have_received(:call).with(
+      input: {
+        import_run_id: run.id,
+        records:
+      }
+    )
+    expect(steps.fetch(:reconcile_missing_upstream)).to have_received(:call).with(
+      input: {
+        import_run_id: run.id,
+        records:,
+        country_code: "AD"
+      }
+    )
+  end
+
+  def downloaded_paths
+    {
+      all_countries_path: "spec/fixtures/imports/geonames/country_AD.txt",
+      alternate_names_path: "spec/fixtures/imports/geonames/alternate_names_AD.txt"
+    }
+  end
+
+  def records
+    Imports::GeoNames::BuildRegionDataset.call(input: dataset_input).value!.fetch(:records)
+  end
+
+  def dataset_input
+    {
+      country_codes: [ "AD" ],
+      languages: %w[en ru ca fr es],
+      feature_codes: %w[PCLI ADM1 PPLA PPLC],
+      all_countries_path: downloaded_paths.fetch(:all_countries_path),
+      alternate_names_path: downloaded_paths[:alternate_names_path]
+    }
+  end
+
+  def stats
+    {
+      "record_count" => 15,
+      "processed_count" => 15,
+      "created_region_count" => 15
+    }
   end
 
   def expect_item_to_be_succeeded
@@ -136,5 +193,31 @@ RSpec.describe Imports::GeoNames::ProcessRunItem, type: :interactor do
       "processed_count" => 15,
       "missing_upstream_count" => 0
     )
+  end
+
+  def success(value = {})
+    result_interactor.call(input: { value:, success: true })
+  end
+
+  def failure(error)
+    result_interactor.call(input: { value: error, success: false })
+  end
+
+  def step_double(result)
+    class_double(ApplicationInteractor).tap do |step|
+      allow(step).to receive(:call).and_return(result)
+    end
+  end
+
+  def result_interactor
+    @result_interactor ||= Class.new(ApplicationInteractor) do
+      option :input
+
+      def call
+        return Success(input.fetch(:value)) if input.fetch(:success)
+
+        Failure(input.fetch(:value))
+      end
+    end
   end
 end

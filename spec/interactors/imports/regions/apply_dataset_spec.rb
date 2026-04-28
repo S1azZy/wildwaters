@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
+RSpec.describe Imports::Regions::ApplyDataset, type: :interactor do
   subject(:result) { described_class.call(input:) }
 
   let!(:source) do
@@ -150,43 +150,15 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
     expect(bali_source_record.record_snapshots.last.payload.fetch("alternate_names")).to eq([ changed_bali_alternate_name ])
   end
 
-  it "marks records as missing upstream on a repeated full import without deleting matched regions" do
+  it "does not mark omitted records as missing upstream" do
     result
 
     bali_source_record = Imports::SourceRecord.find_by!(external_uid: "1650535")
-    bali_region = bali_source_record.region_source_link.region
-
-    rerun_result = described_class.call(input: input.merge(records: [ dataset.first ]))
-
-    expect(rerun_result).to be_success
-    expect(bali_source_record.reload).to have_attributes(
-      status: Imports::SourceRecord::STATUSES[:missing_upstream],
-      last_import_run: rerun_result.value!.fetch(:run)
-    )
-    expect(bali_source_record.region_source_link.region).to eq(bali_region)
-    expect(Region.find(bali_region.id)).to eq(bali_region)
-  end
-
-  it "does not mark omitted records as missing on incremental reruns" do
-    result
-
-    bali_source_record = Imports::SourceRecord.find_by!(external_uid: "1650535")
-
-    run.update!(mode: Imports::Run::MODES[:incremental])
 
     rerun_result = described_class.call(input: input.merge(records: [ dataset.first ]))
 
     expect(rerun_result).to be_success
     expect(bali_source_record.reload.status).to eq(Imports::SourceRecord::STATUSES[:matched])
-  end
-
-  it "limits missing-upstream reconciliation to the requested country shard" do
-    old_ad_record = create_old_source_record(external_uid: "old-ad", country_code: "AD")
-    old_fr_record = create_old_source_record(external_uid: "old-fr", country_code: "FR")
-
-    expect(import_ad_shard).to be_success
-    expect(old_ad_record.reload.status).to eq(Imports::SourceRecord::STATUSES[:missing_upstream])
-    expect(old_fr_record.reload.status).to eq(Imports::SourceRecord::STATUSES[:matched])
   end
 
   context "when the source is disabled" do
@@ -198,6 +170,17 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
       expect(result).to be_failure
       expect(result.failure[:code]).to eq(:source_disabled)
       expect(run.reload.status).to eq(Imports::Run::STATUSES[:running])
+    end
+  end
+
+  context "with another enabled region source" do
+    before do
+      source.update!(key: "manual_regions")
+    end
+
+    it "applies the already prepared dataset without source-specific branching" do
+      expect(result).to be_success
+      expect(Region.find_by!(slug: "bali").parent).to eq(Region.find_by!(slug: "indonesia"))
     end
   end
 
@@ -255,45 +238,5 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
 
   def bali_region
     Region.find_by!(slug: "bali")
-  end
-
-  def create_old_source_record(external_uid:, country_code:)
-    create(
-      :imports_source_record,
-      import_source: source,
-      last_import_run: nil,
-      external_uid:,
-      status: Imports::SourceRecord::STATUSES[:matched],
-      normalized_payload: { "country_code" => country_code }
-    )
-  end
-
-  def import_ad_shard
-    described_class.call(
-      input: input.merge(
-        reconciliation_country_code: "AD",
-        records: [ andorra_country_record ]
-      )
-    )
-  end
-
-  def andorra_country_record
-    {
-      record_kind: "region",
-      external_uid: "3041565",
-      external_url: "https://www.geonames.org/3041565",
-      name: "Principality of Andorra",
-      ascii_name: "Andorra",
-      region_kind: "country",
-      country_code: "AD",
-      parent_external_uid: nil,
-      latitude: 42.5,
-      longitude: 1.5,
-      alternate_names: []
-    }
-  end
-
-  def andorra_ru_name
-    country.region_names.find_by!(language_code: "ru", name: "Андорра")
   end
 end
