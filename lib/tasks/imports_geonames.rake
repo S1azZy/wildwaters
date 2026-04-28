@@ -1,3 +1,4 @@
+require Rails.root.join("app/models/imports")
 require Rails.root.join("app/lib/imports/geo_names/region_dump_dataset_builder")
 require Rails.root.join("app/lib/imports/geo_names/region_dump_downloader")
 
