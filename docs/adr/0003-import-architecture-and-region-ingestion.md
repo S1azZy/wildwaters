@@ -612,7 +612,7 @@ Use `Solid Queue`.
 
 Recommended job shape:
 
-- `Imports::RunSourceJob`
+- imports should enter through the shared queue orchestration flow
 - source-specific batch processing may stay inside the coordinator flow for MVP and be split into additional jobs only when runtime or volume justifies it
 
 Operational rules:

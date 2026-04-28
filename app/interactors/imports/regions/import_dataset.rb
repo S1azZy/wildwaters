@@ -1,4 +1,3 @@
-require Rails.root.join("app/lib/imports/geo_names/region_dump_dataset_builder")
 require Rails.root.join("app/lib/imports/geo_names/region_record_connector")
 require "set"
 
@@ -8,131 +7,74 @@ module Imports
       option :input
       option :apply_source_record, default: -> { Imports::Regions::ApplySourceRecord }
       option :region_record_connector, default: -> { Imports::GeoNames::RegionRecordConnector }
-      option :region_dump_dataset_builder, default: -> { Imports::GeoNames::RegionDumpDatasetBuilder }
 
       class ValidationContract < ApplicationContract
         params do
-          required(:source_key).filled(:string)
-          required(:mode).filled(:string)
-          required(:initiated_by).filled(:string)
-          optional(:records).maybe(:array)
-          optional(:import_run_id).filled(:integer)
+          required(:import_run_id).filled(:integer)
+          required(:records).filled(:array)
           optional(:reconciliation_country_code).filled(:string)
         end
       end
 
       def call
-        source = yield find_source
+        run = yield find_run
+        source = yield source_for(run)
         records = yield normalize_records(source)
-        run = yield find_or_create_run(source:, record_count: records.size)
-        stats = {
-          "processed_count" => 0,
-          "record_count" => records.size,
-          "created_region_count" => 0,
-          "missing_upstream_count" => 0
-        }
+        stats = stats_for(records)
 
-        records.each do |record|
-          apply_result = apply_source_record.call(input: { source:, run:, record: })
-          return fail_run(run:, error: apply_result.failure, stats:) if apply_result.failure?
+        yield apply_records(source:, run:, records:, stats:)
+        yield reconcile_missing_upstream_records(source:, run:, records:, stats:)
 
-          stats["processed_count"] += 1
-          stats["created_region_count"] += 1 if apply_result.value!.fetch(:created_region)
-        end
-
-        reconcile_result = reconcile_missing_upstream_records(source:, run:, records:, stats:)
-        return fail_run(run:, error: reconcile_result.failure, stats:) if reconcile_result.failure?
-
-        return Success(run:, stats:) if existing_run?
-
-        complete_run(source:, run:, stats:)
-      rescue ActiveRecord::RecordNotUnique
-        retry
+        Success(run:, stats:)
       end
 
       private
 
-      def find_source
-        source = Imports::Source.find_by(key: input[:source_key], target_kind: "region")
-        return fail_with(code: :source_not_found, errors: { source_key: [ "not found" ] }) unless source
-        return Success(source) if source.enabled?
-
-        fail_with(code: :source_disabled, errors: { source_key: [ "is disabled" ] })
-      end
-
-      def normalize_records(source)
-        if source.key == "geonames_regions"
-          return Success(region_record_connector.call(records: input[:records])) if input[:records].present?
-          return load_geonames_dump_records(source) if source.fetch_mode_dump?
-        end
-
-        fail_with(code: :unsupported_source, errors: { source_key: [ "not supported" ] })
-      end
-
-      def load_geonames_dump_records(source)
-        records = region_dump_dataset_builder.call(config: source.config)
-
-        Success(region_record_connector.call(records: records))
-      rescue ArgumentError, Errno::ENOENT => error
-        fail_with(code: :invalid_source_config, errors: { config: [ error.message ] })
-      end
-
-      def create_run(source:, record_count:)
-        run = source.runs.create!(
-          mode: input[:mode],
-          status: Imports::Run::STATUSES[:running],
-          started_at: Time.current,
-          initiated_by: input[:initiated_by],
-          stats: { "record_count" => record_count }
-        )
-
-        Success(run)
-      rescue ActiveRecord::RecordNotUnique
-        fail_with(code: :run_already_active, errors: { source_key: [ "already has an active run" ] })
-      end
-
-      def find_or_create_run(source:, record_count:)
-        return find_run(source) if existing_run?
-
-        create_run(source:, record_count:)
-      end
-
-      def find_run(source)
-        run = source.runs.find_by(id: input[:import_run_id])
+      def find_run
+        run = Imports::Run.includes(:import_source).find_by(id: input[:import_run_id])
         return Success(run) if run
 
         fail_with(code: :run_not_found, errors: { import_run_id: [ "not found" ] })
       end
 
-      def complete_run(source:, run:, stats:)
-        now = Time.current
+      def source_for(run)
+        source = run.import_source
+        return Success(source) if source.enabled?
 
-        run.update!(
-          status: Imports::Run::STATUSES[:succeeded],
-          finished_at: now,
-          stats:
-        )
-        source.update!(last_successful_run_at: now)
-
-        Success(run:)
+        fail_with(code: :source_disabled, errors: { import_source: [ "is disabled" ] })
       end
 
-      def fail_run(run:, error:, stats:)
-        return Failure(error) if existing_run?
+      def normalize_records(source)
+        if source.key == "geonames_regions"
+          return Success(region_record_connector.call(records: input[:records])) if input[:records].present?
+        end
 
-        run.update!(
-          status: Imports::Run::STATUSES[:failed],
-          finished_at: Time.current,
-          error_class: error[:code].to_s,
-          error_message: error[:errors].presence&.to_json,
-          stats:
-        )
+        fail_with(code: :unsupported_source, errors: { import_source: [ "not supported" ] })
+      end
 
-        Failure(error)
+      def stats_for(records)
+        {
+          "processed_count" => 0,
+          "record_count" => records.size,
+          "created_region_count" => 0,
+          "missing_upstream_count" => 0
+        }
+      end
+
+      def apply_records(source:, run:, records:, stats:)
+        records.each do |record|
+          result = apply_source_record.call(input: { source:, run:, record: })
+          return result if result.failure?
+
+          stats["processed_count"] += 1
+          stats["created_region_count"] += 1 if result.value!.fetch(:created_region)
+        end
+
+        Success()
       end
 
       def reconcile_missing_upstream_records(source:, run:, records:, stats:)
-        return Success() unless reconcile_missing_upstream?
+        return Success() unless reconcile_missing_upstream?(run)
 
         seen_external_uids_by_kind = records.each_with_object(Hash.new { |hash, key| hash[key] = Set.new }) do |record, memo|
           memo[record.fetch(:record_kind)] << record.fetch(:external_uid)
@@ -155,8 +97,8 @@ module Imports
         Success()
       end
 
-      def reconcile_missing_upstream?
-        input[:mode].in?([ Imports::Run::MODES[:full], Imports::Run::MODES[:replay] ])
+      def reconcile_missing_upstream?(run)
+        run.mode.in?([ Imports::Run::MODES[:full], Imports::Run::MODES[:replay] ])
       end
 
       def source_records_for_reconciliation(source)
@@ -166,10 +108,6 @@ module Imports
           "normalized_payload ->> 'country_code' = ?",
           input[:reconciliation_country_code].to_s.upcase
         )
-      end
-
-      def existing_run?
-        input[:import_run_id].present?
       end
     end
   end

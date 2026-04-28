@@ -19,7 +19,7 @@ module Imports
         private
 
         def countries_from_env(config)
-          raw_value = ENV["GEONAMES_COUNTRIES"].presence || config.country_codes
+          raw_value = ENV["GEONAMES_COUNTRY_CODES"].presence || config.country_codes
           normalize_list(raw_value).map(&:upcase)
         end
 

@@ -7,7 +7,7 @@ RSpec.describe Imports::GeoNames::Settings do
     around do |example|
       with_env(
         "GEONAMES_SOURCE_KEY" => "custom_geonames",
-        "GEONAMES_COUNTRIES" => "ad, fr",
+        "GEONAMES_COUNTRY_CODES" => "ad, fr",
         "GEONAMES_LANGUAGES" => "en, RU",
         "GEONAMES_FEATURE_CODES" => "PCLI, adm1",
         "GEONAMES_DOWNLOAD_ALTERNATE_NAMES" => "0",

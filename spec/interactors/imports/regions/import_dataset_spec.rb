@@ -14,11 +14,20 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
       display_policy: "public_display_allowed"
     )
   end
+  let!(:run) do
+    create(
+      :imports_run,
+      import_source: source,
+      mode: Imports::Run::MODES[:full],
+      status: Imports::Run::STATUSES[:running],
+      started_at: Time.current,
+      initiated_by: "import_run_item:test",
+      params: { "source_key" => source.key }
+    )
+  end
   let(:input) do
     {
-      source_key: source.key,
-      mode: "full",
-      initiated_by: "seed",
+      import_run_id: run.id,
       records: dataset
     }
   end
@@ -63,10 +72,20 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
 
   it "creates regions, provenance records, links, and localized names" do
     expect { result }.to change(Region, :count).by(2)
-      .and change(Imports::Run, :count).by(1)
       .and change(Imports::SourceRecord, :count).by(2)
       .and change(Imports::RegionSourceLink, :count).by(2)
       .and change(RegionName, :count).by(6)
+    expect(Imports::Run.count).to eq(1)
+  end
+
+  it "leaves run lifecycle untouched" do
+    result
+
+    expect(run.reload).to have_attributes(
+      status: Imports::Run::STATUSES[:running],
+      finished_at: nil,
+      stats: {}
+    )
   end
 
   it "stores the canonical hierarchy and centers" do
@@ -95,7 +114,7 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
   it "is idempotent on repeated imports" do
     result
 
-    expect { described_class.call(input:) }.to change(Imports::Run, :count).by(1)
+    expect { described_class.call(input:) }.not_to change(Imports::Run, :count)
     expect([ Region.count, Imports::SourceRecord.count, Imports::RegionSourceLink.count, RegionName.count ]).to eq([ 2, 2, 2, 6 ])
     expect(Imports::RecordSnapshot.count).to eq(2)
   end
@@ -153,7 +172,9 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
 
     bali_source_record = Imports::SourceRecord.find_by!(external_uid: "1650535")
 
-    rerun_result = described_class.call(input: input.merge(mode: "incremental", records: [ dataset.first ]))
+    run.update!(mode: Imports::Run::MODES[:incremental])
+
+    rerun_result = described_class.call(input: input.merge(records: [ dataset.first ]))
 
     expect(rerun_result).to be_success
     expect(bali_source_record.reload.status).to eq(Imports::SourceRecord::STATUSES[:matched])
@@ -173,133 +194,29 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
       source.update!(enabled: false)
     end
 
-    it "returns a disabled-source failure without creating a run" do
+    it "returns a disabled-source failure without changing run lifecycle" do
       expect(result).to be_failure
       expect(result.failure[:code]).to eq(:source_disabled)
-      expect(Imports::Run.count).to eq(0)
+      expect(run.reload.status).to eq(Imports::Run::STATUSES[:running])
     end
   end
 
-  context "when the source does not exist" do
-    let(:input) { super().merge(source_key: "missing") }
+  context "when the run does not exist" do
+    let(:input) { super().merge(import_run_id: 0) }
 
     it "returns failure" do
       expect(result).to be_failure
-      expect(result.failure[:code]).to eq(:source_not_found)
+      expect(result.failure[:code]).to eq(:run_not_found)
     end
   end
 
-  context "when loading records from configured GeoNames dump files" do
-    let(:all_countries_path) { Rails.root.join("tmp/geonames_all_countries_test.txt") }
-    let(:alternate_names_path) { Rails.root.join("tmp/geonames_alternate_names_test.txt") }
-    let(:input) do
-      {
-        source_key: source.key,
-        mode: "full",
-        initiated_by: "manual"
-      }
-    end
+  context "when import_run_id is missing" do
+    let(:input) { super().except(:import_run_id) }
 
-    before do
-      source.update!(
-        fetch_mode: "dump",
-        config: {
-          "all_countries_path" => all_countries_path.to_s,
-          "alternate_names_path" => alternate_names_path.to_s,
-          "country_codes" => [ "ID" ],
-          "languages" => [ "en", "ru" ]
-        }
-      )
-
-      all_countries_path.dirname.mkpath
-      all_countries_path.write(
-        [
-          "1643084\tIndonesia\tIndonesia\tIndonesia\t-2.5\t118.0\tA\tPCLI\tID\t\t\t\t\t\t0\t\t\tAsia/Jakarta\t2024-01-01",
-          "1650535\tBali\tBali\tBali\t-8.4095\t115.1889\tA\tADM1\tID\t\t02\t\t\t\t0\t\t\tAsia/Jakarta\t2024-01-01",
-          "1651111\tSingaraja\tSingaraja\tSingaraja\t-8.112\t115.088\tP\tPPL\tID\t\t02\t\t\t\t0\t\t\tAsia/Jakarta\t2024-01-01"
-        ].join("\n")
-      )
-      alternate_names_path.write(
-        [
-          "1\t1650535\tru\tБали\t1\t0\t0\t0\t\t",
-          "2\t1651111\tru\tСингараджа\t0\t0\t0\t0\t\t"
-        ].join("\n")
-      )
-    end
-
-    after do
-      all_countries_path.delete if all_countries_path.exist?
-      alternate_names_path.delete if alternate_names_path.exist?
-    end
-
-    it "imports the default MVP feature-code slice through the existing pipeline when records are omitted" do
-      expect(result).to be_success
-      expect(Region.find_by!(slug: "bali").country_code).to eq("ID")
-      expect(RegionName.find_by!(name: "Бали").language_code).to eq("ru")
-      expect(Region.find_by(slug: "singaraja")).to be_nil
-    end
-  end
-
-  context "when loading the official GeoNames Andorra fixtures" do
-    let(:expected_record_count) { 15 }
-    let(:input) do
-      {
-        source_key: source.key,
-        mode: "full",
-        initiated_by: "fixture"
-      }
-    end
-    let(:country) { Imports::SourceRecord.find_by!(external_uid: "3041565").region_source_link.region }
-    let(:ordino_area) { Imports::SourceRecord.find_by!(external_uid: "3039676").region_source_link.region }
-    let(:ordino_locality) { Imports::SourceRecord.find_by!(external_uid: "3039678").region_source_link.region }
-
-    before do
-      source.update!(
-        fetch_mode: "dump",
-        config: {
-          "all_countries_path" => "spec/fixtures/imports/geonames/country_AD.txt",
-          "alternate_names_path" => "spec/fixtures/imports/geonames/alternate_names_AD.txt",
-          "country_codes" => [ "AD" ],
-          "languages" => [ "en", "ru", "ca", "fr", "es" ]
-        }
-      )
-    end
-
-    it "imports the real fixture through the existing dump pipeline" do
-      expect { result }.to change(Region, :count).by(expected_record_count)
-        .and change(Imports::SourceRecord, :count).by(expected_record_count)
-        .and change(Imports::RegionSourceLink, :count).by(expected_record_count)
-    end
-
-    it "preserves the expected Andorra hierarchy from the official fixture" do
-      result
-
-      expect(country).to have_attributes(
-        name: "Principality of Andorra",
-        region_kind: "country",
-        parent: nil
-      )
-      expect(ordino_area.parent).to eq(country)
-      expect(ordino_area.region_kind).to eq("area")
-      expect(ordino_locality.parent).to eq(ordino_area)
-      expect(ordino_locality.region_kind).to eq("locality")
-      expect(andorra_ru_name).to have_attributes(name_role: "preferred", searchable: true)
-    end
-
-    it "remains idempotent on repeated runs of the real fixture" do
-      result
-
-      expect { described_class.call(input:) }.to change(Imports::Run, :count).by(1)
-      expect([ Region.count, Imports::SourceRecord.count, Imports::RegionSourceLink.count ]).to eq(
-        [ expected_record_count, expected_record_count, expected_record_count ]
-      )
-      expect(Imports::SourceRecord.where(status: Imports::SourceRecord::STATUSES[:missing_upstream]).count).to eq(0)
-    end
-
-    it "accepts an explicit nil records value for dump-driven execution paths" do
-      expect(
-        described_class.call(input: input.merge(records: nil))
-      ).to be_success
+    it "returns validation failure" do
+      expect(result).to be_failure
+      expect(result.failure[:code]).to eq(:validation_error)
+      expect(result.failure[:errors]).to include(import_run_id: [ "is missing" ])
     end
   end
 
@@ -352,11 +269,8 @@ RSpec.describe Imports::Regions::ImportDataset, type: :interactor do
   end
 
   def import_ad_shard
-    shard_run = create(:imports_run, import_source: source, mode: Imports::Run::MODES[:full])
-
     described_class.call(
       input: input.merge(
-        import_run_id: shard_run.id,
         reconciliation_country_code: "AD",
         records: [ andorra_country_record ]
       )

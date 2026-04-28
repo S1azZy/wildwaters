@@ -96,11 +96,8 @@ module Imports
 
       def import_input(item:, records:)
         {
-          source_key: item.import_run.import_source.key,
-          mode: item.import_run.mode,
-          initiated_by: "import_run_item:#{item.id}",
-          records:,
           import_run_id: item.import_run_id,
+          records:,
           reconciliation_country_code: country_code_for(item)
         }
       end
