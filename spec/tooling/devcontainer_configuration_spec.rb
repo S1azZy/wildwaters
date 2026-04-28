@@ -55,12 +55,12 @@ RSpec.describe DevcontainerConfiguration do
     )
   end
 
-  it "configures Codex for autonomous work inside the container sandbox" do
+  it "keeps the project Codex config safe for regular local work" do
     codex_config = codex_config_path.read
 
-    expect(codex_config).to include('approval_policy = "never"')
+    expect(codex_config).to include('approval_policy = "on-request"')
     expect(codex_config).to include('sandbox_mode = "workspace-write"')
-    expect(codex_config).to include("network_access = true")
+    expect(codex_config).not_to include("writable_roots")
     expect(codex_config).not_to match(/api[_-]?key|token|secret|password/i)
   end
 
