@@ -29,6 +29,12 @@ After classification, use `docs/CONTEXT_MAP.md` to load the smallest useful file
 set for the task. Do not scan the whole repository unless the task is explicitly
 repository-wide.
 
+## Branching
+
+When a task includes creating a PR, create or switch to a `codex/` branch in the
+current checkout before mutating files. Do not create a separate git worktree
+unless the user explicitly asks for one.
+
 ## Task Packet
 
 For non-trivial work, keep this packet mentally or in the conversation before

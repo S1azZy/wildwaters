@@ -1,6 +1,9 @@
 # Changes
 
 ## 2026-05-17
+- Refreshed the current actionable dependency freshness set by updating Bundler-resolved gems including `bootsnap`, `dry-configurable`, `jbuilder`, `puma`, `selenium-webdriver`, `tailwindcss-ruby`, and `view_component`.
+- Tightened `make outdated` to use Bundler's strict mode so the freshness gate tracks updateable dependencies within current constraints and does not fail on upstream-blocked transitive releases such as `diff-lcs` `2.0.0`.
+- Clarified the development workflow so PR tasks start from a `codex/` branch in the current checkout unless the user explicitly asks for a separate worktree.
 - Streamlined `AGENTS.md` into a concise Codex operating contract with task routing, execution flow, command references, permission boundaries, database rules, and explicit done criteria.
 - Split agent workflow, command selection, permission boundaries, and verification matrices into `docs/DEVELOPMENT.md`; clarified ownership across the documentation set and removed stale README duplication.
 - Refocused `docs/FOUNDATIONS.md` on durable product, architecture, domain, data, and database boundaries by removing startup-era roadmap, suggested-schema, and stack/tooling duplication.
