@@ -10,6 +10,7 @@ path. Do not duplicate detailed project rules here.
 
 | Need | Read |
 | --- | --- |
+| Context loading by task area | `docs/CONTEXT_MAP.md` |
 | Agent workflow, commands, permissions, verification | `docs/DEVELOPMENT.md` |
 | Product scope, architecture, domain, database, PostGIS | `docs/FOUNDATIONS.md` |
 | Security, testing policy, CI and merge gates | `docs/QUALITY_SECURITY.md` |
@@ -33,7 +34,7 @@ docs unless explicitly requested.
 ## Start Every Task
 
 1. Classify the task with `docs/DEVELOPMENT.md`.
-2. Read only the mapped docs and relevant neighboring files.
+2. Load task-specific context from `docs/CONTEXT_MAP.md`.
 3. Identify whether the task changes behavior, schema, security, dependencies,
    or only documentation/style.
 4. Follow the matching execution loop and verification matrix.

@@ -10,6 +10,7 @@ with waterfalls.
 
 | Need | Read |
 | --- | --- |
+| Context loading by task area | [`docs/CONTEXT_MAP.md`](docs/CONTEXT_MAP.md) |
 | Agent workflow, commands, permissions, verification | [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) |
 | Product scope, architecture, domain, database, PostGIS | [`docs/FOUNDATIONS.md`](docs/FOUNDATIONS.md) |
 | Security, testing policy, CI and merge gates | [`docs/QUALITY_SECURITY.md`](docs/QUALITY_SECURITY.md) |

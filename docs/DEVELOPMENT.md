@@ -2,7 +2,8 @@
 
 This document owns agent workflow, command selection, permission boundaries, and
 verification. Product and architecture rules live in `docs/FOUNDATIONS.md`.
-Security and testing policy lives in `docs/QUALITY_SECURITY.md`.
+Security and testing policy lives in `docs/QUALITY_SECURITY.md`. Task-specific
+context loading lives in `docs/CONTEXT_MAP.md`.
 
 ## Task Router
 
@@ -24,6 +25,10 @@ Before editing, classify the task and load only the required context.
 If classification is unclear, inspect files first. Ask only when a wrong
 assumption would create product, security, data, or schema risk.
 
+After classification, use `docs/CONTEXT_MAP.md` to load the smallest useful file
+set for the task. Do not scan the whole repository unless the task is explicitly
+repository-wide.
+
 ## Task Packet
 
 For non-trivial work, keep this packet mentally or in the conversation before
@@ -35,6 +40,7 @@ Task type:
 Behavior change: yes/no
 Risk class: docs_only | low | medium | high
 Docs loaded:
+Context map entries used:
 Neighboring files inspected:
 Red test required: yes/no
 Approval required: yes/no
@@ -167,6 +173,7 @@ Forbidden:
 | Document | Owns | Does not own |
 | --- | --- | --- |
 | `AGENTS.md` | Always-loaded agent map and hard stops | Detailed product, workflow, or security policy |
+| `docs/CONTEXT_MAP.md` | Task-specific context loading map | Workflow, policy, or product rules |
 | `docs/DEVELOPMENT.md` | Workflow, commands, permissions, verification | Product scope or domain architecture |
 | `docs/FOUNDATIONS.md` | Product, architecture, domain, data, database rules | Task execution or CI policy |
 | `docs/QUALITY_SECURITY.md` | Security, testing policy, CI gates | Product scope or domain architecture |
