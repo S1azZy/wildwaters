@@ -1,5 +1,9 @@
 # Quality and Security
 
+This document owns security baseline, testing policy, and CI/merge gates.
+Workflow, commands, and permission routing live in `docs/DEVELOPMENT.md`.
+Product and architecture rules live in `docs/FOUNDATIONS.md`.
+
 ## Security baseline
 Authentication:
 - Passwords are hashed only

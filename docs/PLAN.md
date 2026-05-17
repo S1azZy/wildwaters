@@ -1,5 +1,9 @@
 # Plan
 
+This document owns current status, delivery phases, roadmap, and deferred work.
+Architecture rules live in `docs/FOUNDATIONS.md`; execution workflow lives in
+`docs/DEVELOPMENT.md`.
+
 ## Current status
 
 Completed:

@@ -1,5 +1,10 @@
 # Foundations
 
+This document owns product scope, architecture, domain, data, and database
+rules. Workflow, commands, permissions, and verification live in
+`docs/DEVELOPMENT.md`. Security and testing policy lives in
+`docs/QUALITY_SECURITY.md`.
+
 ## Product priorities
 Decision order:
 1. Product value
