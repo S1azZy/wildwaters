@@ -13,7 +13,6 @@ with waterfalls.
 | Agent workflow, commands, permissions, verification | [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) |
 | Product scope, architecture, domain, database, PostGIS | [`docs/FOUNDATIONS.md`](docs/FOUNDATIONS.md) |
 | Security, testing policy, CI and merge gates | [`docs/QUALITY_SECURITY.md`](docs/QUALITY_SECURITY.md) |
-| Current phase, roadmap, deferred work | [`docs/PLAN.md`](docs/PLAN.md) |
 | Architecture decisions | [`docs/adr/`](docs/adr/) |
 | Change history | [`CHANGES.md`](CHANGES.md) |
 

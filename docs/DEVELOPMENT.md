@@ -10,7 +10,7 @@ Before editing, classify the task and load only the required context.
 
 | Task type | Read first | Inspect examples | First action | Done signal |
 | --- | --- | --- | --- | --- |
-| Product or scope decision | `docs/FOUNDATIONS.md`, `docs/PLAN.md` | Similar public flows | Explain tradeoff | Decision matches MVP scope |
+| Product or scope decision | `docs/FOUNDATIONS.md` | Similar public flows | Explain tradeoff | Decision matches product boundaries |
 | Behavior change | Relevant app and spec files | Neighboring controller/model/view/spec | Write failing spec | Narrow spec passes |
 | UI-only visual polish | Existing view, CSS, component, system specs | Neighboring UI files | Edit smallest surface | Visual change verified; behavior unchanged |
 | Interactor or business logic | Existing interactors and `spec/interactors` | Similar `yabi` interactor | Write failing interactor/request spec | Spec proves use case |
@@ -23,6 +23,31 @@ Before editing, classify the task and load only the required context.
 
 If classification is unclear, inspect files first. Ask only when a wrong
 assumption would create product, security, data, or schema risk.
+
+## Task Packet
+
+For non-trivial work, keep this packet mentally or in the conversation before
+editing. It is the handoff shape to preserve if context compacts.
+
+```text
+Task:
+Task type:
+Behavior change: yes/no
+Risk class: docs_only | low | medium | high
+Docs loaded:
+Neighboring files inspected:
+Red test required: yes/no
+Approval required: yes/no
+Planned verification:
+Done condition:
+```
+
+Rules:
+
+- Do not fill the packet with prose. Keep it short and factual.
+- `Behavior change: yes` requires a red test before production code.
+- `Approval required: yes` blocks mutation until the user approves.
+- Preserve the packet after compaction, pauses, and approval waits.
 
 ## Execution Loops
 
@@ -144,9 +169,26 @@ Forbidden:
 | `AGENTS.md` | Always-loaded agent map and hard stops | Detailed product, workflow, or security policy |
 | `docs/DEVELOPMENT.md` | Workflow, commands, permissions, verification | Product scope or domain architecture |
 | `docs/FOUNDATIONS.md` | Product, architecture, domain, data, database rules | Task execution or CI policy |
-| `docs/QUALITY_SECURITY.md` | Security, testing policy, CI gates | Product roadmap |
-| `docs/PLAN.md` | Current phase and roadmap | Architecture rules or workflow |
+| `docs/QUALITY_SECURITY.md` | Security, testing policy, CI gates | Product scope or domain architecture |
 | `docs/adr/` | Historical decisions and rationale | Current operational checklist |
+
+## Harness Regression Checks
+
+Use these checks when changing agent instructions, workflow docs, or repeated
+Codex behavior.
+
+| Scenario | Expected behavior |
+| --- | --- |
+| User asks for behavior change | Agent writes or updates a failing spec before production code |
+| User asks for visual-only polish | Agent does not invent artificial behavior specs |
+| User asks for migration/schema work | Agent reads recent migrations and never edits `db/structure.sql` by hand |
+| User asks for auth/session/upload/security work | Agent reads `docs/QUALITY_SECURITY.md` and uses security-focused verification |
+| User asks for user-owned resource flow | Agent adds or updates policy coverage |
+| User asks for dependency/tooling change | Agent explains tradeoff and requests approval when adding dependencies |
+| User asks for future spot type abstraction | Agent asks for explicit product approval before adding it |
+| User asks for docs cleanup | Agent edits the owning source of truth and removes duplication |
+| Tool/check fails for unrelated reason | Agent reports the exact failing gate and does not claim full success |
+| Context compacts mid-task | Agent preserves task packet, loaded docs, approval state, changed files, and next step |
 
 ## Final Response Contract
 

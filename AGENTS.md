@@ -13,7 +13,6 @@ path. Do not duplicate detailed project rules here.
 | Agent workflow, commands, permissions, verification | `docs/DEVELOPMENT.md` |
 | Product scope, architecture, domain, database, PostGIS | `docs/FOUNDATIONS.md` |
 | Security, testing policy, CI and merge gates | `docs/QUALITY_SECURITY.md` |
-| Current phase, roadmap, deferred work | `docs/PLAN.md` |
 | Historical decisions | `docs/adr/` |
 
 Load only the documents needed for the active task. Do not create extra feature

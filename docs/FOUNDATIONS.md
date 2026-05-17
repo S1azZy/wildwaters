@@ -13,7 +13,7 @@ Use it when a task needs to answer:
 
 Workflow, commands, permissions, and verification live in
 `docs/DEVELOPMENT.md`. Security and testing policy lives in
-`docs/QUALITY_SECURITY.md`. Delivery sequencing lives in `docs/PLAN.md`.
+`docs/QUALITY_SECURITY.md`.
 
 ## Product Boundary
 
