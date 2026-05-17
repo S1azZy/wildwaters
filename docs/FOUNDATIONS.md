@@ -1,158 +1,154 @@
 # Foundations
 
-## Product priorities
+This document owns stable product, architecture, domain, data, and database
+boundaries. It is not a roadmap, status report, command list, or implementation
+scratchpad.
+
+Use it when a task needs to answer:
+
+- what Wild Waters is and is not;
+- which domain concepts are canonical;
+- where business logic, data access, and UI orchestration belong;
+- which database and geospatial rules must stay consistent.
+
+Workflow, commands, permissions, and verification live in
+`docs/DEVELOPMENT.md`. Security and testing policy lives in
+`docs/QUALITY_SECURITY.md`.
+
+## Product Boundary
+
+Wild Waters is a production-minded, mobile-first Rails monolith for discovering
+natural water places, starting with waterfalls.
+
 Decision order:
-1. Product value
-2. Maintainability and consistency
-3. Delivery speed
-4. Future extensibility without MVP bloat
 
-Wild Waters is a production-minded, mobile-first discovery platform for natural water places, starting with waterfalls.
+1. Product value.
+2. Maintainability and consistency.
+3. Delivery speed.
+4. Future extensibility without MVP bloat.
 
-Prefer the current default code style and built-in conventions of the active library or framework, especially Rails, unless this project has explicitly chosen otherwise.
+Current product stance:
 
-## MVP scope
-Must-have:
-- Email/password auth
-- Regions hierarchy
-- Waterfall catalog
-- Map with waterfall markers
-- Waterfall detail pages
-- Photos upload
-- Reviews
-- Check-ins with photo
-- User profiles
-- Follow relationships
-- Basic activity feed
-- Nearby waterfalls search
-- Achievement groundwork
-- JSON API structure for future mobile clients
+- Waterfalls are the only active public spot type.
+- Region hierarchy, map browsing, waterfall details, and nearby discovery are
+  core discovery surfaces.
+- Accounts, profiles, follows, reviews, photos, check-ins, activity, and
+  achievements are product layers around the waterfall discovery loop.
+- Web and future API behavior should share the same domain/use-case layer.
+- Russian and English are first-class UI locales.
 
-Explicitly out of MVP:
-- Non-waterfall spot types in user-facing behavior
-- Native mobile apps
-- Hiking route planner
-- Generic outdoor platform features
-- Real-time features unless clearly needed
-- Overbuilt abstractions for unsupported spot types
+Do not turn the MVP into:
 
-## Stack
-Mandatory:
-- Ruby on Rails `8.x`
-- PostgreSQL `18`
-- PostGIS
-- Hotwire (`Turbo + Stimulus`)
-- Tailwind CSS
-- ERB templates unless a later project-wide migration decision is made
-- Active Storage
-- Active Job + Solid Queue
-- JSON API
-- Docker + docker-compose
-- Kamal
-- S3-compatible object storage
-- `yabi`
-- Pundit
-- I18n with Russian and English locales from day one
-- RSpec
-- RuboCop
-- Brakeman
-- bundler-audit
+- a generic outdoor platform;
+- a native mobile app;
+- an offline-first system;
+- an AI product;
+- a real-time product without a concrete need;
+- a moderation, recommendation, or routing platform before the waterfall social
+  loop is complete.
 
-## Architecture
-- Rails monolith powering web app, JSON API, admin tools, and background jobs
-- Server-rendered web UI with strong mobile-first UX
-- Thin controllers for HTTP orchestration only
-- Thin models for persistence and local invariants
-- Business orchestration in a consistent service/interactor layer built on `yabi`
-- Authorization must stay explicit and centralized
-- API and web should share the same domain and use-case layer
-- Action Cable is deferred until a concrete real-time use case appears
+## Architecture Boundary
 
-Bounded areas:
-- Identity
-- Regions
-- Spots
-- Media
-- Reviews
-- Social
-- Activity
-- Achievements
-- Admin
-- Public API
+Wild Waters is one Rails monolith serving web UI, JSON API, admin tools, imports,
+and background jobs.
 
-Hard boundaries:
-- MVP behavior is waterfall-only even if schema is extensible
-- `Spot` is the root place entity; waterfall is the only active `type` at launch
-- Geographic search lives in database-backed queries/services, not in controllers
-- Upload lifecycle and image processing are infrastructure concerns, not domain logic
-- Feed and achievement calculation must be asynchronous where possible
-- Do not mix architectural styles across features
+Stable architecture rules:
 
-## Domain skeleton
-Core entities:
-- `User`
-- `Region`
-- `Spot`
-- `CheckIn`
-- `Photo`
-- `Review`
-- `Follow`
-- `Achievement`
+- Prefer current Rails conventions and existing project patterns.
+- Controllers orchestrate HTTP only.
+- Models own persistence, associations, scopes, normalization, and local
+  invariants.
+- Business use cases live in `app/interactors` and use the canonical `yabi`
+  style.
+- Queries that are not business use cases may live in `app/queries`.
+- Authorization stays explicit and centralized through policies.
+- Server-rendered web UI uses ERB, Hotwire, Tailwind, and the existing UI
+  component layer where it already exists.
+- Background work uses the Rails/Solid Queue stack unless a concrete need
+  justifies otherwise.
+- Do not introduce parallel service/interactor/API response styles.
 
-Recommended root entity:
-- `Spot`
+Concrete cross-cutting decisions live in ADRs:
 
-MVP active spot type:
-- `waterfall`
+- Map browsing: `docs/adr/0001-map-browse-stack.md`
+- Design system: `docs/adr/0002-design-system-foundation.md`
+- Import architecture: `docs/adr/0003-import-architecture-and-region-ingestion.md`
+- GeoNames queued import orchestration:
+  `docs/adr/0004-geonames-queued-import-orchestration.md`
 
-Future spot types:
-- `natural_pool`
-- `lake`
-- `hot_spring`
-- `river`
-- `cenote`
+## Domain Boundary
 
-Suggested `spots` fields:
-- `name`
-- `slug`
-- `type`
-- `description`
-- `region_id`
-- `location`
-- `metadata` (`jsonb`)
-- `swimmable`
+Canonical domain areas:
 
-Waterfall-oriented metadata examples:
-- `height`
-- `river`
-- `access_difficulty`
-- `seasonality_notes`
+- Identity and authentication.
+- Regions and multilingual region names.
+- Imports and source provenance.
+- Spots and waterfalls.
+- Waterfall browse/search queries.
+- Media, reviews, check-ins, profiles, follows, activity, and achievements as
+  the next social layers.
+- Admin and operational tooling.
+- Public API contracts when web/API behavior needs to align.
 
-## Data and geospatial rules
-- PostGIS is a first-class dependency, not an optional add-on
-- Store canonical spot coordinates in a geospatial column suitable for nearby queries
-- Keep region hierarchy explicit (`parent_id`) and queryable
-- Use `jsonb` only for attributes that are genuinely subtype-specific or import-oriented
-- Do not move core searchable/filterable fields into `metadata`
-- Nearby search must be index-backed and implemented at the database/query layer
-- Slugs must be stable and unique within the intended public namespace
+Canonical place model:
 
-## Database and migration rules
-- Prefer SQL-forward migrations inside Rails migration wrappers
-- Use explicit `up` / `down`
-- Canonical dump: `structure.sql`
-- For user-facing or primary domain tables, prefer UUID primary keys generated by PostgreSQL 18 `uuidv7()`
-- For purely internal or operational tables, `bigint` is acceptable when it is the simpler fit
-- Foreign keys should match the primary key type of the referenced table
-- Every table must have explicit primary keys, foreign keys, indexes, and `NOT NULL` constraints where appropriate
-- Add geospatial indexes for location-based lookups
-- `CHECK` constraints are allowed only for clearly necessary storage-level invariants; when in doubt, keep business rules in models/interactors
-- Business validation belongs to the app layer
-- Keep naming consistent and within PostgreSQL identifier limits
+- `Spot` is the root place entity.
+- `waterfall` is the only active `spot_type` for MVP behavior.
+- Waterfall-specific fields belong in `waterfalls`.
+- Shared searchable/filterable fields belong on first-class tables, not inside
+  generic metadata.
+- Future spot types require an explicit product decision before user-facing
+  behavior, routes, filters, or abstractions are added.
 
-## Consistency contract
-- Do not mix multiple interactor/service styles; `yabi` is the canonical base
-- Do not mix multiple API response styles
-- Keep naming and placement conventions uniform
-- Keep web and API behavior aligned through shared domain/application flows
-- Prefer explicit, boring code over speculative generic abstractions
+Region model:
+
+- `Region` owns product-facing hierarchy and browse context.
+- `RegionClosure` supports subtree traversal.
+- `RegionName` owns canonical and alternate multilingual names.
+- Import provenance stays in the `Imports` namespace and attaches to domain
+  records through explicit link tables.
+
+Import model:
+
+- Imports are not a generic ETL product.
+- Import flows must be idempotent, provenance-aware, and safe to retry.
+- Source-specific orchestration belongs under `app/interactors/imports`.
+- Domain writes from imports should pass through explicit domain/apply
+  interactors.
+
+## Data and Geospatial Boundary
+
+- PostgreSQL 18 and PostGIS are first-class dependencies.
+- Canonical spot coordinates live in a geospatial column suitable for nearby and
+  bounds queries.
+- Location and nearby search belong in database-backed queries/services, not in
+  controllers.
+- Nearby and map queries must be index-backed.
+- Keep map payloads lean and product-shaped.
+- Use `jsonb` only for genuinely source-specific, import-oriented, or
+  subtype-specific data that is not a core searchable field.
+- Do not move stable public filters, identifiers, names, coordinates, or status
+  fields into generic metadata.
+
+## Database Boundary
+
+- Use `structure.sql` as the canonical schema dump.
+- Never edit `db/structure.sql` by hand.
+- Prefer SQL-forward migrations inside Rails migration wrappers.
+- Use explicit `up` and `down`.
+- Prefer PostgreSQL `uuidv7()` primary keys for main domain tables.
+- `bigint` is acceptable for internal operational tables when it is the simpler
+  fit.
+- Foreign key types must match referenced primary keys.
+- Default to explicit primary keys, foreign keys, `NOT NULL`, and justified
+  indexes.
+- Add geospatial indexes for location-backed lookups.
+- Use `CHECK` only for true storage-level invariants.
+- Keep business validation in the application layer.
+- Keep naming consistent and within PostgreSQL identifier limits.
+
+## Extension Rule
+
+Extend from the current product and codebase, not from speculative future
+platform ideas. Add abstractions only when an implemented use case needs them or
+an ADR records the decision.
