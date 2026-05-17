@@ -3,6 +3,7 @@
 ## 2026-05-17
 - Streamlined `AGENTS.md` into a concise Codex operating contract with task routing, execution flow, command references, permission boundaries, database rules, and explicit done criteria.
 - Split agent workflow, command selection, permission boundaries, and verification matrices into `docs/DEVELOPMENT.md`; clarified ownership across the documentation set and removed stale README duplication.
+- Refocused `docs/FOUNDATIONS.md` on durable product, architecture, domain, data, and database boundaries by removing startup-era roadmap, suggested-schema, and stack/tooling duplication.
 
 ## 2026-04-24
 - Added a working Dev Container setup for agent-driven development with the existing Rails/PostGIS compose stack, mounted local Codex/GitHub/SSH authentication, project-scoped autonomous Codex sandbox settings, and a separate agent-oriented devcontainer image while keeping the regular development image minimal.
