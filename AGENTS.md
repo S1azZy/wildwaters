@@ -1,181 +1,135 @@
 # AGENTS.md
 
-## Project
+## Purpose
 
-Wild Waters is a Rails monolith for discovering and sharing natural water places, starting with waterfalls.
+This file is the Codex operating contract for Wild Waters. Keep it short and
+actionable. Product, architecture, quality, and security details live in:
 
-Core product goals:
-- waterfall-first public catalog
-- region hierarchy
-- map browsing and nearby discovery
-- accounts, profiles, follows, reviews, photos, and check-ins
-- lightweight activity feed
-- bilingual UI (`ru`/`en`)
-
-## Canonical docs
-
-Use these files as the documentation baseline:
 - `docs/FOUNDATIONS.md`
 - `docs/QUALITY_SECURITY.md`
 - `docs/PLAN.md`
 
-Do not create extra feature docs unless explicitly requested.
+Load those docs only when the task requires them. Do not create extra feature
+docs unless explicitly requested.
 
-## Priorities
+## Project Invariants
 
-When tradeoffs appear, prioritize in this order:
-1. product value
-2. maintainability and consistency
-3. delivery speed
-4. educational value
+- Rails monolith with Hotwire, ERB, Tailwind, PostgreSQL/PostGIS, RSpec, Pundit,
+  Active Storage, I18n (`ru`/`en`), and `yabi`.
+- MVP user-facing behavior is waterfall-first.
+- Controllers stay thin.
+- Models keep persistence and local invariants only.
+- Business use cases go in `app/interactors` and use the project canonical
+  `yabi` style.
+- Authorization is explicit for every user-owned resource.
+- User-facing text must have both `ru` and `en` locale entries.
+- `db/structure.sql` is generated only; never edit it by hand.
+- Keep `CHANGES.md` current for behavior, schema, dependency, process, or
+  user-facing changes.
 
-## MVP non-goals
+## Task Router
 
-Do not build in MVP:
-- generic non-waterfall behavior
-- AI features
-- offline-first sync
-- real-time features without a concrete need
-- native mobile apps
-- complex recommendation or moderation systems
-- speculative abstractions for unsupported future spot types
+Before editing, classify the task and load only the needed context.
 
-## Stack
+| Task type | Read first | Required workflow |
+| --- | --- | --- |
+| Product or scope decision | `docs/FOUNDATIONS.md`, `docs/PLAN.md` | Explain tradeoff before editing |
+| Behavior change | Relevant app and spec files | Red test, minimal code, green test |
+| UI-only visual polish | Existing views, styles, and components | Test only changed behavior/state |
+| Interactor or business logic | Existing interactors and specs | Red interactor/request spec first |
+| Authorization, admin, or user-owned resource | Existing policies/specs, `docs/QUALITY_SECURITY.md` | Policy coverage required |
+| Migration, schema, or PostGIS | Existing migrations, `docs/FOUNDATIONS.md` | Explicit `up`/`down`; generated `structure.sql` only |
+| Security, auth, uploads, or sessions | `docs/QUALITY_SECURITY.md` | Security-first review and tests |
+| Dependency or tooling | `Gemfile`, lockfiles, `Makefile` | Explain tradeoff and run relevant gates |
 
-Mandatory:
-- Ruby `4.0.x`
-- Rails `8.1.x`
-- PostgreSQL `18.x` + PostGIS
-- Hotwire (`Turbo + Stimulus`)
-- Tailwind CSS
-- ERB
-- Docker / docker-compose
-- Kamal placeholders
-- RSpec
-- `yabi`
-- Pundit
-- Active Storage
-- I18n with `ru` and `en`
+If classification is unclear, inspect files first. Ask only when a wrong
+assumption would create product, security, data, or schema risk.
 
-Preferred:
-- auth: Rails-native approach unless blocked
-- admin: Rails namespace admin UI
-- forms: standard Rails forms first
-- pagination: Pagy when needed
-- enums/state: Rails enum unless richer data justifies a table
-- jobs: Rails built-in stack first (`Solid Queue`)
+## Execution Loop
 
-## Architecture
+For behavior-changing work:
 
-1. Keep controllers thin.
-2. Keep models thin; persistence and local invariants only.
-3. Business use cases live in `app/interactors` and use one consistent `yabi` style.
-4. Authorization is explicit and centralized.
-5. Keep web and API flows aligned through shared domain/use-case logic.
-6. Waterfall-first behavior is a hard product rule even if the schema is extensible.
-7. Avoid speculative abstractions and one-off local patterns.
-8. Naming, testing, authorization, UI, and service patterns must stay uniform.
+1. Inspect relevant files and existing patterns.
+2. Write or update the failing spec first.
+3. Run the narrowest relevant spec and confirm it fails for the expected reason.
+4. Make the smallest production change.
+5. Run the narrow spec until green.
+6. Run the relevant quality gate.
+7. Update `CHANGES.md` when required.
+8. Summarize changed files and verification.
 
-## Database
+If production behavior changes before a red test, stop and correct the process
+by adding or reworking the test.
 
-- Prefer SQL-forward migrations in Rails wrappers.
-- Use explicit `up` / `down`.
-- Use `structure.sql`, not `schema.rb`.
-- Do not edit `db/structure.sql` by hand; it may change only as a generated artifact of migrations/schema dump.
-- Default to `NOT NULL`, `FOREIGN KEY`, and indexes where justified.
-- Use `CHECK` only for true storage-level invariants.
-- Do not add triggers or stored procedures unless explicitly approved.
-- Prefer PostgreSQL `uuidv7()` UUID primary keys for main domain tables.
+## Commands
+
+Prefer `Makefile` targets:
+
+- Setup: `make setup`
+- App up: `make up`
+- Doctor: `make doctor`
+- Tests: `make test`
+- Lint with autocorrect: `make lint`
+- RuboCop only: `make rubocop`
+- Security: `make security`
+- Fast verification: `make verify-fast`
+- Full verification: `make verify`
+- Migration: `make migration NAME=MigrationName`
+- Dependency freshness: `make outdated`
+
+Use narrower `docker compose run --rm web ...` commands only when faster
+feedback is needed.
+
+## Permissions
+
+Allowed without asking:
+
+- Read files and search with `rg`.
+- Edit files inside this repository for the active task.
+- Run non-destructive tests, linters, security checks, and Rails generators.
+- Update generated schema artifacts only through Rails tasks or migrations.
+
+Ask first:
+
+- Add a gem, package, external service, or runtime dependency.
+- Introduce a new architectural pattern.
+- Add triggers, stored procedures, or non-obvious database constraints.
+- Create broad abstractions for future non-waterfall spot types.
+- Change authentication, authorization, session, cookie, upload, or secret
+  handling.
+- Run destructive cleanup commands.
+- Push, publish, or open a PR unless explicitly requested.
+
+Forbidden:
+
+- Push to `main`.
+- Edit `db/structure.sql` by hand.
+- Store or log secrets, credentials, passwords, reset tokens, signed blob
+  tokens, or raw credentials.
+- Disable CSRF.
+- Skip authorization on user-owned resources.
+- Mock app internals without a concrete reason.
+- Add docs outside canonical docs unless explicitly requested.
+- Build AI, offline-first, native mobile, or real-time MVP features without
+  explicit approval.
+
+## Database Rules
+
+- Use explicit `up` and `down` migrations.
+- Prefer SQL-forward Rails migrations.
+- Default to `NOT NULL`, foreign keys, and justified indexes.
 - Match foreign key types to referenced primary keys.
-- If generators are used, prefer `--skip-migration` when that helps preserve migration style.
+- Prefer PostgreSQL `uuidv7()` UUID primary keys for main domain tables.
+- Use PostGIS-backed queries for location behavior.
+- Use `CHECK` only for true storage-level invariants.
 
-## Security
+## Done Criteria
 
-- Never store plaintext passwords.
-- Never log passwords, reset tokens, secrets, or raw credentials.
-- Secrets only via env/credentials.
-- CSRF must stay enabled.
-- Session/cookie settings must be strict.
-- Authorization is required on every user-owned resource.
-- Admin access must be role-protected.
-- Brakeman, bundler-audit, RuboCop, and RSpec must run in CI.
-- Authentication flows must be security-first.
+A task is done only when:
 
-## Quality gates
-
-Before merge:
-- tests pass
-- linters pass
-- security scans pass
-- no obvious N+1 in changed areas
-- policy coverage exists for new secured flows
-- new business logic uses the canonical `yabi` interactor style
-- new code matches project conventions
-- migrations follow project DB rules
-- `CHANGES.md` is updated
-- RuboCop runs with autocorrect by default
-
-## Git workflow
-
-- Work in a dedicated branch.
-- Codex branches must use the `codex/` prefix.
-- Merge through GitHub Pull Requests, not direct commits to `main`.
-- Before opening or updating a PR, run the local verification flow.
-
-## Coding style
-
-- Favor readability over cleverness.
-- Prefer explicit names.
-- Keep methods short.
-- Avoid hidden side effects.
-- Avoid fat helpers.
-- Prefer boring, inspectable Rails patterns.
-- Use POROs for business operations.
-- Add comments only when they reduce real complexity.
-
-## Testing rules
-
-- Prefer integration with the real database over mocks/stubs.
-- Do not mock app code without a concrete need.
-- Persistence-touching business logic should be tested against the real database.
-- Use `test-prof` when improving test performance or factory usage.
-- Use `shared_context` / `shared_examples` only when they reduce duplication without hiding intent.
-
-## Strict rules
-
-1. Every behavior-changing code change starts with a failing test.
-2. Do not write production code that changes system behavior before the test is red.
-3. If a behavior-changing test is not red first, rewrite the test before writing code.
-4. The valid flow for behavior changes is: red test, minimal code, green test.
-5. Purely visual or stylistic UI design work may proceed without a red test first, but any changed behavior, interaction, state, or business logic still requires the red-green flow.
-6. Code written before the test for a behavior change is a process error and must be corrected.
-
-## Not to do
-
-- Do not write behavior-changing code before writing the test.
-- Do not add artificial or low-value tests just to satisfy the red-green rule for purely visual design polish.
-- Push to main
-
-## Directory expectations
-
-- `app/interactors`
-- `app/policies`
-- `app/presenters` or `app/view_models` if needed
-- `app/components` only after an explicit project decision
-- `spec/requests`
-- `spec/system`
-- `spec/interactors`
-- `spec/policies`
-- `spec/models`
-
-## Agent behavior
-
-When generating code:
-- prefer stable, boring solutions
-- prefer official Rails conventions over exotic gems
-- explain tradeoffs when introducing dependencies
-- do not invent undocumented requirements
-- implement the smallest safe and testable solution when uncertain
-- preserve project coherence over local optimization
-- keep `CHANGES.md` current
-- run RuboCop with autocorrect by default
+- Required specs pass.
+- Relevant lint/security gates pass or failures are explained.
+- Authorization and i18n were handled where applicable.
+- No obvious N+1 was introduced in changed areas.
+- `CHANGES.md` was updated when required.
+- Final response lists changed files and commands run.

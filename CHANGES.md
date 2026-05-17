@@ -1,5 +1,8 @@
 # Changes
 
+## 2026-05-17
+- Streamlined `AGENTS.md` into a concise Codex operating contract with task routing, execution flow, command references, permission boundaries, database rules, and explicit done criteria.
+
 ## 2026-04-24
 - Added a working Dev Container setup for agent-driven development with the existing Rails/PostGIS compose stack, mounted local Codex/GitHub/SSH authentication, project-scoped autonomous Codex sandbox settings, and a separate agent-oriented devcontainer image while keeping the regular development image minimal.
 - Implemented ADR 0004 GeoNames queued import orchestration with `import_run_items`, run parameter snapshots, per-country Active Job execution, item finalization, partial-failure run status, failed-item retry, country-scoped missing-upstream reconciliation, and `make import_geonames` / retry entrypoints.
