@@ -45,6 +45,7 @@
 
 # JetBrains IDE settings (RubyMine, IntelliJ, etc.)
 .idea/
+/node_modules/
 
 
 /app/assets/builds/*

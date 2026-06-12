@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wild Waters Spec-Driven Change"
+  short_description: "Choose and run the right Wild Waters SDD flow"
+  default_prompt: "Use $wildwaters-spec-driven-change to classify and guide this Wild Waters task."

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+export XDG_CONFIG_HOME="${ROOT_DIR}/config"
+export OPENSPEC_TELEMETRY="0"
+
+if command -v asdf >/dev/null 2>&1; then
+  ASDF_NODE="$(asdf which node 2>/dev/null || true)"
+
+  if [ -n "${ASDF_NODE}" ]; then
+    export PATH="$(dirname "${ASDF_NODE}"):${PATH}"
+  fi
+fi
+
+cd "${ROOT_DIR}"
+exec npm exec -- openspec "$@"

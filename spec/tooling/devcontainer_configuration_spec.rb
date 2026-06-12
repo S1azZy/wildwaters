@@ -73,6 +73,17 @@ RSpec.describe DevcontainerConfiguration do
     expect(post_create).not_to include('git config --global --add safe.directory /app')
   end
 
+  it "pins Node in the development image without apt Node packages" do
+    dockerfile = dockerfile_devcontainer_path.read
+
+    expect(dockerfile).to include("ARG NODE_VERSION=24.16.0")
+    expect(dockerfile.index("ARG RUBY_VERSION=4.0.3")).to be < dockerfile.index("FROM node:")
+    expect(dockerfile).to include('FROM node:${NODE_VERSION}-bookworm-slim AS node')
+    expect(dockerfile).to include("COPY --from=node /usr/local/bin/node /usr/local/bin/node")
+    expect(dockerfile).not_to match(/^\s+nodejs\s*\\/m)
+    expect(dockerfile).not_to match(/^\s+npm\s*\\/m)
+  end
+
   it "installs the agent and GitHub tools in the development image" do
     dockerfile = dockerfile_devcontainer_path.read
 
@@ -80,6 +91,12 @@ RSpec.describe DevcontainerConfiguration do
     expect(dockerfile).to include("bubblewrap")
     expect(dockerfile).to include("gh")
     expect(dockerfile).to include("npm install -g @openai/codex")
+  end
+
+  it "installs project Node dependencies during container creation" do
+    expect(devcontainer_compose.dig("services", "web", "build", "args", "NODE_VERSION")).to eq("24.16.0")
+    expect(post_create).to include("npm ci")
+    expect(post_create).to include("bin/openspec --version")
   end
 
   it "removes outdated shell aliases before installing the Codex function" do

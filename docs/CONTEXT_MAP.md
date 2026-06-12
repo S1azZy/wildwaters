@@ -14,6 +14,8 @@ substitute for inspecting neighboring files; local examples still win.
 - Prefer `rg` and targeted file reads over broad directory dumps.
 - Read generated artifacts only when the task depends on their generated
   output.
+- For Level 2 or 3 work, inspect related active changes before creating a new
+  change and read current capability specs before changing existing behavior.
 - Treat ADRs as historical decisions; prefer current code and current docs when
   implementation has moved on.
 - If the mapped context is insufficient, expand one directory or pattern at a
@@ -29,6 +31,9 @@ rules, or making cross-cutting decisions.
 | Agent operating rules | `AGENTS.md`, `docs/DEVELOPMENT.md` |
 | Product/domain/database boundaries | `docs/FOUNDATIONS.md` |
 | Security/testing/merge gates | `docs/QUALITY_SECURITY.md` |
+| Spec-driven task levels and lifecycle | `docs/DEVELOPMENT.md` |
+| Current capability behavior | `openspec/specs/` |
+| Active feature changes | `openspec/changes/`, `bin/openspec list --json` |
 | Human project entrypoint | `README.md` |
 | Historical decisions | `docs/adr/README.md`, then the specific ADR |
 | Recent project changes | `CHANGES.md` |
@@ -90,6 +95,8 @@ rules, or making cross-cutting decisions.
 | Workflow, permissions, verification | `docs/DEVELOPMENT.md` |
 | Product, architecture, domain, database boundaries | `docs/FOUNDATIONS.md` |
 | Security/testing/risk gates | `docs/QUALITY_SECURITY.md` |
+| Current feature intent and observable behavior | `openspec/specs/` |
+| Proposed feature changes, design, and tasks | `openspec/changes/` |
 | Historical architecture decisions | `docs/adr/` |
 | Routes | `config/routes.rb` |
 | Commands | `Makefile` |

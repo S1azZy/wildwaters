@@ -14,6 +14,7 @@ with waterfalls.
 | Agent workflow, commands, permissions, verification | [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) |
 | Product scope, architecture, domain, database, PostGIS | [`docs/FOUNDATIONS.md`](docs/FOUNDATIONS.md) |
 | Security, testing policy, CI and merge gates | [`docs/QUALITY_SECURITY.md`](docs/QUALITY_SECURITY.md) |
+| Current feature specifications and active changes | [`openspec/`](openspec/) |
 | Architecture decisions | [`docs/adr/`](docs/adr/) |
 | Change history | [`CHANGES.md`](CHANGES.md) |
 
@@ -39,6 +40,32 @@ Useful local targets:
 - `make test` - run the full test suite
 - `make security` - run bundler-audit and Brakeman
 - `make verify` - run the full local verification gate
+
+## Spec-Driven Changes
+
+Use `$wildwaters-spec-driven-change` to choose the workflow:
+
+| Level | Typical work | Artifacts |
+| --- | --- | --- |
+| 1 | Copy, visual polish, narrow bug or refactor | None; use the normal project loop |
+| 2 | Meaningful feature or uncertain behavior | OpenSpec proposal, specs, design, and tasks |
+| 3 | Durable cross-cutting architecture change | Level 2 plus a focused ADR |
+
+Level 2 and 3 flow:
+
+```text
+explore -> confirm -> propose -> review -> apply -> verify -> archive
+```
+
+OpenSpec records intent and acceptance behavior. The existing Codex skills,
+RSpec suite, permission matrix, and Make verification remain authoritative for
+implementation.
+
+```bash
+bin/openspec list
+make openspec-validate
+make openspec-update
+```
 
 ## GeoNames Import
 

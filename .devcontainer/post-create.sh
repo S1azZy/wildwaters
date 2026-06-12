@@ -44,6 +44,7 @@ SHELL
 done
 
 bundle check || bundle install
+npm ci
 bin/rails db:prepare
 
 if command -v gh >/dev/null && gh auth status >/dev/null 2>&1; then
@@ -57,3 +58,5 @@ if command -v codex >/dev/null; then
 else
   printf '%s\n' "Codex CLI is not available in this container image."
 fi
+
+bin/openspec --version
