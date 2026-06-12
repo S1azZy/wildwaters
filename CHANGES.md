@@ -1,6 +1,11 @@
 # Changes
 
+## 2026-06-12
+- Added a project-scoped OpenSpec workflow over the existing Codex harness, with native asdf-managed Node, pinned tooling, generated OpenSpec skills, strict validation, and a Wild Waters orchestration skill.
+- Defined direct, specified-feature, and architectural-feature task levels with discovery, approval, specification revision, verification, archive, and focused ADR promotion rules.
+
 ## 2026-05-17
+- Added project-local Codex skills for Wild Waters yabi interactors, auth/security flows, PostGIS discovery queries, GeoNames imports, and waterfall UI work so agents can load focused workflow guidance only when needed.
 - Refreshed the current actionable dependency freshness set by updating Bundler-resolved gems including `bootsnap`, `dry-configurable`, `jbuilder`, `puma`, `selenium-webdriver`, `tailwindcss-ruby`, and `view_component`.
 - Tightened `make outdated` to use Bundler's strict mode so the freshness gate tracks updateable dependencies within current constraints and does not fail on upstream-blocked transitive releases such as `diff-lcs` `2.0.0`.
 - Clarified the development workflow so PR tasks start from a `codex/` branch in the current checkout unless the user explicitly asks for a separate worktree.

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v asdf >/dev/null 2>&1; then
+  ASDF_NODE="$(asdf which node 2>/dev/null || true)"
+
+  if [ -n "${ASDF_NODE}" ]; then
+    exec "${ASDF_NODE}" "$@"
+  fi
+fi
+
+exec node "$@"

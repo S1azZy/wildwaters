@@ -3,3 +3,5 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.devcontainer
+      args:
+        NODE_VERSION: "24.16.0"

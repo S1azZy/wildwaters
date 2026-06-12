@@ -14,6 +14,7 @@ path. Do not duplicate detailed project rules here.
 | Agent workflow, commands, permissions, verification | `docs/DEVELOPMENT.md` |
 | Product scope, architecture, domain, database, PostGIS | `docs/FOUNDATIONS.md` |
 | Security, testing policy, CI and merge gates | `docs/QUALITY_SECURITY.md` |
+| Feature intent, acceptance behavior, active changes | `openspec/specs/`, `openspec/changes/` |
 | Historical decisions | `docs/adr/` |
 
 Load only the documents needed for the active task. Do not create extra feature
@@ -33,7 +34,7 @@ docs unless explicitly requested.
 
 ## Start Every Task
 
-1. Classify the task with `docs/DEVELOPMENT.md`.
+1. Classify the task type and SDD level with `docs/DEVELOPMENT.md`.
 2. Load task-specific context from `docs/CONTEXT_MAP.md`.
 3. Identify whether the task changes behavior, schema, security, dependencies,
    or only documentation/style.

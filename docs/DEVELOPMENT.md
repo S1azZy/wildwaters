@@ -29,6 +29,36 @@ After classification, use `docs/CONTEXT_MAP.md` to load the smallest useful file
 set for the task. Do not scan the whole repository unless the task is explicitly
 repository-wide.
 
+## Spec-Driven Task Levels
+
+Choose the lightest level that preserves useful discovery and review.
+
+| Level | Use for | Required flow |
+| --- | --- | --- |
+| 1: Direct | Copy, visual polish, obvious narrow bugs, small contract-preserving refactors | Existing execution loop; no OpenSpec change or ADR |
+| 2: Specified feature | Meaningful behavior, interacting mechanisms, uncertain requirements, persistent acceptance criteria | Explore, confirm, propose, review, apply, verify, archive |
+| 3: Architectural feature | Level 2 plus a durable, cross-cutting, difficult-to-reverse decision | Level 2 plus an ADR for the confirmed architectural decision |
+
+For Level 2 or 3, use `$wildwaters-spec-driven-change`:
+
+1. Explore through focused dialogue. Inspect code and risks, ask one question at
+   a time, and do not create artifacts yet.
+2. Summarize the recommended direction and obtain user confirmation.
+3. Create an OpenSpec change with proposal, behavioral specs, design, and tasks.
+4. Review those artifacts with the user before implementation.
+5. Apply tasks through the normal permission matrix and red-green execution
+   loops.
+6. If implementation disproves an assumption, pause and update the affected
+   OpenSpec artifacts. Obtain approval before continuing with changed intent or
+   architecture.
+7. Verify the implementation against the artifacts and project gates, then
+   archive the change.
+
+OpenSpec owns current feature intent and observable behavior. ADRs own only
+durable architecture decisions promoted from a Level 3 change. Current code,
+RSpec, and Make gates remain implementation proof; OpenSpec does not replace
+the existing harness.
+
 ## Branching
 
 When a task includes creating a PR, create or switch to a `codex/` branch in the
@@ -43,6 +73,9 @@ editing. It is the handoff shape to preserve if context compacts.
 ```text
 Task:
 Task type:
+SDD level: 1 | 2 | 3
+OpenSpec change: none | change-name
+ADR: none | required | path
 Behavior change: yes/no
 Risk class: docs_only | low | medium | high
 Docs loaded:
@@ -105,6 +138,9 @@ Prefer `Makefile` targets.
 | Build/start local stack | `make setup` |
 | Start app stack | `make up` |
 | Check toolchain | `make doctor` |
+| Install Node/OpenSpec dependencies | `make openspec-install` |
+| Refresh generated OpenSpec adapters | `make openspec-update` |
+| Validate all OpenSpec artifacts | `make openspec-validate` |
 | Install gems in container | `make bundle` |
 | Rails console | `make shell` |
 | Container shell | `make bash` |
@@ -183,7 +219,8 @@ Forbidden:
 | `docs/DEVELOPMENT.md` | Workflow, commands, permissions, verification | Product scope or domain architecture |
 | `docs/FOUNDATIONS.md` | Product, architecture, domain, data, database rules | Task execution or CI policy |
 | `docs/QUALITY_SECURITY.md` | Security, testing policy, CI gates | Product scope or domain architecture |
-| `docs/adr/` | Historical decisions and rationale | Current operational checklist |
+| `openspec/specs/`, `openspec/changes/` | Current feature intent, acceptance behavior, design, implementation tasks | Durable cross-cutting decisions or implementation proof |
+| `docs/adr/` | Durable architecture decisions and rationale | Feature specifications, task tracking, or current operational checklist |
 
 ## Harness Regression Checks
 
@@ -200,6 +237,10 @@ Codex behavior.
 | User asks for dependency/tooling change | Agent explains tradeoff and requests approval when adding dependencies |
 | User asks for future spot type abstraction | Agent asks for explicit product approval before adding it |
 | User asks for docs cleanup | Agent edits the owning source of truth and removes duplication |
+| User asks for narrow copy or visual polish | Agent selects Level 1 and creates no OpenSpec change |
+| User asks for a meaningful feature | Agent selects Level 2 and explores before creating artifacts |
+| User asks for a durable cross-cutting change | Agent selects Level 3, requires confirmation, and promotes only the architecture decision to an ADR |
+| Implementation learning changes approved intent | Agent pauses and updates OpenSpec before divergent coding continues |
 | Tool/check fails for unrelated reason | Agent reports the exact failing gate and does not claim full success |
 | Context compacts mid-task | Agent preserves task packet, loaded docs, approval state, changed files, and next step |
 
