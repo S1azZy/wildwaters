@@ -69,7 +69,7 @@ RSpec.describe Imports::GeoNames::DownloadRegionDump, type: :interactor do
     it "raises a clear download error" do
       expect(result).to be_failure
       expect(result.failure[:code]).to eq(:region_dump_download_failed)
-      expect(result.failure[:errors].fetch(:base).first).to match(/Unable to download GeoNames dump for AD/)
+      expect(result.failure[:errors].fetch(:base).first).to include('Unable to download GeoNames dump for AD')
     end
   end
 
