@@ -1,5 +1,8 @@
 # Changes
 
+## 2026-06-14
+- Refreshed project dependencies by updating `shoulda-matchers` to `8.0.1`, Ruby to `4.0.5`, and RubyGems/Bundler to `4.0.14`; aligned the production build with Bundler's version-file lookup; and confirmed Node `24.16.0`, OpenSpec `1.4.1`, MapLibre GL JS `5.24.0`, PostgreSQL 18/PostGIS 3.6, Importmap pins, and the remaining Bundler set are current.
+
 ## 2026-06-13
 - Split the OpenSpec baseline tooling assertions to satisfy the project RSpec lint limits and updated Brakeman to `8.0.5` so the enforced latest-version security gate remains green.
 - Reconstructed the OpenSpec baseline from current code and RSpec across authentication, password reset, waterfall discovery, region and spot domains, GeoNames imports, admin job operations, and the shared design-system shell.
