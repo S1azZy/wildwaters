@@ -71,12 +71,3 @@ Before archive:
 
 Agentic verification informs judgment; only mechanical validation, tests, and
 project gates provide blocking proof.
-
-## Repair A Reconstructed Baseline
-
-The 2026-06-13 baseline was reconstructed from existing code and RSpec. A missed
-historical behavior may be added directly to a main spec only when runtime
-behavior does not change and existing tests prove it. Treat that as Level 1
-documentation work, update `CHANGES.md`, run strict OpenSpec validation, and run
-the tooling spec. Any intended behavior change uses the normal Level 2 or 3
-flow.
