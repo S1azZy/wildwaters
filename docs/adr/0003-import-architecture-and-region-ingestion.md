@@ -19,6 +19,17 @@ project's thin-model, interactor-oriented application structure.
 Create a dedicated `Imports` subsystem with generic provenance records and
 domain-specific links.
 
+### Technology and ownership boundary
+
+- The subsystem remains inside the Rails monolith.
+- PostgreSQL JSONB stores source payloads and execution metadata.
+- PostGIS stores product-facing region centers.
+- `pg_trgm` indexes searchable region names.
+- `yabi` interactors own acquisition, normalization, matching, apply, and
+  domain synchronization use cases.
+- Active Record models own associations, persistence, enums, and local
+  invariants; they do not become an ETL orchestration layer.
+
 ### Import persistence
 
 The generic persistence model is:
@@ -32,10 +43,16 @@ The generic persistence model is:
 - `import_record_snapshots` stores payload history when a source record changes;
 - domain-specific link tables connect source records to local domain records.
 
+An upstream object is identified by source, record kind, and external UID.
+`raw_payload` preserves the received record for audit and diagnostics.
+`normalized_payload` is the stable internal contract between source-specific
+normalization and source-independent matching/apply logic. A checksum covers
+both representations, and a snapshot is added only when that content changes.
+
 Region provenance uses `import_region_source_links`, not a polymorphic generic
 link. This preserves database foreign keys and supports one primary identity per
-region. A link may be primary only when its source has the
-`canonical_identity` role.
+region. Links record match strategy, confidence, and match time. A link may be
+primary only when its source has the `canonical_identity` role.
 
 ### Region domain
 
@@ -47,15 +64,26 @@ The local region model remains product-oriented:
 - `region_names` stores multilingual names and aliases with normalized,
   searchable values and optional source provenance.
 
+The core region model uses product-oriented kinds instead of copying every
+upstream administrative level. Source-specific details remain import data.
+Reparenting imported regions goes through a domain interactor that rebuilds the
+affected closure rows transactionally.
+
 Imported domain writes go through `yabi` interactors. The region import path
 upserts source records, snapshots changed payloads, resolves parents, reuses an
 existing source link or a structural local match, creates or synchronizes the
 region, refreshes provenance, and synchronizes names.
 
 GeoNames is the only implemented region dataset. It is configured as the
-canonical identity and hierarchy source. Other source roles exist in the
-persistence model, but no additional region enrichment pipeline is implied by
-this ADR.
+canonical identity and hierarchy source and supplies initial centers and names.
+Other source roles exist in the persistence model, but no additional region
+enrichment pipeline is implied by this ADR.
+
+The implemented apply path enforces canonical-source ownership of a primary
+identity link. It does not separately prohibit a non-canonical source from
+creating a region because no enrichment source apply path currently exists.
+Introducing one requires an explicit matching and creation policy before it can
+write domain records.
 
 ## Alternatives Considered
 
@@ -85,6 +113,10 @@ and database indexes.
 - Re-imports can update stable source records and retain changed snapshots.
 - Domain writes remain governed by the same interactors as other application
   use cases.
+- JSONB preserves source fidelity without leaking source-specific schema into
+  the product-facing region table.
+- Closure tables and trigram-indexed names support hierarchy traversal and
+  multilingual lookup without introducing a separate search or GIS service.
 - Matching behavior is explicit application logic and must be covered by RSpec.
 - Supporting another imported domain requires a domain-specific link and apply
   path instead of extending a polymorphic catch-all.

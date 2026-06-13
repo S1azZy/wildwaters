@@ -54,10 +54,11 @@ For Level 2 or 3, use `$wildwaters-spec-driven-change`:
 7. Verify the implementation against the artifacts and project gates, then
    archive the change.
 
-OpenSpec owns current feature intent and observable behavior. ADRs own only
-durable architecture decisions promoted from a Level 3 change. Current code,
-RSpec, and Make gates remain implementation proof; OpenSpec does not replace
-the existing harness.
+OpenSpec owns current feature intent and observable behavior. ADRs own durable
+architecture decisions promoted from a Level 3 change, including selected
+technologies, system boundaries, persistence or execution models, and
+design-system foundations. Current code, RSpec, and Make gates remain
+implementation proof; OpenSpec does not replace the existing harness.
 
 ## Baseline Specs And Existing Code
 
@@ -245,7 +246,7 @@ Forbidden:
 | `openspec/specs/` | Current observable behavior and acceptance scenarios | Pending design/tasks, durable architecture, or implementation proof |
 | `openspec/changes/` | Pending intent, delta specs, design, and implementation tasks | Archived current behavior or durable architecture |
 | `docs/TODO.md` | Ordered unimplemented work awaiting confirmation and an OpenSpec change | Current behavior or acceptance criteria |
-| `docs/adr/` | Durable architecture decisions and rationale | Feature specifications, task tracking, or current operational checklist |
+| `docs/adr/` | Durable technology choices, architecture boundaries, design-system foundations, and rationale | Feature specifications, task tracking, or current operational checklist |
 
 ## Harness Regression Checks
 

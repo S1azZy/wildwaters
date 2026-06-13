@@ -20,7 +20,33 @@ of its effective input.
 Represent a GeoNames import as one master `Imports::Run` with one
 `Imports::RunItem` per country.
 
-The implemented orchestration is:
+### Configuration boundary
+
+Environment variables are boot-time defaults, not durable job input.
+`dry-configurable` and typed `dry-types` constructors expose them through:
+
+- `BootConfig` for process, server, queue, logging, security, Redis, and
+  database settings;
+- `ApplicationConfig` for application URLs, storage, and GeoNames defaults.
+
+`Imports::GeoNames::Settings` normalizes those defaults and explicit overrides.
+The enqueue interactor then snapshots the effective settings into the run and
+item rows. A delayed or retried item therefore does not change meaning after an
+environment or deployment change.
+
+### Persistence and queue boundary
+
+- one active run per import source is enforced by a partial unique database
+  index;
+- `import_run_items` is a generic shard model identified by run, item kind, and
+  item key;
+- each item persists parameters, artifact paths, statistics, attempt count,
+  timing, and failure details;
+- GeoNames uses `item_kind = "country"` and the country code as `item_key`;
+- Rails Active Job with Solid Queue executes items on the `imports` queue;
+- jobs receive only the run-item id and reconstruct work from persisted state.
+
+### Orchestration flow
 
 1. `Imports::GeoNames::Settings` builds effective input from typed application
    configuration or explicit overrides.
@@ -38,9 +64,14 @@ The implemented orchestration is:
    it `succeeded` or `partially_failed`.
 8. `RetryFailedItems` requeues only failed items and reopens the parent run.
 
-Solid Queue is the queue backend through Rails Active Job. Make and rake tasks
-are operator adapters; orchestration lives in interactors and can be called by
-any application entrypoint.
+Item claiming and parent finalization use row locks. Full and replay
+reconciliation is scoped to the item's country. Artifacts live under the
+configured download root followed by run id and country code, and the paths
+actually used are persisted on the item.
+
+Make and rake tasks are operator adapters. Orchestration lives in interactors,
+so any application entrypoint must call the same use case rather than shelling
+out or duplicating the workflow.
 
 ## Alternatives Considered
 
@@ -71,5 +102,7 @@ the run was created.
 - A parent run exposes aggregate progress and partial failure.
 - Retries remain tied to persisted work definitions and attempt counts.
 - Artifact storage is organized by run and country and recorded on each item.
+- Configuration defaults may change without rewriting the meaning of an
+  existing run.
 - The orchestration introduces more persistent states, so idempotency and
   finalization require focused tests.

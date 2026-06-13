@@ -16,24 +16,39 @@ synchronization.
 
 ## Decision
 
-Use MapLibre GL JS as the browser map renderer and keep browse data delivery in
-the Rails application.
+Use an open, replaceable map stack built around MapLibre GL JS, Rails, and
+PostGIS. Do not make a proprietary map SDK or a hosted vendor API the owner of
+waterfall discovery.
 
-The implemented architecture is:
+### Technology boundary
+
+- MapLibre GL JS is the browser renderer.
+- The published MapLibre JavaScript and CSS are vendored in the application,
+  pinned through importmap and Rails assets, and are not loaded from a runtime
+  CDN.
+- Rails, ERB, Hotwire, and Stimulus own page delivery and browser orchestration.
+- PostgreSQL with PostGIS owns spatial filtering.
+- Basemap style and tile services are runtime content dependencies selected
+  through an application-owned catalog. Stadia Maps and OpenFreeMap are current
+  providers, but provider replacement does not change this architecture.
+
+### Browse delivery
 
 - Rails renders the initial waterfall list and map shell;
 - a Stimulus controller owns MapLibre lifecycle and interaction;
 - waterfall points use MapLibre style layers and built-in clustering rather
   than one DOM marker per waterfall;
 - `waterfalls#map_data` returns a compact GeoJSON feature collection;
-- map requests require visible bounds and use a PostGIS envelope query;
+- browser movement triggers bounded refreshes, and map requests require visible
+  bounds and use a PostGIS envelope query;
 - list and map delivery share the same application query path;
 - map styles are selected from an application-owned catalog, while the selected
   style preference is stored in the browser.
 
-MapLibre is application infrastructure. External style and tile providers are
-runtime content dependencies and may be replaced without changing this
-decision.
+GeoJSON over bounds-based HTTP requests is the current data-delivery contract.
+Vector tiles, PMTiles, or a separate geospatial delivery service are not part of
+the adopted stack. They require measured need and a new architecture decision,
+not an implicit extension of this ADR.
 
 ## Alternatives Considered
 
@@ -61,5 +76,7 @@ product currently needs.
   experience depends on JavaScript.
 - Basemap availability and attribution must be monitored independently from the
   application.
-- Larger data-delivery mechanisms are not part of this decision; adopting one
-  would require a new confirmed architecture decision.
+- Vendoring the renderer reduces runtime supply-chain and CDN availability
+  dependencies, while dependency freshness remains an explicit project check.
+- The application can replace basemap providers without replacing MapLibre or
+  the Rails/PostGIS query path.

@@ -60,8 +60,9 @@ explore -> confirm -> propose -> review -> apply -> verify -> archive
 
 OpenSpec records current observable behavior and pending behavior changes. The
 baseline under `openspec/specs/` was reconstructed from the implemented code and
-RSpec suite on 2026-06-13. ADRs record only durable architecture; future work
-that has not become a change lives in `docs/TODO.md`.
+RSpec suite on 2026-06-13. ADRs record durable technology choices, system
+boundaries, execution and persistence models, and design-system foundations.
+Future work that has not become a change lives in `docs/TODO.md`.
 
 If an omitted historical behavior is discovered later, the baseline may be
 corrected directly only when no code behavior changes and existing RSpec proves
