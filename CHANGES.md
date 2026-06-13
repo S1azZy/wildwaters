@@ -1,6 +1,7 @@
 # Changes
 
 ## 2026-06-13
+- Split the OpenSpec baseline tooling assertions to satisfy the project RSpec lint limits and updated Brakeman to `8.0.5` so the enforced latest-version security gate remains green.
 - Reconstructed the OpenSpec baseline from current code and RSpec across authentication, password reset, waterfall discovery, region and spot domains, GeoNames imports, admin job operations, and the shared design-system shell.
 - Rewrote ADR 0001-0004 as records of implemented architecture, preserving durable stack choices, design-system foundations, data contracts, and execution boundaries while removing rollout plans and future requirements.
 - Added a prioritized `docs/TODO.md` for unimplemented contract gaps, product layers, import operations, enrichment, and scale work.

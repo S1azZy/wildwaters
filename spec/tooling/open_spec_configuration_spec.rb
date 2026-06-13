@@ -63,7 +63,7 @@ RSpec.describe OpenSpecConfiguration do
     expect(config.fetch("rules").keys).to contain_exactly("proposal", "specs", "design", "tasks")
   end
 
-  it "keeps a validated capability baseline for implemented behavior" do
+  it "keeps a capability baseline for implemented behavior" do
     expect(spec_names).to contain_exactly(
       "admin-job-operations",
       "authentication",
@@ -74,7 +74,9 @@ RSpec.describe OpenSpecConfiguration do
       "spot-waterfall-domain",
       "waterfall-discovery",
     )
+  end
 
+  it "keeps every capability specification structurally valid" do
     spec_paths.each do |path|
       content = path.read
 
