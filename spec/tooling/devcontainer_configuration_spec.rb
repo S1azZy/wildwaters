@@ -77,11 +77,26 @@ RSpec.describe DevcontainerConfiguration do
     dockerfile = dockerfile_devcontainer_path.read
 
     expect(dockerfile).to include("ARG NODE_VERSION=24.16.0")
-    expect(dockerfile.index("ARG RUBY_VERSION=4.0.3")).to be < dockerfile.index("FROM node:")
+    expect(dockerfile.index("ARG RUBY_VERSION=4.0.5")).to be < dockerfile.index("FROM node:")
     expect(dockerfile).to include('FROM node:${NODE_VERSION}-bookworm-slim AS node')
     expect(dockerfile).to include("COPY --from=node /usr/local/bin/node /usr/local/bin/node")
     expect(dockerfile).not_to match(/^\s+nodejs\s*\\/m)
     expect(dockerfile).not_to match(/^\s+npm\s*\\/m)
+  end
+
+  it "keeps the Ruby and RubyGems versions aligned across the toolchain" do
+    ruby_version = "4.0.5"
+    rubygems_version = "4.0.14"
+    dockerfiles = %w[Dockerfile Dockerfile.dev Dockerfile.devcontainer].map { |path| root.join(path).read }
+    compose = root.join("docker-compose.yml").read
+
+    expect(root.join(".ruby-version").read.strip).to eq("ruby-#{ruby_version}")
+    expect(root.join(".tool-versions").read).to include("ruby #{ruby_version}")
+    expect(compose.scan(/RUBY_VERSION: "#{Regexp.escape(ruby_version)}"/).size).to eq(2)
+    expect(dockerfiles.first).to include("COPY Gemfile Gemfile.lock .ruby-version vendor ./")
+
+    expect(dockerfiles).to all(include("ARG RUBY_VERSION=#{ruby_version}"))
+    expect(dockerfiles).to all(include("ARG RUBYGEMS_VERSION=#{rubygems_version}"))
   end
 
   it "installs the agent and GitHub tools in the development image" do
