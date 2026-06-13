@@ -1,7 +1,8 @@
 # TODO
 
-This document is the ordered queue for known behavior that is not implemented.
-It is not a specification and does not authorize implementation by itself.
+This document is the ordered queue for known behavior and deferred architecture
+or tooling work that is not implemented. It is not a specification and does
+not authorize implementation by itself.
 
 Before starting an item:
 
@@ -85,42 +86,54 @@ Earlier items should normally be considered before later ones.
 
 ## P3: Improve Import Operations and Coverage
 
-15. **Add an admin import operations surface.**
+15. **Evaluate a React UI toolkit before substantial application-owned admin
+    UI work.**
+    Compare accessibility-first or headless options against Digital Naturalist,
+    React 19 compatibility, maintenance health, bundle impact, testability, and
+    migration cost. Do not adopt a toolkit implicitly while building the first
+    admin screens.
+
+16. **Add an admin import operations surface.**
     Provide source/run/item visibility, sanitized failures, enqueue controls,
     and retry-failed actions behind explicit admin authorization. Reuse the
     existing import interactors rather than shelling out to Make or rake.
 
-16. **Add scheduled GeoNames imports when an operating cadence is known.**
+17. **Add scheduled GeoNames imports when an operating cadence is known.**
     Scheduled jobs must call the same enqueue interactor and use persisted run
     snapshots. Do not add a scheduler merely to satisfy the old ADR plan.
 
-17. **Add targeted Wikidata name enrichment when GeoNames language coverage is
+18. **Add targeted Wikidata name enrichment when GeoNames language coverage is
     insufficient.**
     Match only to existing regions, preserve source provenance, and prove the
     licensing/display policy before importing.
 
-18. **Add geoBoundaries geometry enrichment when a product feature needs region
+19. **Add geoBoundaries geometry enrichment when a product feature needs region
     polygons or improved centroids.**
     Keep polygon data outside the core `regions` table until a confirmed query
     or display requirement justifies promotion.
 
-19. **Evaluate Who's On First only for a demonstrated concordance problem.**
+20. **Evaluate Who's On First only for a demonstrated concordance problem.**
     Do not add it as a general extra source; require a concrete matching or data
     quality case first.
 
 ## P4: Optional Consolidation and Scale Work
 
-20. **Extract shared explore-map controls and result cards after reuse becomes
-    stable.**
-    The current page-level ERB and partials are valid under ADR 0002. Extract
-    components only when another surface needs the same API or current markup
-    becomes difficult to test.
+21. **Extract shared React explore-map controls and result cards only after
+    reuse becomes stable.**
+    Keep the migrated Explore composition feature-owned until another React
+    surface needs the same API or the local components become difficult to
+    test.
 
-21. **Move map delivery beyond bounded GeoJSON only when measured load requires
+22. **Move map delivery beyond bounded GeoJSON only when measured load requires
     it.**
     Evaluate vector tiles or PMTiles against observed payload size, query cost,
     cache behavior, and operating complexity before selecting an architecture.
 
-22. **Add a public API only for a concrete consumer.**
+23. **Add a public API only for a concrete consumer.**
     Reuse existing interactors and authorization rules, but define separate
     versioning, pagination, error, and exposure contracts in OpenSpec.
+
+24. **Evaluate Inertia server-side rendering after the initial release.**
+    Measure SEO, initial rendering, accessibility, and operational needs before
+    adding a production Node SSR process. Preserve Rails security and routing
+    ownership, and require a new Level 3 change if SSR is adopted.

@@ -41,7 +41,7 @@ rules, or making cross-cutting decisions.
 | Durable architecture decisions | `docs/adr/README.md`, then the specific ADR |
 | Recent project changes | `CHANGES.md` |
 | Commands | `Makefile` |
-| Dependencies | `Gemfile`, `Gemfile.lock`, `config/importmap.rb` |
+| Dependencies | `Gemfile`, `Gemfile.lock`, `package.json`, `package-lock.json`, `config/importmap.rb` |
 | Routes and entrypoints | `config/routes.rb` |
 
 ## Backend Context
@@ -104,7 +104,7 @@ rules, or making cross-cutting decisions.
 | Durable architecture decisions | `docs/adr/` |
 | Routes | `config/routes.rb` |
 | Commands | `Makefile` |
-| Dependencies | `Gemfile`, `Gemfile.lock`, `config/importmap.rb` |
+| Dependencies | `Gemfile`, `Gemfile.lock`, `package.json`, `package-lock.json`, `config/importmap.rb` |
 | Runtime configuration shape | `config/configs/`, `config/initializers/01_settings.rb` |
 | Database schema state | Rails migrations and generated `db/structure.sql` |
 | Queue schema state | Queue migrations and generated `db/queue_structure.sql` |
