@@ -1,99 +1,65 @@
 # ADR 0001: Map Browse Stack
 
 - Status: Accepted
-- Date: 2026-03-19
+- Decided: 2026-03-19
+- Normalized to implementation: 2026-06-13
 
 ## Context
 
-Wild Waters needs a map-first browse experience for waterfall discovery.
-The target interaction is:
+Waterfall discovery is map-first. The application is a Rails monolith with
+Hotwire, Stimulus, PostgreSQL, and PostGIS, and it needs an interactive map
+without making a proprietary map SDK part of the application architecture.
 
-- large, fast map as the primary surface
-- secondary list panel with compact spot cards
-- top-level filters for region and spot attributes
-- smooth zooming and panning
-- room for later reviews, check-ins, and social signals
-
-Product direction is closest to `AllTrails` for information architecture and `Hipcamp` for visual tone.
-
-Project constraints:
-
-- free/open stack preferred
-- no monetization-driven vendor lock-in
-- Rails monolith with Hotwire, Stimulus, PostgreSQL 18, and PostGIS
-- mobile-first, but strong desktop map UX is required
+The browse surface must support a server-rendered initial state and progressively
+enhance it with map movement, filtering, marker selection, and result-list
+synchronization.
 
 ## Decision
 
-Use `MapLibre GL JS` as the map renderer for the public browse experience.
+Use MapLibre GL JS as the browser map renderer and keep browse data delivery in
+the Rails application.
 
-Adopt this implementation shape:
+The implemented architecture is:
 
-- map-first desktop layout with a large map and a narrow list panel
-- `MapLibre` with a lightweight vector basemap style
-- spot rendering through `style layers`, not large numbers of DOM markers
-- map data loaded for the current visible bounds only
-- built-in clustering for broader zoom levels
-- compact map payloads with only browse-critical fields
+- Rails renders the initial waterfall list and map shell;
+- a Stimulus controller owns MapLibre lifecycle and interaction;
+- waterfall points use MapLibre style layers and built-in clustering rather
+  than one DOM marker per waterfall;
+- `waterfalls#map_data` returns a compact GeoJSON feature collection;
+- map requests require visible bounds and use a PostGIS envelope query;
+- list and map delivery share the same application query path;
+- map styles are selected from an application-owned catalog, while the selected
+  style preference is stored in the browser.
 
-For the first implementation stage:
-
-- use `GeoJSON by bounds` for spot data
-- update data after map movement settles (`moveend`)
-- sync list and map selection without full-page rerenders
-
-For a later scale-up path:
-
-- move high-volume browse data to `vector tiles` or `PMTiles`
+MapLibre is application infrastructure. External style and tile providers are
+runtime content dependencies and may be replaced without changing this
+decision.
 
 ## Alternatives Considered
 
-### Mapbox GL JS
+### Mapbox GL JS or Google Maps
 
-Strong product quality and performance, but rejected because it introduces paid/vendor-controlled terms that do not fit the project's free/open preference.
-
-### Google Maps JavaScript API
-
-Fast and familiar, but rejected as the primary direction because it is less brandable for an outdoor-first product and remains vendor-controlled.
+Both provide mature hosted products, but would make a vendor-controlled SDK and
+commercial terms part of the core browse architecture.
 
 ### Leaflet
 
-Good for simpler maps, but not the preferred foundation for an `AllTrails`-style, map-dominant interface with WebGL-style rendering and future scaling.
+Leaflet is simpler, but the product uses WebGL style layers and clustering as
+first-class map behavior.
 
 ### OpenLayers
 
-Very capable, but heavier and more GIS-oriented than needed for the initial product experience.
+OpenLayers is capable but adds a broader GIS-oriented API surface than this
+product currently needs.
 
 ## Consequences
 
-Benefits:
-
-- keeps the stack open and free-friendly
-- supports the required fast, smooth, map-first UX
-- gives a clean path from MVP browse to larger-scale tile-based delivery
-- allows a branded visual language closer to `AllTrails + Hipcamp` than a default vendor map
-
-Trade-offs:
-
-- performance will depend on our data delivery strategy, not on `MapLibre` alone
-- we must choose or host an appropriate free basemap/style
-- we must design the map payload and interaction model carefully
-
-Non-goals for the first map slice:
-
-- custom 3D terrain
-- complex route logic
-- rich social overlays on the browse map
-- large HTML marker systems
-
-## Implementation Notes
-
-Start with:
-
-1. map-first `waterfalls#index` layout
-2. `MapLibre` integration via Stimulus
-3. bounds-based spot endpoint for published waterfalls
-4. layer-based markers and clustering
-5. MVP filters for region and key waterfall attributes
-
-This ADR fixes the map stack decision, not the full visual design system.
+- The application owns GeoJSON payload shape, query limits, and map/list
+  synchronization.
+- PostGIS remains the source of truth for visible-bounds filtering.
+- The initial page remains usable as server-rendered HTML, while the richer map
+  experience depends on JavaScript.
+- Basemap availability and attribution must be monitored independently from the
+  application.
+- Larger data-delivery mechanisms are not part of this decision; adopting one
+  would require a new confirmed architecture decision.

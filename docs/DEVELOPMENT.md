@@ -35,7 +35,7 @@ Choose the lightest level that preserves useful discovery and review.
 
 | Level | Use for | Required flow |
 | --- | --- | --- |
-| 1: Direct | Copy, visual polish, obvious narrow bugs, small contract-preserving refactors | Existing execution loop; no OpenSpec change or ADR |
+| 1: Direct | Copy, visual polish, obvious narrow bugs, small contract-preserving refactors, evidence-backed baseline corrections | Existing execution loop; no OpenSpec change or ADR |
 | 2: Specified feature | Meaningful behavior, interacting mechanisms, uncertain requirements, persistent acceptance criteria | Explore, confirm, propose, review, apply, verify, archive |
 | 3: Architectural feature | Level 2 plus a durable, cross-cutting, difficult-to-reverse decision | Level 2 plus an ADR for the confirmed architectural decision |
 
@@ -58,6 +58,29 @@ OpenSpec owns current feature intent and observable behavior. ADRs own only
 durable architecture decisions promoted from a Level 3 change. Current code,
 RSpec, and Make gates remain implementation proof; OpenSpec does not replace
 the existing harness.
+
+## Baseline Specs And Existing Code
+
+The initial capability baseline was reconstructed on 2026-06-13 from current
+code and passing RSpec examples. It describes implemented behavior only; the
+project does not create fictional historical changes for code written before
+OpenSpec.
+
+After this bootstrap:
+
+- read the related main spec before changing established behavior;
+- use normal delta changes and archive for every meaningful new or changed
+  behavior;
+- use `docs/TODO.md` only to choose future work, never as acceptance criteria;
+- when a missed historical behavior is discovered, a direct main-spec repair is
+  allowed only if no runtime behavior changes and existing RSpec proves the
+  statement;
+- if implementation and an old document disagree, verify code and tests, repair
+  the baseline to the implemented contract, and put any desired change through a
+  new OpenSpec change.
+
+Every direct baseline repair is a documentation/process change: update
+`CHANGES.md`, run strict OpenSpec validation, and run the tooling spec.
 
 ## Branching
 
@@ -219,7 +242,9 @@ Forbidden:
 | `docs/DEVELOPMENT.md` | Workflow, commands, permissions, verification | Product scope or domain architecture |
 | `docs/FOUNDATIONS.md` | Product, architecture, domain, data, database rules | Task execution or CI policy |
 | `docs/QUALITY_SECURITY.md` | Security, testing policy, CI gates | Product scope or domain architecture |
-| `openspec/specs/`, `openspec/changes/` | Current feature intent, acceptance behavior, design, implementation tasks | Durable cross-cutting decisions or implementation proof |
+| `openspec/specs/` | Current observable behavior and acceptance scenarios | Pending design/tasks, durable architecture, or implementation proof |
+| `openspec/changes/` | Pending intent, delta specs, design, and implementation tasks | Archived current behavior or durable architecture |
+| `docs/TODO.md` | Ordered unimplemented work awaiting confirmation and an OpenSpec change | Current behavior or acceptance criteria |
 | `docs/adr/` | Durable architecture decisions and rationale | Feature specifications, task tracking, or current operational checklist |
 
 ## Harness Regression Checks

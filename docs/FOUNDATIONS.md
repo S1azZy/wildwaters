@@ -30,11 +30,12 @@ Decision order:
 Current product stance:
 
 - Waterfalls are the only active public spot type.
-- Region hierarchy, map browsing, waterfall details, and nearby discovery are
-  core discovery surfaces.
-- Accounts, profiles, follows, reviews, photos, check-ins, activity, and
-  achievements are product layers around the waterfall discovery loop.
-- Web and future API behavior should share the same domain/use-case layer.
+- Region hierarchy, map browsing, and waterfall details are the active
+  discovery surfaces.
+- Confirmed future work is ordered in `docs/TODO.md` and becomes behavior only
+  through an OpenSpec change.
+- Web and API entrypoints must share the same domain/use-case layer when both
+  exist.
 - Russian and English are first-class UI locales.
 
 Do not turn the MVP into:
@@ -49,8 +50,8 @@ Do not turn the MVP into:
 
 ## Architecture Boundary
 
-Wild Waters is one Rails monolith serving web UI, JSON API, admin tools, imports,
-and background jobs.
+Wild Waters is one Rails monolith serving web UI, JSON responses, admin tools,
+imports, and background jobs.
 
 Stable architecture rules:
 
@@ -61,7 +62,8 @@ Stable architecture rules:
 - Business use cases live in `app/interactors` and use the canonical `yabi`
   style.
 - Queries that are not business use cases may live in `app/queries`.
-- Authorization stays explicit and centralized through policies.
+- Authorization stays explicit through policies for domain resources or a
+  dedicated guard for a bounded admin engine.
 - Server-rendered web UI uses ERB, Hotwire, Tailwind, and the existing UI
   component layer where it already exists.
 - Background work uses the Rails/Solid Queue stack unless a concrete need
@@ -85,10 +87,9 @@ Canonical domain areas:
 - Imports and source provenance.
 - Spots and waterfalls.
 - Waterfall browse/search queries.
-- Media, reviews, check-ins, profiles, follows, activity, and achievements as
-  the next social layers.
 - Admin and operational tooling.
-- Public API contracts when web/API behavior needs to align.
+
+Unimplemented domain layers are tracked in `docs/TODO.md`, not here.
 
 Canonical place model:
 

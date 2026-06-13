@@ -27,15 +27,17 @@ ADR.
 ## Discover Level 2 And 3 Work
 
 1. Load only context selected by `docs/CONTEXT_MAP.md`, then inspect the relevant
-   code and tests.
-2. Run `bin/openspec list --json` to find related active changes.
-3. Use `$openspec-explore` as the thinking stance.
-4. Ask one focused question at a time. Do not create artifacts yet.
-5. Challenge assumptions. Identify scope, non-goals, unknowns, and applicable
+   main capability specs, code, and tests.
+2. Use `docs/TODO.md` only when the request selects unimplemented work; do not
+   treat TODO text as acceptance criteria.
+3. Run `bin/openspec list --json` to find related active changes.
+4. Use `$openspec-explore` as the thinking stance.
+5. Ask one focused question at a time. Do not create artifacts yet.
+6. Challenge assumptions. Identify scope, non-goals, unknowns, and applicable
    data, authorization/privacy, migration, retry/idempotency, PostGIS/
    performance, operational, observability, and rollback risks.
-6. Compare two or three credible approaches when the choice is non-obvious.
-7. Summarize the recommended direction and ask the user to confirm it.
+7. Compare two or three credible approaches when the choice is non-obvious.
+8. Summarize the recommended direction and ask the user to confirm it.
 
 Do not invoke `$openspec-propose` until the user confirms the explored
 direction.
@@ -69,3 +71,12 @@ Before archive:
 
 Agentic verification informs judgment; only mechanical validation, tests, and
 project gates provide blocking proof.
+
+## Repair A Reconstructed Baseline
+
+The 2026-06-13 baseline was reconstructed from existing code and RSpec. A missed
+historical behavior may be added directly to a main spec only when runtime
+behavior does not change and existing tests prove it. Treat that as Level 1
+documentation work, update `CHANGES.md`, run strict OpenSpec validation, and run
+the tooling spec. Any intended behavior change uses the normal Level 2 or 3
+flow.

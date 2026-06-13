@@ -16,8 +16,10 @@ substitute for inspecting neighboring files; local examples still win.
   output.
 - For Level 2 or 3 work, inspect related active changes before creating a new
   change and read current capability specs before changing existing behavior.
-- Treat ADRs as historical decisions; prefer current code and current docs when
-  implementation has moved on.
+- Treat ADRs as implemented architecture decisions, not feature specifications.
+- Use `docs/TODO.md` only when selecting or scoping unimplemented work.
+- If a source still conflicts with established code and RSpec, treat the
+  implementation as evidence and repair the owning document.
 - If the mapped context is insufficient, expand one directory or pattern at a
   time and record what was added in the task packet.
 
@@ -34,8 +36,9 @@ rules, or making cross-cutting decisions.
 | Spec-driven task levels and lifecycle | `docs/DEVELOPMENT.md` |
 | Current capability behavior | `openspec/specs/` |
 | Active feature changes | `openspec/changes/`, `bin/openspec list --json` |
+| Prioritized unimplemented work | `docs/TODO.md` |
 | Human project entrypoint | `README.md` |
-| Historical decisions | `docs/adr/README.md`, then the specific ADR |
+| Durable architecture decisions | `docs/adr/README.md`, then the specific ADR |
 | Recent project changes | `CHANGES.md` |
 | Commands | `Makefile` |
 | Dependencies | `Gemfile`, `Gemfile.lock`, `config/importmap.rb` |
@@ -97,7 +100,8 @@ rules, or making cross-cutting decisions.
 | Security/testing/risk gates | `docs/QUALITY_SECURITY.md` |
 | Current feature intent and observable behavior | `openspec/specs/` |
 | Proposed feature changes, design, and tasks | `openspec/changes/` |
-| Historical architecture decisions | `docs/adr/` |
+| Known unimplemented work | `docs/TODO.md` |
+| Durable architecture decisions | `docs/adr/` |
 | Routes | `config/routes.rb` |
 | Commands | `Makefile` |
 | Dependencies | `Gemfile`, `Gemfile.lock`, `config/importmap.rb` |

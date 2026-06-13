@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-13
+- Reconstructed the OpenSpec baseline from current code and RSpec across authentication, password reset, waterfall discovery, region and spot domains, GeoNames imports, admin job operations, and the shared design-system shell.
+- Rewrote ADR 0001-0004 as records of implemented architecture, removing rollout plans, future requirements, and stale implementation details.
+- Added a prioritized `docs/TODO.md` for unimplemented contract gaps, product layers, import operations, enrichment, and scale work.
+- Updated the documentation ownership model, legacy OpenSpec policy, harness checks, and README, including the current GeoNames environment variable names.
+
 ## 2026-06-12
 - Added a project-scoped OpenSpec workflow over the existing Codex harness, with native asdf-managed Node, pinned tooling, generated OpenSpec skills, strict validation, and a Wild Waters orchestration skill.
 - Defined direct, specified-feature, and architectural-feature task levels with discovery, approval, specification revision, verification, archive, and focused ADR promotion rules.

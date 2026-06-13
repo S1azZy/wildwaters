@@ -48,10 +48,10 @@ Secrets and logging:
 
 Abuse protection:
 
-- Rate limit sign in.
-- Rate limit password reset.
-- Rate limit registration.
-- Rate limit review, check-in, and photo spam surfaces as they are introduced.
+- Public authentication and write endpoints require abuse protection
+  appropriate to their risk.
+- Known missing controls are tracked in `docs/TODO.md` until implemented through
+  an OpenSpec change.
 
 ## Risk Matrix
 
@@ -96,19 +96,19 @@ Coverage targets:
 Critical flows:
 
 - Auth.
-- Region browsing.
+- Region hierarchy and imports.
 - Waterfall browse/detail.
-- Nearby search.
-- Photo upload.
-- Check-in creation.
-- Review permissions.
-- Profile and follow flows.
+- Waterfall map data.
+
+New protected, upload, location, or social flows become critical when their
+OpenSpec change is approved.
 
 Performance guardrails:
 
 - Watch N+1 in catalog, feed, and profile surfaces.
-- Keep nearby queries index-backed.
-- Paginate feed and catalog surfaces by default.
+- Keep distance queries index-backed when introduced.
+- Keep public collections bounded and add pagination before exposing unbounded
+  catalog or feed results.
 - Keep map payloads lean.
 
 ## CI and Merge Gates
