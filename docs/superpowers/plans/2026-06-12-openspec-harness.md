@@ -1,5 +1,9 @@
 # OpenSpec Harness Integration Implementation Plan
 
+> Status: Completed on 2026-06-12. This is a historical execution plan; its
+> unchecked boxes are not current work. Use `docs/TODO.md` for the active
+> backlog and `openspec/specs/` for current behavior.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a reproducible OpenSpec specification layer that uses the existing Wild Waters harness, supports three task levels, and validates specifications in CI.

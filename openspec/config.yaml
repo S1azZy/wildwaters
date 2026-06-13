@@ -7,6 +7,7 @@ context: |
   - Load only task-specific context selected by docs/CONTEXT_MAP.md.
   - Preserve product and architecture boundaries from docs/FOUNDATIONS.md.
   - Apply docs/QUALITY_SECURITY.md for security and test risk.
+  - Use docs/TODO.md only to select unimplemented work, never as a specification.
   - Use matching project skills from .codex/skills for domain-specific work.
   - Treat current code, RSpec, and Make verification as implementation proof.
   OpenSpec owns feature intent and behavior. ADRs under docs/adr own only

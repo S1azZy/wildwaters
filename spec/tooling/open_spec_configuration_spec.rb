@@ -16,6 +16,8 @@ RSpec.describe OpenSpecConfiguration do
     Dir[root.join(".codex/skills/openspec-*/SKILL.md")]
       .map { |path| Pathname(path).dirname.basename.to_s }
   end
+  let(:spec_paths) { Dir[root.join("openspec/specs/*/spec.md")].map { |path| Pathname(path) } }
+  let(:spec_names) { spec_paths.map { |path| path.dirname.basename.to_s } }
 
   it "pins the shared Node and OpenSpec versions" do
     expect(root.join(".tool-versions").read).to include("nodejs 24.16.0")
@@ -53,12 +55,46 @@ RSpec.describe OpenSpecConfiguration do
   it "layers feature specifications over the existing harness" do
     expected_sources = %w[
       AGENTS.md docs/DEVELOPMENT.md docs/CONTEXT_MAP.md
-      docs/FOUNDATIONS.md docs/QUALITY_SECURITY.md
+      docs/FOUNDATIONS.md docs/QUALITY_SECURITY.md docs/TODO.md
     ]
 
     expect(config.fetch("schema")).to eq("spec-driven")
     expect(config.fetch("context")).to include(*expected_sources)
     expect(config.fetch("rules").keys).to contain_exactly("proposal", "specs", "design", "tasks")
+  end
+
+  it "keeps a capability baseline for implemented behavior" do
+    expect(spec_names).to contain_exactly(
+      "admin-job-operations",
+      "authentication",
+      "design-system-shell",
+      "geonames-region-import",
+      "password-reset",
+      "region-management",
+      "spot-waterfall-domain",
+      "waterfall-discovery",
+    )
+  end
+
+  it "keeps every capability specification structurally valid" do
+    spec_paths.each do |path|
+      content = path.read
+
+      expect(content).to include("## Purpose", "## Requirements")
+      expect(content).to match(/^### Requirement: .+/)
+      expect(content).to match(/\b(?:SHALL|MUST)\b/)
+      expect(content).to match(/^#### Scenario: .+/)
+      expect(content).to match(/^- \*\*WHEN\*\* .+/)
+      expect(content).to match(/^- \*\*THEN\*\* .+/)
+    end
+  end
+
+  it "keeps unimplemented work outside ADRs and baseline specifications" do
+    todo = root.join("docs/TODO.md").read
+    adr_index = root.join("docs/adr/README.md").read
+
+    expect(todo).to include("This document is the ordered queue for known behavior that is not implemented.")
+    expect(adr_index).to include("Move unimplemented work to `docs/TODO.md`")
   end
 
   it "installs only the selected OpenSpec skills" do

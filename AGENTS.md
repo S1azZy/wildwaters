@@ -15,7 +15,8 @@ path. Do not duplicate detailed project rules here.
 | Product scope, architecture, domain, database, PostGIS | `docs/FOUNDATIONS.md` |
 | Security, testing policy, CI and merge gates | `docs/QUALITY_SECURITY.md` |
 | Feature intent, acceptance behavior, active changes | `openspec/specs/`, `openspec/changes/` |
-| Historical decisions | `docs/adr/` |
+| Known unimplemented work | `docs/TODO.md` |
+| Durable architecture decisions | `docs/adr/` |
 
 Load only the documents needed for the active task. Do not create extra feature
 docs unless explicitly requested.
@@ -23,6 +24,7 @@ docs unless explicitly requested.
 ## Always-On Rules
 
 - Inspect neighboring files before editing and follow the local pattern.
+- Read the related baseline spec before changing established behavior.
 - Behavior-changing work uses red test, minimal code, green test.
 - Keep MVP user-facing behavior waterfall-first.
 - Put business use cases in `app/interactors` using the canonical `yabi` style.

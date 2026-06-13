@@ -27,15 +27,17 @@ ADR.
 ## Discover Level 2 And 3 Work
 
 1. Load only context selected by `docs/CONTEXT_MAP.md`, then inspect the relevant
-   code and tests.
-2. Run `bin/openspec list --json` to find related active changes.
-3. Use `$openspec-explore` as the thinking stance.
-4. Ask one focused question at a time. Do not create artifacts yet.
-5. Challenge assumptions. Identify scope, non-goals, unknowns, and applicable
+   main capability specs, code, and tests.
+2. Use `docs/TODO.md` only when the request selects unimplemented work; do not
+   treat TODO text as acceptance criteria.
+3. Run `bin/openspec list --json` to find related active changes.
+4. Use `$openspec-explore` as the thinking stance.
+5. Ask one focused question at a time. Do not create artifacts yet.
+6. Challenge assumptions. Identify scope, non-goals, unknowns, and applicable
    data, authorization/privacy, migration, retry/idempotency, PostGIS/
    performance, operational, observability, and rollback risks.
-6. Compare two or three credible approaches when the choice is non-obvious.
-7. Summarize the recommended direction and ask the user to confirm it.
+7. Compare two or three credible approaches when the choice is non-obvious.
+8. Summarize the recommended direction and ask the user to confirm it.
 
 Do not invoke `$openspec-propose` until the user confirms the explored
 direction.

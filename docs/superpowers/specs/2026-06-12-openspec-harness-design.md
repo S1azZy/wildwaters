@@ -1,5 +1,9 @@
 # OpenSpec Harness Integration Design
 
+> Status: Implemented on 2026-06-12 and normalized on 2026-06-13. The
+> reconstructed baseline and ADR migration described below supersede the
+> original no-migration assumption.
+
 ## Goal
 
 Add OpenSpec as a lightweight specification layer over the existing Wild Waters
@@ -48,6 +52,7 @@ makes OpenSpec behavior reproducible across the host, devcontainer, and CI.
 | Security and test policy | `docs/QUALITY_SECURITY.md` |
 | Feature intent and pending behavioral changes | `openspec/changes/` |
 | Current specified behavior after archive | `openspec/specs/` |
+| Prioritized unimplemented work | `docs/TODO.md` |
 | Durable cross-cutting architecture decisions | `docs/adr/` |
 | Reusable SDD conversation workflow | project Codex skill |
 
@@ -178,7 +183,12 @@ OpenSpec agentic verify
 - `README.md` will contain only a compact quick-start table and command list.
 - `AGENTS.md` and `docs/CONTEXT_MAP.md` will point to the owning documents and
   OpenSpec artifacts without duplicating the workflow.
-- Existing ADRs remain historical records and require no migration.
+- The implemented code and RSpec suite were used to reconstruct main capability
+  specs directly under `openspec/specs/` as a one-time bootstrap.
+- Existing ADRs were normalized to implemented durable decisions; plans and
+  unimplemented requirements moved to `docs/TODO.md`.
+- After bootstrap, meaningful behavior changes use delta specs and archive into
+  the main baseline.
 
 ## Alternatives Rejected
 

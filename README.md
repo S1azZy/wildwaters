@@ -15,6 +15,7 @@ with waterfalls.
 | Product scope, architecture, domain, database, PostGIS | [`docs/FOUNDATIONS.md`](docs/FOUNDATIONS.md) |
 | Security, testing policy, CI and merge gates | [`docs/QUALITY_SECURITY.md`](docs/QUALITY_SECURITY.md) |
 | Current feature specifications and active changes | [`openspec/`](openspec/) |
+| Prioritized unimplemented work | [`docs/TODO.md`](docs/TODO.md) |
 | Architecture decisions | [`docs/adr/`](docs/adr/) |
 | Change history | [`CHANGES.md`](CHANGES.md) |
 
@@ -57,12 +58,21 @@ Level 2 and 3 flow:
 explore -> confirm -> propose -> review -> apply -> verify -> archive
 ```
 
-OpenSpec records intent and acceptance behavior. The existing Codex skills,
-RSpec suite, permission matrix, and Make verification remain authoritative for
-implementation.
+OpenSpec records current observable behavior and pending behavior changes. The
+baseline under `openspec/specs/` was reconstructed from the implemented code and
+RSpec suite on 2026-06-13. ADRs record durable technology choices, system
+boundaries, execution and persistence models, and design-system foundations.
+Future work that has not become a change lives in `docs/TODO.md`.
+
+If an omitted historical behavior is discovered later, the baseline may be
+corrected directly only when no code behavior changes and existing RSpec proves
+the contract. New or changed behavior always uses the Level 2 or 3 delta flow.
+RSpec, project skills, permissions, and Make verification remain implementation
+proof.
 
 ```bash
 bin/openspec list
+bin/openspec list --specs
 make openspec-validate
 make openspec-update
 ```
@@ -90,17 +100,20 @@ Default MVP import slice:
 - `ADM1` - first-level administrative areas
 - `PPLA` and `PPLC` - administrative seats and capitals
 
-If you need a wider slice for a one-off import, override `FEATURE_CODES`.
+If you need a wider slice for a one-off import, override
+`GEONAMES_FEATURE_CODES`.
 
 Useful environment variables:
 
-- `COUNTRY_CODES=AD,FR` - required ISO country codes to import
-- `LANGUAGES=en,ru` - alternate-name languages to keep during import
-- `SOURCE_KEY=geonames_regions` - import source key
-- `DOWNLOAD_DIR=tmp/imports/geonames/custom` - prepared dump artifact path
-- `DOWNLOAD_ALTERNATE_NAMES=0` - skip alternate names download
-- `MODE=full` - import mode passed into `import_runs`
-- `INITIATED_BY=manual` - audit label for the run
+- `GEONAMES_COUNTRY_CODES=AD,FR` - ISO country codes to import
+- `GEONAMES_LANGUAGES=en,ru` - alternate-name languages to keep
+- `GEONAMES_SOURCE_KEY=geonames_regions` - existing import source key
+- `GEONAMES_FEATURE_CODES=PCLI,ADM1` - GeoNames feature codes to include
+- `GEONAMES_DOWNLOAD_DIR=tmp/imports/geonames/custom` - artifact root
+- `GEONAMES_DOWNLOAD_ALTERNATE_NAMES=0` - skip alternate names download
+- `GEONAMES_DEFAULT_MODE=full` - run mode
+
+The rake task name supplies the run's `initiated_by` audit label.
 
 ## Notes
 
