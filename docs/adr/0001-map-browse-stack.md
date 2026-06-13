@@ -3,6 +3,9 @@
 - Status: Accepted
 - Decided: 2026-03-19
 - Normalized to implementation: 2026-06-13
+- Partially superseded: ADR 0005 replaces the page-rendering and browser-build
+  boundary for migrated routes; this ADR continues to own MapLibre, PostGIS,
+  and map data delivery.
 
 ## Context
 

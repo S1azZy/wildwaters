@@ -1,6 +1,12 @@
 # Changes
 
 ## 2026-06-14
+- Accepted ADR 0005 and proposed the `frontend-foundation` OpenSpec change for
+  a route-by-route migration of the application-owned business frontend to
+  Vite, Inertia Rails, React, strict TypeScript, and Vite-owned Tailwind, while
+  preserving the current design and deferring SSR and UI-kit adoption; removed
+  a brittle tooling spec that asserted documentation wording without proving
+  its claimed OpenSpec ownership rule.
 - Refreshed project dependencies by updating `shoulda-matchers` to `8.0.1`, Ruby to `4.0.5`, and RubyGems/Bundler to `4.0.14`; aligned the production build with Bundler's version-file lookup; and confirmed Node `24.16.0`, OpenSpec `1.4.1`, MapLibre GL JS `5.24.0`, PostgreSQL 18/PostGIS 3.6, Importmap pins, and the remaining Bundler set are current.
 
 ## 2026-06-13

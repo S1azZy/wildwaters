@@ -3,6 +3,9 @@
 - Status: Accepted
 - Decided: 2026-03-22
 - Normalized to implementation: 2026-06-13
+- Partially superseded: ADR 0005 replaces the ERB/ViewComponent implementation
+  boundary for migrated routes; this ADR continues to own Digital Naturalist
+  and its token vocabulary.
 
 ## Context
 

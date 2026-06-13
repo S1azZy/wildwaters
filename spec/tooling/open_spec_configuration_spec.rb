@@ -89,14 +89,6 @@ RSpec.describe OpenSpecConfiguration do
     end
   end
 
-  it "keeps unimplemented work outside ADRs and baseline specifications" do
-    todo = root.join("docs/TODO.md").read
-    adr_index = root.join("docs/adr/README.md").read
-
-    expect(todo).to include("This document is the ordered queue for known behavior that is not implemented.")
-    expect(adr_index).to include("Move unimplemented work to `docs/TODO.md`")
-  end
-
   it "installs only the selected OpenSpec skills" do
     expect(skill_names).to contain_exactly(
       "openspec-explore",

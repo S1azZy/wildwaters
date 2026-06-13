@@ -64,8 +64,14 @@ Stable architecture rules:
 - Queries that are not business use cases may live in `app/queries`.
 - Authorization stays explicit through policies for domain resources or a
   dedicated guard for a bounded admin engine.
-- Server-rendered web UI uses ERB, Hotwire, Tailwind, and the existing UI
-  component layer where it already exists.
+- The application-owned business frontend is transitioning route by route to
+  Vite, Inertia Rails, React, TypeScript, and Tailwind under ADR 0005.
+  Unmigrated routes retain ERB, Hotwire, Stimulus, and ViewComponent until their
+  approved vertical slice is complete; one route never mixes both browser
+  runtimes.
+- Rails continues to own web routing, sessions, CSRF, authorization, I18n, and
+  business use cases. Mailer ERB and third-party Rails engine interfaces are
+  outside the business frontend migration.
 - Background work uses the Rails/Solid Queue stack unless a concrete need
   justifies otherwise.
 - Do not introduce parallel service/interactor/API response styles.
@@ -77,6 +83,8 @@ Concrete cross-cutting decisions live in ADRs:
 - Import architecture: `docs/adr/0003-import-architecture-and-region-ingestion.md`
 - GeoNames queued import orchestration:
   `docs/adr/0004-geonames-queued-import-orchestration.md`
+- Business frontend architecture:
+  `docs/adr/0005-business-frontend-architecture.md`
 
 ## Domain Boundary
 
