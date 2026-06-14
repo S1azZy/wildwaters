@@ -1,6 +1,11 @@
 # Changes
 
 ## 2026-06-14
+- Archived the completed `frontend-foundation` OpenSpec change into the
+  permanent `frontend-platform` baseline and proposed Phase 1 to migrate the
+  waterfall detail route to Inertia React with a minimal shared React shell,
+  explicit public props, full-document legacy-boundary navigation, and
+  retirement of the temporary smoke surface.
 - Implemented the Phase 0 frontend foundation with Vite, Inertia Rails, React,
   strict TypeScript, Vite-owned Tailwind, isolated legacy/Inertia layouts,
   frontend quality gates, a development/test smoke page, CI integration, and
