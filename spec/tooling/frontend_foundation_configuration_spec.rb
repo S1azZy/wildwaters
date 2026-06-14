@@ -76,8 +76,11 @@ RSpec.describe FrontendFoundationConfiguration do
   end
 
   it "preserves representative legacy styles in the Vite stylesheet" do
-    manifest = JSON.parse(root.join("public/vite/.vite/manifest.json").read)
-    stylesheet = root.join("public/vite", manifest.fetch("entrypoints/application.css").fetch("file")).read
+    vite_config = JSON.parse(root.join("config/vite.json").read)
+    output_dir = vite_config.fetch("test").fetch("publicOutputDir")
+    build_dir = root.join("public", output_dir)
+    manifest = JSON.parse(build_dir.join(".vite/manifest.json").read)
+    stylesheet = build_dir.join(manifest.fetch("entrypoints/application.css").fetch("file")).read
 
     expect(stylesheet).to include(
       "--color-primary-500",
