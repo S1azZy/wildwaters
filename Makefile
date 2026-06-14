@@ -3,7 +3,7 @@ SHELL := /bin/bash
 COMPOSE := docker compose
 APP := $(COMPOSE) run --rm web
 
-.PHONY: setup openspec-install openspec-update openspec-validate install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated importmap-outdated maplibre-outdated outdated
+.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated importmap-outdated maplibre-outdated outdated
 
 setup: openspec-install
 	$(COMPOSE) up --build -d
@@ -16,6 +16,30 @@ openspec-update:
 
 openspec-validate:
 	bin/openspec validate --all --strict
+
+frontend-install:
+	$(APP) bin/npm ci
+
+frontend-format:
+	$(APP) bin/npm run frontend:format
+
+frontend-lint:
+	$(APP) bin/npm run frontend:lint
+
+frontend-typecheck:
+	$(APP) bin/npm run frontend:typecheck
+
+frontend-test:
+	$(APP) bin/npm run frontend:test
+
+frontend-build:
+	$(APP) bin/npm run frontend:build
+
+frontend-audit:
+	$(APP) bin/npm run frontend:audit
+
+frontend-verify:
+	$(APP) bin/npm run frontend:verify
 
 install-hooks:
 	git config core.hooksPath .githooks
@@ -50,17 +74,17 @@ rubocop-autocorrect:
 erb-lint:
 	$(APP) bin/erb_lint --lint-all
 
-test:
-	$(APP) bash -lc "RAILS_ENV=test bin/rails db:prepare && RAILS_ENV=test bin/rails tailwindcss:build && RAILS_ENV=test bundle exec rspec"
+test: frontend-install
+	$(APP) bash -lc "bin/npm run frontend:build:test && RAILS_ENV=test bin/rails db:prepare && RAILS_ENV=test bundle exec rspec"
 
 security:
 	$(APP) bash -lc "bin/bundler-audit && bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
 
-verify: openspec-validate
-	$(APP) bash -lc "bin/rubocop -A && bin/erb_lint --lint-all && RAILS_ENV=test bin/rails db:prepare && RAILS_ENV=test bin/rails tailwindcss:build && RAILS_ENV=test bundle exec rspec && bin/bundler-audit && bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
+verify: openspec-validate frontend-install frontend-verify
+	$(APP) bash -lc "bin/npm run frontend:build:test && bin/rubocop -A && bin/erb_lint --lint-all && RAILS_ENV=test bin/rails db:prepare && RAILS_ENV=test bundle exec rspec && bin/bundler-audit && bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
 
-verify-fast:
-	$(APP) bash -lc "bin/rubocop -A && bin/erb_lint --lint-all && RAILS_ENV=test bin/rails db:prepare && RAILS_ENV=test bin/rails tailwindcss:build && RAILS_ENV=test bundle exec rspec"
+verify-fast: frontend-install
+	$(APP) bash -lc "bin/npm run frontend:format && bin/npm run frontend:lint && bin/npm run frontend:typecheck && bin/npm run frontend:test && bin/npm run frontend:build:test && bin/rubocop -A && bin/erb_lint --lint-all && RAILS_ENV=test bin/rails db:prepare && RAILS_ENV=test bundle exec rspec"
 
 ci:
 	$(APP) bin/ci

@@ -22,10 +22,13 @@ services:
       dockerfile: Dockerfile.dev
       args:
         RUBY_VERSION: "4.0.5"
+        NODE_VERSION: "24.16.0"
     command: >
-      bash -lc "bundle install &&
+      bash -lc "npm ci &&
+      bundle install &&
       bin/rails db:prepare &&
-      bin/rails server -b 0.0.0.0 -p 3000"
+      rm -f tmp/pids/server.pid &&
+      bin/dev"
     environment:
       RAILS_ENV: development
       DB_HOST: db
@@ -34,9 +37,11 @@ services:
       DB_PASSWORD: postgres
     ports:
       - "3000:3000"
+      - "3036:3036"
     volumes:
       - .:/app
       - bundle_data:/usr/local/bundle
+      - node_modules_data:/app/node_modules
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/up || exit 1"]
       interval: 10s
@@ -53,6 +58,7 @@ services:
       dockerfile: Dockerfile.dev
       args:
         RUBY_VERSION: "4.0.5"
+        NODE_VERSION: "24.16.0"
     command: >
       bash -lc "bundle install &&
       bin/rails db:prepare &&
@@ -73,3 +79,4 @@ services:
 volumes:
   postgres_data:
   bundle_data:
+  node_modules_data:

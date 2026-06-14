@@ -4,10 +4,13 @@ require "securerandom"
 
 Rails.application.configure do
   config.content_security_policy do |policy|
+    vite_websocket_sources = Rails.env.development? ? [ "ws://localhost:3036", "ws://127.0.0.1:3036" ] : []
+
     policy.default_src :self
     policy.base_uri :self
     policy.child_src :blob
-    policy.connect_src :self, "https://tiles.openfreemap.org", "https://tiles.stadiamaps.com"
+    policy.connect_src :self, "https://tiles.openfreemap.org", "https://tiles.stadiamaps.com",
+                       *vite_websocket_sources
     policy.font_src :self, :data, "https://fonts.gstatic.com", "https://tiles.openfreemap.org", "https://tiles.stadiamaps.com"
     policy.form_action :self
     policy.frame_ancestors :none

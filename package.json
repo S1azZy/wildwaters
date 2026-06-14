@@ -1,13 +1,51 @@
 {
-  "name": "wildwaters-tooling",
+  "name": "wildwaters",
   "private": true,
+  "type": "module",
   "engines": {
     "node": "24.16.0"
   },
   "scripts": {
-    "openspec:validate": "bin/openspec validate --all --strict"
+    "openspec:validate": "bin/openspec validate --all --strict",
+    "frontend:audit": "npm audit --audit-level=high",
+    "frontend:build": "RAILS_ENV=production vite build",
+    "frontend:build:test": "RAILS_ENV=test bin/vite build",
+    "frontend:format": "prettier --check \"app/frontend/**/*.{ts,tsx,css}\" vite.config.ts eslint.config.mjs package.json tsconfig.json",
+    "frontend:lint": "eslint .",
+    "frontend:test": "vitest run --coverage --passWithNoTests",
+    "frontend:typecheck": "tsc --noEmit",
+    "frontend:verify": "npm run frontend:format && npm run frontend:lint && npm run frontend:typecheck && npm run frontend:test && npm run frontend:build && npm run frontend:audit"
   },
   "devDependencies": {
-    "@fission-ai/openspec": "1.4.1"
+    "@fission-ai/openspec": "1.4.1",
+    "@inertiajs/vite": "3.4.0",
+    "@tailwindcss/vite": "4.3.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
+    "@types/node": "25.9.3",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitest/coverage-v8": "4.1.8",
+    "axe-core": "4.12.1",
+    "eslint": "9.39.4",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "jsdom": "29.1.1",
+    "prettier": "3.8.4",
+    "tailwindcss": "4.3.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.61.0",
+    "vite": "8.0.16",
+    "vite-plugin-ruby": "5.2.2",
+    "vitest": "4.1.8"
+  },
+  "dependencies": {
+    "@inertiajs/react": "3.4.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   }
 }

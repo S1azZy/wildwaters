@@ -57,6 +57,40 @@ jobs:
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bin/importmap audit
 
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24.16.0"
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Check frontend formatting
+        run: npm run frontend:format
+
+      - name: Lint frontend code
+        run: npm run frontend:lint
+
+      - name: Typecheck frontend code
+        run: npm run frontend:typecheck
+
+      - name: Test frontend code
+        run: npm run frontend:test
+
+      - name: Build production frontend assets
+        run: npm run frontend:build
+
+      - name: Audit frontend dependencies
+        run: npm run frontend:audit
+
   lint:
     runs-on: ubuntu-latest
     env:
@@ -122,11 +156,20 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24.16.0"
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
       - name: Prepare test database
         run: bin/rails db:prepare
 
-      - name: Build Tailwind assets for test
-        run: RAILS_ENV=test bin/rails tailwindcss:build
+      - name: Build frontend assets for test
+        run: npm run frontend:build:test
 
       - name: Run RSpec
         run: bundle exec rspec

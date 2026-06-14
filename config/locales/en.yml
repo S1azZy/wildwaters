@@ -28,6 +28,14 @@
 #       enabled: "ON"
 
 en:
+  frontend:
+    javascript_required: "JavaScript is required to use this application."
+    smoke:
+      action: "Return to waterfalls"
+      description: "Rails, Inertia, React, TypeScript, Tailwind, and Vite are connected without changing the existing product interface."
+      eyebrow: "Frontend foundation"
+      interaction: "React state is working."
+      title: "The new frontend runtime is ready"
   admin:
     authorization:
       required: "You are not allowed to access that page."
