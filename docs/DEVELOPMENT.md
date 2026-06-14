@@ -165,6 +165,9 @@ Prefer `Makefile` targets.
 | Install Node/OpenSpec dependencies | `make openspec-install` |
 | Refresh generated OpenSpec adapters | `make openspec-update` |
 | Validate all OpenSpec artifacts | `make openspec-validate` |
+| Install locked frontend dependencies | `make frontend-install` |
+| Run frontend format, lint, typecheck, tests, build, and audit | `make frontend-verify` |
+| Run one frontend gate | `make frontend-format`, `make frontend-lint`, `make frontend-typecheck`, `make frontend-test`, `make frontend-build`, or `make frontend-audit` |
 | Install gems in container | `make bundle` |
 | Rails console | `make shell` |
 | Container shell | `make bash` |
@@ -194,7 +197,8 @@ feedback is needed.
 | Policy/authorization | Policy/request specs, then `make verify-fast` |
 | Migration/schema/PostGIS | Migration/spec path, then `make verify-fast` |
 | Security/auth/uploads/sessions | Relevant specs plus `make security` |
-| Dependency/tooling | Relevant install/check plus `make verify` |
+| Dependency/tooling | Relevant install/check, production asset build when applicable, plus `make verify` |
+| React/Inertia page | Narrow request and component specs, browser smoke when interaction changes, then `make verify-fast` |
 | Before PR or merge | `make verify` |
 
 If a gate fails for an unrelated existing issue, record the exact failing tool,

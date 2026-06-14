@@ -45,6 +45,9 @@ Secrets and logging:
 - Never log passwords, reset tokens, signed blob tokens, secrets, or raw
   credentials.
 - Filter sensitive parameters and headers.
+- Treat Inertia props as a public response surface: keep them page-specific and
+  exclude credentials, raw session material, reset tokens, policy internals,
+  and unnecessary user attributes.
 
 Abuse protection:
 
@@ -115,6 +118,12 @@ Performance guardrails:
 
 Required checks:
 
+- Frontend format check.
+- ESLint, including React Hooks and accessibility rules.
+- Strict TypeScript typecheck.
+- Vitest component tests with coverage reporting.
+- Vite production build.
+- npm vulnerability audit.
 - RuboCop.
 - ERB lint.
 - RSpec.
@@ -124,6 +133,8 @@ Required checks:
 Before merge:
 
 - All required checks are green or the known blocker is explicitly accepted.
+- Production frontend assets resolve through the Vite manifest, and
+  development-only Vite CSP allowances do not leak into production.
 - I18n keys exist for `ru` and `en` when user-facing text is introduced.
 - Authorization coverage exists for new protected flows.
 - New business logic uses the canonical `yabi` interactor style.

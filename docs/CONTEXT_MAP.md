@@ -64,12 +64,15 @@ rules, or making cross-cutting decisions.
 
 | Task area | Start with | Then inspect |
 | --- | --- | --- |
-| Layout/header/application shell | `app/views/layouts/application.html.erb`, `app/components/ui/site_header_component.*` | `spec/components/ui/site_header_component_spec.rb`, `spec/system/design_system_shell_spec.rb`, shared UI components |
+| Frontend architecture or migration boundary | `docs/adr/0005-business-frontend-architecture.md`, relevant OpenSpec capability/change | `app/frontend/`, both application layouts, matching request/component/system specs |
+| Legacy layout/header/application shell | `app/views/layouts/application.html.erb`, `app/components/ui/site_header_component.*` | `spec/components/ui/site_header_component_spec.rb`, `spec/system/design_system_shell_spec.rb`, shared UI components |
+| Inertia page or layout | `app/views/layouts/inertia.html.erb`, relevant page in `app/frontend/pages/` | Rails controller/request spec, page prop types, React Testing Library test, routing/system coverage |
 | Auth screens | Relevant auth view in `app/views/sessions/`, `app/views/registrations/`, or `app/views/password_resets/` | `app/components/ui/auth_shell_component.*`, auth request/system specs, locale files |
 | Waterfall pages | Relevant `app/views/waterfalls/` template | `app/controllers/waterfalls_controller.rb`, waterfall presenter/query, request/system specs |
 | Explore map UI | `app/javascript/controllers/explore_map_controller.js`, `app/views/waterfalls/index.html.erb` | `app/presenters/waterfalls/map_style_catalog.rb`, MapLibre ADR, map system/request specs, local MapLibre assets |
 | UI components | Relevant `app/components/ui/*` Ruby and ERB files | Matching component spec, neighboring component APIs, design-system ADR |
-| Styles/design tokens | `app/assets/tailwind/design_tokens.css`, `app/assets/tailwind/application.css`, `app/assets/stylesheets/application.css` | Relevant component/view, component/system specs |
+| Styles/design tokens | `app/frontend/styles/design_tokens.css`, `app/frontend/entrypoints/application.css` | Relevant legacy component/view or React page, component/system specs, production Vite manifest |
+| Frontend tooling | `package.json`, `vite.config.ts`, `config/vite.json`, `eslint.config.mjs`, `tsconfig.json` | `spec/tooling/frontend_foundation_configuration_spec.rb`, `Makefile`, CI and Docker build files |
 | Stimulus behavior | Relevant controller in `app/javascript/controllers/` | View markup that owns targets/actions, matching system spec |
 | I18n copy | `config/locales/en.yml`, `config/locales/ru.yml` | View/component using the keys, request/system coverage when behavior changes |
 
@@ -85,6 +88,7 @@ rules, or making cross-cutting decisions.
 | Model specs | Relevant file in `spec/models/`, matching model/factory |
 | Policy specs | `spec/support/pundit.rb`, relevant file in `spec/policies/` |
 | Component specs | Relevant file in `spec/components/ui/`, component Ruby/ERB files |
+| React component tests | Relevant file in `app/frontend/test/`, page/component source, `app/frontend/test/setup.ts` |
 | Job/mailer specs | Relevant file in `spec/jobs/` or `spec/mailers/` |
 | Tooling/bin specs | Relevant file in `spec/bin/`, `spec/tooling/`, or `spec/lib/` |
 | External fixtures | Relevant file in `spec/fixtures/` only when the spec uses it |

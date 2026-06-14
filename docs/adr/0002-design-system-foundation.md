@@ -47,8 +47,8 @@ editorial hierarchy. It is not a reason for inconsistent component states.
 ### Token foundation
 
 The executable token catalog lives in
-`app/assets/tailwind/design_tokens.css` and is loaded through
-`app/assets/tailwind/application.css`.
+`app/frontend/styles/design_tokens.css` and is loaded through
+`app/frontend/entrypoints/application.css`.
 
 The canonical families are:
 
@@ -70,8 +70,12 @@ ADR.
 
 ### Rendering and component boundary
 
-- ViewComponent owns reusable UI primitives and application-shell elements;
-- page structure and feature-specific composition remain in ERB views;
+- ViewComponent owns reusable UI primitives and application-shell elements on
+  unmigrated legacy routes;
+- page structure and feature-specific composition remain in ERB views until a
+  route migrates under ADR 0005;
+- migrated routes port stable primitives into application-owned typed React
+  components while preserving this token vocabulary;
 - Stimulus owns focused interaction behavior without becoming a second
   rendering architecture;
 - user-facing component and page copy is provided through Rails I18n;
