@@ -65,14 +65,15 @@ RSpec.describe OpenSpecConfiguration do
 
   it "keeps a capability baseline for implemented behavior" do
     expect(spec_names).to contain_exactly(
-      "admin-job-operations",
-      "authentication",
-      "design-system-shell",
-      "geonames-region-import",
-      "password-reset",
-      "region-management",
-      "spot-waterfall-domain",
-      "waterfall-discovery",
+        "admin-job-operations",
+        "authentication",
+        "design-system-shell",
+        "frontend-platform",
+        "geonames-region-import",
+        "password-reset",
+        "region-management",
+        "spot-waterfall-domain",
+        "waterfall-discovery",
     )
   end
 
