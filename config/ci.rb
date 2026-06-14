@@ -3,6 +3,14 @@
 CI.run do
   step "Setup", "bin/setup --skip-server"
 
+  step "Frontend: Format", "npm run frontend:format"
+  step "Frontend: Lint", "npm run frontend:lint"
+  step "Frontend: Typecheck", "npm run frontend:typecheck"
+  step "Frontend: Test", "npm run frontend:test"
+  step "Frontend: Build", "npm run frontend:build"
+  step "Frontend: Audit", "npm run frontend:audit"
+  step "Frontend: Test build", "npm run frontend:build:test"
+
   step "Style: Ruby", "bin/rubocop"
   step "Style: ERB", "bin/erb_lint --lint-all"
 

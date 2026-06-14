@@ -1,4 +1,12 @@
 ru:
+  frontend:
+    javascript_required: "Для работы приложения необходимо включить JavaScript."
+    smoke:
+      action: "Вернуться к водопадам"
+      description: "Rails, Inertia, React, TypeScript, Tailwind и Vite соединены без изменения текущего интерфейса продукта."
+      eyebrow: "Основа фронтенда"
+      interaction: "Состояние React работает."
+      title: "Новый фронтенд запущен"
   admin:
     authorization:
       required: "У вас нет доступа к этой странице."

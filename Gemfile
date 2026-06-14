@@ -17,9 +17,11 @@ gem "importmap-rails"
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
-# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
-gem "tailwindcss-rails"
 gem "view_component"
+# Build the application-owned frontend with Vite.
+gem "vite_rails", "3.11.0"
+# Deliver React pages through Rails routes and controllers.
+gem "inertia_rails", "3.21.2"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 gem "pundit"

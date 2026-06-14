@@ -31,6 +31,7 @@
 !/tmp/storage/.keep
 
 /public/assets
+/public/vite*
 /coverage
 /tmp/mails/*
 .vscode/
@@ -45,7 +46,7 @@
 
 # JetBrains IDE settings (RubyMine, IntelliJ, etc.)
 .idea/
-/node_modules/
+node_modules/
 
 
 /app/assets/builds/*
