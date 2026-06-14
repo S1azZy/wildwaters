@@ -205,6 +205,22 @@ RSpec.describe "Waterfalls", type: :request do
   describe "GET /waterfalls/:slugged_public_id" do
     subject(:perform_request) { get waterfall_path(slugged_public_id) }
 
+    let(:expected_shell_labels) do
+      {
+        brandName: I18n.t("layouts.header.brand_name"),
+        brandTagline: I18n.t("layouts.header.brand_tagline"),
+        explore: I18n.t("layouts.header.explore"),
+        profile: I18n.t("layouts.header.profile"),
+        signIn: I18n.t("layouts.header.sign_in")
+      }
+    end
+    let(:expected_shell_urls) do
+      {
+        dashboard: dashboard_path,
+        explore: root_path,
+        signIn: new_session_path
+      }
+    end
     let!(:waterfall) do
       create(
         :waterfall,
@@ -222,14 +238,116 @@ RSpec.describe "Waterfalls", type: :request do
         )
       )
     end
+    let(:expected_page_props) do
+      {
+        copy: {
+          back: I18n.t("waterfalls.show.back")
+        },
+        urls: {
+          explore: waterfalls_path
+        },
+        waterfall: {
+          publicId: waterfall.spot.public_id,
+          name: "Sekumpul Waterfall",
+          regionName: waterfall.spot.region.name,
+          summary: "Twin cascades in North Bali.",
+          description: "A dramatic jungle waterfall.",
+          facts: expected_waterfall_facts
+        }
+      }
+    end
+    let(:expected_waterfall_facts) do
+      [
+        {
+          key: "height",
+          label: I18n.t("waterfalls.show.height_label"),
+          value: I18n.t("waterfalls.shared.height", value: waterfall.height_meters)
+        },
+        {
+          key: "flowSeasonality",
+          label: I18n.t("waterfalls.show.flow_seasonality_label"),
+          value: waterfall.flow_seasonality.humanize
+        },
+        {
+          key: "approachDifficulty",
+          label: I18n.t("waterfalls.show.approach_difficulty_label"),
+          value: waterfall.approach_difficulty.humanize
+        },
+        {
+          key: "plungePool",
+          label: I18n.t("waterfalls.show.plunge_pool_label"),
+          value: I18n.t("waterfalls.show.plunge_pool_yes")
+        }
+      ]
+    end
+    let(:sensitive_prop_keys) do
+      %w[
+        coordinates
+        created_at
+        location
+        password
+        policy
+        published_at
+        reset_token
+        session
+        status
+        updated_at
+      ]
+    end
     let(:slugged_public_id) { "#{waterfall.spot.public_id}--wrong-slug" }
 
-    it "resolves the waterfall by public id" do
+    it "renders the typed waterfall detail Inertia page by public id" do
       perform_request
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Sekumpul Waterfall")
-      expect(response.body).to include("Twin cascades in North Bali.")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("Waterfalls/Show")
+      expect(inertia).to have_props(expected_page_props)
+    end
+
+    it "sends the exact guest shell contract" do
+      perform_request
+
+      expect(inertia).to have_props(
+        shell: {
+          authenticated: false,
+          labels: expected_shell_labels,
+          urls: expected_shell_urls
+        },
+      )
+    end
+
+    it "sends the authenticated shell contract without user attributes" do
+      user_identity = create(:user_identity, email: "user@example.com")
+      authenticate(user_identity)
+
+      perform_request
+
+      expect(inertia).to have_props(
+        shell: {
+          authenticated: true,
+          labels: expected_shell_labels,
+          urls: expected_shell_urls
+        },
+      )
+      expect(inertia).to have_flash(notice: I18n.t("auth.sessions.create.success"))
+    end
+
+    it "uses the isolated Inertia layout and JavaScript fallback" do
+      perform_request
+
+      expect(response.body).to include(I18n.t("frontend.javascript_required"))
+      expect(response.body).to include('href="/vite-test/assets/application-', 'type="module"')
+      expect(response.body).not_to include("javascript_importmap_tags", "data-turbo-track")
+    end
+
+    it "exposes only the approved page and shell props" do
+      perform_request
+
+      expect(inertia.props.keys).to contain_exactly("copy", "errors", "shell", "urls", "waterfall")
+      expect(inertia.props.fetch("errors")).to eq({})
+
+      expect(nested_keys(inertia.props)).not_to include(*sensitive_prop_keys)
     end
 
     it "returns not found for draft waterfalls" do
@@ -238,6 +356,7 @@ RSpec.describe "Waterfalls", type: :request do
       perform_request
 
       expect(response).to have_http_status(:not_found)
+      expect(inertia).not_to be_inertia_response
     end
 
     context "when the waterfall does not exist" do
@@ -247,6 +366,27 @@ RSpec.describe "Waterfalls", type: :request do
         perform_request
 
         expect(response).to have_http_status(:not_found)
+        expect(inertia).not_to be_inertia_response
+      end
+    end
+
+    def authenticate(user_identity)
+      post session_path, params: {
+        session: {
+          email: user_identity.email,
+          password: "Password123!"
+        }
+      }
+    end
+
+    def nested_keys(value)
+      case value
+      when Hash
+        value.flat_map { |key, nested_value| [ key, *nested_keys(nested_value) ] }
+      when Array
+        value.flat_map { |nested_value| nested_keys(nested_value) }
+      else
+        []
       end
     end
   end
