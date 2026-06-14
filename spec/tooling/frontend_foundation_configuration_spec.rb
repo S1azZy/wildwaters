@@ -75,6 +75,16 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(root.join("config/initializers/inertia_rails.rb")).to exist
   end
 
+  it "proves the frontend runtime through a production waterfall page" do
+    routes = root.join("config/routes.rb").read
+    controller = root.join("app/controllers/waterfalls_controller.rb").read
+
+    expect(root.join("app/frontend/pages/Waterfalls/Show.tsx")).to exist
+    expect(controller).to include('render inertia: "Waterfalls/Show"')
+    expect(routes).not_to include("frontend", "smoke")
+    expect(root.join("app/frontend/pages/Frontend/Smoke.tsx")).not_to exist
+  end
+
   it "preserves representative legacy styles in the Vite stylesheet" do
     vite_config = JSON.parse(root.join("config/vite.json").read)
     output_dir = vite_config.fetch("test").fetch("publicOutputDir")

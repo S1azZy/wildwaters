@@ -1,6 +1,8 @@
 class WaterfallsController < ApplicationController
   MAP_RESULTS_LIMIT = 60
 
+  layout "inertia", only: :show
+
   def index
     @filters = explore_filter_input
     @waterfalls = limited_waterfalls(explore_result(input: @filters))
@@ -19,9 +21,77 @@ class WaterfallsController < ApplicationController
 
   def show
     @waterfall = Waterfall.with_public_spot_data.find_by!(spots: { public_id: extracted_public_id })
+
+    render inertia: "Waterfalls/Show", props: waterfall_show_props
   end
 
   private
+
+  def waterfall_show_props
+    {
+      copy: {
+        back: t("waterfalls.show.back")
+      },
+      urls: {
+        explore: waterfalls_path
+      },
+      waterfall: {
+        publicId: @waterfall.spot.public_id,
+        name: @waterfall.spot.name,
+        regionName: @waterfall.spot.region.name,
+        summary: @waterfall.spot.summary,
+        description: @waterfall.spot.description,
+        facts: waterfall_facts
+      }
+    }
+  end
+
+  def waterfall_facts
+    [
+      waterfall_height_fact,
+      waterfall_flow_seasonality_fact,
+      waterfall_approach_difficulty_fact,
+      waterfall_plunge_pool_fact
+    ].compact
+  end
+
+  def waterfall_height_fact
+    return if @waterfall.height_meters.blank?
+
+    {
+      key: "height",
+      label: t("waterfalls.show.height_label"),
+      value: t("waterfalls.shared.height", value: @waterfall.height_meters)
+    }
+  end
+
+  def waterfall_flow_seasonality_fact
+    return if @waterfall.flow_seasonality.blank?
+
+    {
+      key: "flowSeasonality",
+      label: t("waterfalls.show.flow_seasonality_label"),
+      value: @waterfall.flow_seasonality.humanize
+    }
+  end
+
+  def waterfall_approach_difficulty_fact
+    return if @waterfall.approach_difficulty.blank?
+
+    {
+      key: "approachDifficulty",
+      label: t("waterfalls.show.approach_difficulty_label"),
+      value: @waterfall.approach_difficulty.humanize
+    }
+  end
+
+  def waterfall_plunge_pool_fact
+    {
+      key: "plungePool",
+      label: t("waterfalls.show.plunge_pool_label"),
+      value: t(@waterfall.plunge_pool? ? "waterfalls.show.plunge_pool_yes" : "waterfalls.show.plunge_pool_no")
+    }
+  end
 
   def extracted_public_id
     waterfall_params.fetch(:slugged_public_id).to_s.split("--", 2).first
