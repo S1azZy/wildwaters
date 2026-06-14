@@ -40,6 +40,7 @@ Useful local targets:
 - `make lint` - run RuboCop with autocorrect and ERB lint
 - `make test` - run the full test suite
 - `make security` - run bundler-audit and Brakeman
+- `make frontend-verify` - run all frontend quality and build gates
 - `make verify` - run the full local verification gate
 
 ## Spec-Driven Changes

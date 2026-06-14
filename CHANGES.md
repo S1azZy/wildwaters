@@ -1,6 +1,10 @@
 # Changes
 
 ## 2026-06-14
+- Implemented the Phase 0 frontend foundation with Vite, Inertia Rails, React,
+  strict TypeScript, Vite-owned Tailwind, isolated legacy/Inertia layouts,
+  frontend quality gates, a development/test smoke page, CI integration, and
+  production Docker asset compilation without a Node runtime.
 - Accepted ADR 0005 and proposed the `frontend-foundation` OpenSpec change for
   a route-by-route migration of the application-owned business frontend to
   Vite, Inertia Rails, React, strict TypeScript, and Vite-owned Tailwind, while
