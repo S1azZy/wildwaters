@@ -55,24 +55,57 @@ The system SHALL compile the existing Digital Naturalist design tokens and Tailw
 - **WHEN** the frontend assets are built
 - **THEN** the required styles are present in the same compiled stylesheet family
 
-### Requirement: Typed Rails-to-React page contract
-The system SHALL provide explicit TypeScript types for shared and page-specific Inertia props while Rails remains the source of user-facing translations and application URLs.
+### Requirement: Shared React application shell
+The system SHALL provide migrated business pages with a typed React application shell that preserves the current site identity, navigation actions, content frame, document title, and accessible flash presentation.
 
-#### Scenario: Smoke page props
-- **GIVEN** the non-production smoke route is enabled
+#### Scenario: Guest shell
+- **GIVEN** a visitor is not authenticated
+- **WHEN** a migrated business page renders
+- **THEN** the shell displays the translated brand and Explore navigation
+- **AND** it displays the sign-in action without exposing user or session data
+
+#### Scenario: Authenticated shell
+- **GIVEN** a visitor is authenticated
+- **WHEN** a migrated business page renders
+- **THEN** the shell displays the profile action targeting the Rails dashboard
+- **AND** it does not display the guest sign-in action
+
+#### Scenario: Shell flash message
+- **GIVEN** Rails redirects to a migrated page with an allowed notice or alert flash
+- **WHEN** the Inertia page renders
+- **THEN** the shell presents the message with the matching status or alert semantics
+- **AND** the one-time message does not become regular history-persisted shared data
+
+#### Scenario: Shared shell prop exposure
+- **GIVEN** Rails prepares shared data for an Inertia response
+- **WHEN** the data is serialized
+- **THEN** it contains only namespaced translated labels, Rails-generated navigation URLs, and the authentication state required by the shell
+- **AND** it excludes credentials, raw session data, reset tokens, unnecessary user attributes, and policy internals
+
+#### Scenario: Legacy destination
+- **GIVEN** a shell or page link targets an unmigrated Rails route
+- **WHEN** the visitor follows that link
+- **THEN** the browser performs a full document visit to the legacy page
+- **AND** the legacy route remains owned by Turbo, Stimulus, and importmap
+
+### Requirement: Typed Rails-to-React page contract
+The system SHALL provide explicit TypeScript types for shared and page-specific Inertia props while Rails remains the source of user-facing translations, formatted display values, and application URLs.
+
+#### Scenario: Waterfall detail props
+- **GIVEN** the published waterfall detail route is enabled
 - **WHEN** Rails renders its Inertia page
-- **THEN** the page receives typed translated text and typed application URLs through props
-- **AND** the React page renders those values without importing Rails locale files or a generated route catalog
+- **THEN** the page receives typed public waterfall content, translated display copy, formatted detail values, and typed application URLs through props
+- **AND** the React page renders those values without importing Rails locale files, duplicating domain formatting, or using a generated route catalog
 
 #### Scenario: Frontend type error
-- **GIVEN** a page or component violates its declared prop contract
+- **GIVEN** a page or component violates its declared shared or page-specific prop contract
 - **WHEN** the frontend typecheck runs
 - **THEN** verification fails before the application build is accepted
 
 #### Scenario: Sensitive server state
 - **GIVEN** Rails prepares shared or page-specific Inertia props
 - **WHEN** the response is serialized
-- **THEN** it omits credentials, raw session tokens, password-reset tokens, and other server-only secret material
+- **THEN** it omits credentials, raw session tokens, password-reset tokens, policy internals, unpublished state, and other server-only material
 
 ### Requirement: JavaScript-required Inertia shell
 The system SHALL make the CSR requirement explicit for Inertia pages while keeping production application scripts and styles same-origin.
@@ -89,7 +122,7 @@ The system SHALL make the CSR requirement explicit for Inertia pages while keepi
 
 #### Scenario: Development asset policy
 - **GIVEN** the approved Vite development server is running
-- **WHEN** a developer opens the smoke page
+- **WHEN** a developer opens an Inertia page
 - **THEN** development-only content security policy allowances permit its assets and live-reload connection
 - **AND** those allowances are absent from production policy
 
@@ -112,23 +145,23 @@ The system SHALL provide deterministic formatting, linting, accessibility, typec
 - **THEN** verification fails unless a precise reviewed exception is recorded
 
 ### Requirement: Rails integration proof
-The system SHALL prove the frontend foundation through a development/test-only Inertia smoke page without adding a production product route.
+The system SHALL prove the frontend platform through a production waterfall detail Inertia page and SHALL remove the superseded development/test smoke surface.
 
-#### Scenario: Development smoke page
-- **GIVEN** the application runs in development
-- **WHEN** a developer opens the smoke route
+#### Scenario: Production business page
+- **GIVEN** a published waterfall exists
+- **WHEN** a visitor opens its detail route in development, test, or production
 - **THEN** Rails returns the expected Inertia component and props
-- **AND** the React page renders with the shared frontend styles
+- **AND** React renders the page through the shared application shell and frontend styles
 
-#### Scenario: Test smoke page
-- **GIVEN** the application runs in test
-- **WHEN** the smoke route is exercised by request and browser tests
-- **THEN** the tests prove the Inertia response contract and client rendering
+#### Scenario: Browser integration
+- **GIVEN** frontend assets are built
+- **WHEN** the waterfall detail route is exercised by request, component, and browser tests
+- **THEN** the tests prove the Rails-to-Inertia-to-React response contract, client rendering, accessible interaction, and legacy-boundary navigation
 
-#### Scenario: Production route absence
-- **GIVEN** the application runs in production
-- **WHEN** the smoke path is requested
-- **THEN** the application does not expose the development/test smoke route
+#### Scenario: Smoke surface retirement
+- **GIVEN** the production waterfall detail route proves the frontend runtime chain
+- **WHEN** application routes and frontend pages are inspected
+- **THEN** no development/test smoke route, controller, page, copy, or dedicated smoke test remains
 
 ### Requirement: Integrated delivery pipeline
 The system SHALL include frontend installation, verification, and asset compilation in the supported local, CI, and production Docker workflows.
