@@ -1,5 +1,14 @@
 # Changes
 
+## 2026-06-15
+- Migrated the published waterfall detail route from ERB to Inertia React with
+  explicit display-ready props, a typed shared React shell, guest and
+  authenticated header parity, accessible one-time flash rendering, preserved
+  Digital Naturalist styling, and full-document navigation to legacy routes.
+- Replaced the temporary frontend smoke surface with production request,
+  component, accessibility, desktop/mobile Selenium, and runtime-boundary
+  coverage; verified the full frontend and Rails quality/security gates.
+
 ## 2026-06-14
 - Archived the completed `frontend-foundation` OpenSpec change into the
   permanent `frontend-platform` baseline and proposed Phase 1 to migrate the

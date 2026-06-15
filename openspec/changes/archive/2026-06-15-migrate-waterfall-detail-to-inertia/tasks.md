@@ -31,6 +31,6 @@
 - [x] 5.1 Review shared and page-specific Inertia props for accidental secrets, unnecessary user/model data, untranslated copy, duplicated route or domain logic, and history-persisted flash data.
 - [x] 5.2 Compare the legacy and migrated waterfall detail at desktop and mobile widths, including optional-content states, header actions, focus order, accessible names, document title, and the JavaScript-required fallback.
 - [x] 5.3 Run `make verify-fast`, the production Vite build, and `make verify`; record any unrelated blocker exactly.
-- [ ] 5.4 Update `CHANGES.md` and any implementation-owned context documentation in a documentation-only branch, preserving the repository's branch separation policy.
+- [x] 5.4 Update `CHANGES.md` and any implementation-owned context documentation in a documentation-only branch, preserving the repository's branch separation policy.
 - [x] 5.5 If implementation learning changes intent, requirements, shell ownership, prop exposure, or runtime-boundary design, update these approved OpenSpec artifacts and obtain approval before divergent work continues.
-- [ ] 5.6 Invoke `$openspec-verify-change`, run `bin/openspec validate --all --strict`, and archive the change only after implementation and all applicable gates pass.
+- [x] 5.6 Invoke `$openspec-verify-change`, run `bin/openspec validate --all --strict`, and archive the change only after implementation and all applicable gates pass.
