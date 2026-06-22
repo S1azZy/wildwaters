@@ -22,7 +22,7 @@ RSpec.describe FrontendFoundationConfiguration do
       "tailwindcss" => "4.3.1",
       "typescript" => "6.0.3",
       "vite" => "8.0.16",
-      "vitest" => "4.1.8",
+      "vitest" => "4.1.9",
     )
   end
 
@@ -119,6 +119,13 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(makefile).to include("frontend-install:", "frontend-verify:", "bin/npm run frontend:verify")
     expect(ci).to include("Frontend:")
     expect(dockerfile).to include("npm ci", "npm run frontend:build")
+  end
+
+  it "exposes npm dependency freshness through Make" do
+    makefile = root.join("Makefile").read
+
+    expect(makefile).to include("frontend-outdated:", "bin/npm outdated")
+    expect(makefile).not_to include("importmap-outdated:")
   end
 
   it "scopes Vite development CSP allowances to development" do

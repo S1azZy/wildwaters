@@ -18,7 +18,7 @@ RSpec.describe DependencyFreshnessCheck do
     let(:statuses) do
       {
         [ "bundle", "outdated", "--strict" ] => false,
-        [ "bin/importmap", "outdated" ] => true,
+        [ "bin/npm", "outdated" ] => true,
         [ "bin/check-maplibre-gl" ] => false
       }
     end
@@ -28,12 +28,12 @@ RSpec.describe DependencyFreshnessCheck do
       expect(calls).to eq(
         [
           [ "bundle", "outdated", "--strict" ],
-          [ "bin/importmap", "outdated" ],
+          [ "bin/npm", "outdated" ],
           [ "bin/check-maplibre-gl" ]
         ]
       )
       expect(output.string).to include("bundle outdated --strict")
-      expect(output.string).to include("bin/importmap outdated")
+      expect(output.string).to include("bin/npm outdated")
       expect(output.string).to include("bin/check-maplibre-gl")
     end
 
