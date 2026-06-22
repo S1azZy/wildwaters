@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-23
+- Applied each authenticated user's stored `en` or `ru` locale to the complete
+  application request lifecycle while preserving the default English locale
+  for guests and isolating locale state between requests.
+
 ## 2026-06-15
 - Migrated the published waterfall detail route from ERB to Inertia React with
   explicit display-ready props, a typed shared React shell, guest and
