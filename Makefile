@@ -3,7 +3,7 @@ SHELL := /bin/bash
 COMPOSE := docker compose
 APP := $(COMPOSE) run --rm web
 
-.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated importmap-outdated maplibre-outdated outdated
+.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify frontend-outdated install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated maplibre-outdated outdated
 
 setup: openspec-install
 	$(COMPOSE) up --build -d
@@ -115,8 +115,8 @@ endif
 bundle-outdated:
 	$(APP) bundle outdated
 
-importmap-outdated:
-	$(APP) bin/importmap outdated
+frontend-outdated:
+	$(APP) bin/npm outdated
 
 maplibre-outdated:
 	$(APP) bin/check-maplibre-gl

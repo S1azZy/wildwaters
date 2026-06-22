@@ -3,7 +3,7 @@
 module DependencyFreshnessCheck
   CHECKS = [
     [ "Bundler", [ "bundle", "outdated", "--strict" ] ],
-    [ "Importmap", [ "bin/importmap", "outdated" ] ],
+    [ "npm", [ "bin/npm", "outdated" ] ],
     [ "MapLibre GL", [ "bin/check-maplibre-gl" ] ]
   ].freeze
 
