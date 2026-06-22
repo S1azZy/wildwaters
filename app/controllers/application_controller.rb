@@ -2,6 +2,8 @@ class ApplicationController < ActionController::Base
   include Authentication
   include Pundit::Authorization
 
+  around_action :use_request_locale
+
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
@@ -26,5 +28,11 @@ class ApplicationController < ActionController::Base
         }
       }
     }
+  end
+
+  private
+
+  def use_request_locale(&action)
+    I18n.with_locale(current_user&.locale || I18n.default_locale, &action)
   end
 end

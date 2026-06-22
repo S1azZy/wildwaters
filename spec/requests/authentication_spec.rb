@@ -9,6 +9,18 @@ RSpec.describe "Authentication", type: :request do
     expect(body).to include(I18n.t("auth.fields.locale")) if include_locale
   end
 
+  def sign_in_with_locale(locale)
+    user = create(:user, locale:)
+    create(:user_identity, user:, email: "user@example.com")
+
+    post session_path, params: {
+      session: {
+        email: "user@example.com",
+        password: "Password123!"
+      }
+    }
+  end
+
   describe "GET /session/new" do
     subject(:perform_request) { get new_session_path }
 
@@ -102,10 +114,41 @@ RSpec.describe "Authentication", type: :request do
     subject(:perform_request) { get dashboard_path }
 
     it "redirects unauthenticated users to sign in" do
-      perform_request
+      I18n.with_locale(:ru) { perform_request }
 
       expect(response).to redirect_to(new_session_path)
-      expect(flash[:alert]).to eq(I18n.t("auth.sessions.require_authentication"))
+      expect(flash[:alert]).to eq(I18n.t("auth.sessions.require_authentication", locale: :en))
+    end
+
+    context "when authenticated with a Russian locale" do
+      before { sign_in_with_locale("ru") }
+
+      it "renders translations in Russian" do
+        perform_request
+
+        expect(response.body).to include(I18n.t("dashboard.show.heading", locale: :ru))
+      end
+
+      it "does not leak its locale into a later guest request" do
+        perform_request
+        expect(response.body).to include(I18n.t("dashboard.show.heading", locale: :ru))
+
+        delete session_path
+        get new_session_path
+
+        expect(response.body).to include(I18n.t("auth.sessions.new.heading", locale: :en))
+        expect(response.body).not_to include(I18n.t("auth.sessions.new.heading", locale: :ru))
+      end
+    end
+
+    context "when authenticated with an English locale" do
+      before { sign_in_with_locale("en") }
+
+      it "renders translations in English" do
+        perform_request
+
+        expect(response.body).to include(I18n.t("dashboard.show.heading", locale: :en))
+      end
     end
   end
 

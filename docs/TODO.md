@@ -16,77 +16,72 @@ Earlier items should normally be considered before later ones.
 
 ## P0: Close Existing Contract Gaps
 
-1. **Apply the stored user locale to requests.**
-   Registration persists `User#locale`, but authenticated requests still use
-   the application default locale. Add a request-scoped locale selection with a
-   deliberate guest fallback and coverage for both `en` and `ru`.
-
-2. **Restrict automatic region creation to canonical identity sources.**
+1. **Restrict automatic region creation to canonical identity sources.**
    The import model prevents a non-canonical source from becoming a primary
    identity, but the apply path can still create a new `Region` for any enabled
    source. Enrichment sources should attach only to an existing match unless a
    separately approved workflow says otherwise.
 
-3. **Add abuse protection to authentication entrypoints.**
+2. **Add abuse protection to authentication entrypoints.**
    Rate limit sign-in, registration, and password-reset requests without
    revealing account existence or weakening existing session and CSRF
    behavior.
 
-4. **Replace the catalog's fixed first-60 result window with explicit
+3. **Replace the catalog's fixed first-60 result window with explicit
    pagination or continuation.**
    Keep map payloads bounded, but make the HTML catalog and filtered discovery
    behavior explicit when more than 60 published waterfalls match.
 
 ## P1: Complete Core Waterfall Discovery
 
-5. **Add database-backed waterfall and region-name search.**
+4. **Add database-backed waterfall and region-name search.**
    The explore search field currently filters only the features already loaded
    in the browser. Search should use first-class waterfall fields and indexed
    `region_names`, while preserving the current map filters.
 
-6. **Add nearby waterfall discovery.**
+5. **Add nearby waterfall discovery.**
    Implement an index-backed PostGIS distance query with an explicit radius,
    ordering, result limit, and privacy-safe handling of user-provided
    coordinates.
 
-7. **Add dedicated region browse behavior.**
+6. **Add dedicated region browse behavior.**
    Expose useful region hierarchy and region context beyond the current filter
    dropdown. Reuse closure-table traversal and multilingual names rather than
    introducing a second hierarchy model.
 
 ## P2: Build the First Account Value Loop
 
-8. **Add a real user profile surface.**
+7. **Add a real user profile surface.**
    Define public and private profile fields before expanding the dashboard
    placeholder.
 
-9. **Add saved waterfalls.**
+8. **Add saved waterfalls.**
    Provide the smallest authenticated return-value loop before introducing
    public social content.
 
-10. **Add waterfall reviews with explicit ownership authorization.**
+9. **Add waterfall reviews with explicit ownership authorization.**
     Define publication state, edit/delete permissions, and anti-spam controls
     before exposing reviews publicly.
 
-11. **Add waterfall photos through Active Storage.**
+10. **Add waterfall photos through Active Storage.**
     Define content-type and size validation, publication visibility,
     attribution, and asynchronous derivatives.
 
-12. **Add check-ins with a privacy boundary.**
+11. **Add check-ins with a privacy boundary.**
     Decide timestamp and location precision, public visibility, and ownership
     rules before persistence or feed integration.
 
-13. **Add follows and an activity feed.**
+12. **Add follows and an activity feed.**
     Build this only after profiles and at least one meaningful activity source
     exist. Paginate the feed and keep authorization explicit.
 
-14. **Add achievements.**
+13. **Add achievements.**
     Treat achievements as a derived layer over stable check-in and activity
     behavior, not as an independent MVP subsystem.
 
 ## P3: Improve Import Operations and Coverage
 
-15. **Evaluate a React UI toolkit before substantial application-owned admin
+14. **Evaluate a React UI toolkit before substantial application-owned admin
     UI work.**
     Compare accessibility-first or headless options against Digital Naturalist,
     React 19 compatibility, maintenance health, bundle impact, testability, and
