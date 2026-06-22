@@ -1,6 +1,8 @@
 # Changes
 
 ## 2026-06-23
+- Synced the implemented request-scoped user locale contract into the
+  authentication baseline and archived its completed OpenSpec change.
 - Applied each authenticated user's stored `en` or `ru` locale to the complete
   application request lifecycle while preserving the default English locale
   for guests and isolating locale state between requests.
