@@ -164,7 +164,7 @@ The system SHALL revoke the current persisted session and clear browser authenti
 - **THEN** the system submits a CSRF-protected `DELETE` request for the current
   session
 - **AND** it records the session as revoked
-- **AND** it clears browser authentication and redirects to the legacy sign-in
+- **AND** it clears browser authentication and redirects to the Inertia sign-in
   page with a localized notice
 
 #### Scenario: Reuse revoked token

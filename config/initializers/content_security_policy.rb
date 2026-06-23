@@ -1,7 +1,5 @@
 # Be sure to restart your server when you modify this file.
 
-require "securerandom"
-
 Rails.application.configure do
   config.content_security_policy do |policy|
     vite_websocket_sources = Rails.env.development? ? [ "ws://localhost:3036", "ws://127.0.0.1:3036" ] : []
@@ -21,9 +19,4 @@ Rails.application.configure do
     policy.style_src_attr :unsafe_inline
     policy.worker_src :self, :blob
   end
-
-  # Rails importmap emits inline bootstrap tags, so use a real per-request nonce.
-  config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
-  config.content_security_policy_nonce_directives = %w[script-src]
-  config.content_security_policy_nonce_auto = true
 end

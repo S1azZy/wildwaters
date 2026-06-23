@@ -64,14 +64,13 @@ Stable architecture rules:
 - Queries that are not business use cases may live in `app/queries`.
 - Authorization stays explicit through policies for domain resources or a
   dedicated guard for a bounded admin engine.
-- The application-owned business frontend is transitioning route by route to
-  Vite, Inertia Rails, React, TypeScript, and Tailwind under ADR 0005.
-  Unmigrated routes retain ERB, Hotwire, Stimulus, and ViewComponent until their
-  approved vertical slice is complete; one route never mixes both browser
-  runtimes.
+- The application-owned business frontend uses Vite, Inertia Rails, React,
+  TypeScript, and Tailwind under ADR 0005. New application-owned business and
+  admin UI must use this stack instead of reintroducing ERB, Hotwire, Stimulus,
+  or ViewComponent pages.
 - Rails continues to own web routing, sessions, CSRF, authorization, I18n, and
   business use cases. Mailer ERB and third-party Rails engine interfaces are
-  outside the business frontend migration.
+  outside the business frontend architecture.
 - Background work uses the Rails/Solid Queue stack unless a concrete need
   justifies otherwise.
 - Do not introduce parallel service/interactor/API response styles.

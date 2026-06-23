@@ -11,13 +11,6 @@ gem "pg", "~> 1.1"
 gem "activerecord-postgis-adapter"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
-gem "importmap-rails"
-# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-gem "turbo-rails"
-# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
-gem "stimulus-rails"
-gem "view_component"
 # Build the application-owned frontend with Vite.
 gem "vite_rails", "3.11.0"
 # Deliver React pages through Rails routes and controllers.

@@ -64,24 +64,31 @@ The system SHALL render non-blank application flash messages through the shared 
 - **THEN** the blank entry is omitted
 
 ### Requirement: Accessible shared controls
-The system SHALL require accessible labels and explicit supported states for shared interactive controls.
+The system SHALL render shared shell controls, auth form controls, and flash
+messages with accessible labels, roles, states, and announcements through the
+React frontend.
 
-#### Scenario: Icon-only control
-- **GIVEN** an icon button is constructed
-- **WHEN** no accessible label is provided
-- **THEN** the component rejects the invalid control
+#### Scenario: Navigation links
+- **GIVEN** the shared application shell is rendered
+- **WHEN** a visitor navigates by keyboard or assistive technology
+- **THEN** brand, Explore, sign-in, and profile actions are exposed as named
+  links with Rails-generated destinations
 
-#### Scenario: Text or select field
-- **GIVEN** a shared text or select field is constructed
-- **WHEN** neither a visible label nor an ARIA label is provided
-- **THEN** the component rejects the invalid field
+#### Scenario: Auth form fields
+- **GIVEN** a migrated authentication or password-reset page is rendered
+- **WHEN** a visitor focuses or submits the form
+- **THEN** each field has a visible label and appropriate input semantics
+- **AND** disabled or processing controls expose matching browser states
 
-#### Scenario: Disabled field
-- **GIVEN** a shared field is disabled or has validation errors
-- **WHEN** it is rendered
-- **THEN** the output exposes matching disabled or error semantics
+#### Scenario: Flash messages
+- **GIVEN** Rails provides notice or alert flash data
+- **WHEN** the React shell renders the page
+- **THEN** notice messages use status semantics with polite announcement priority
+- **AND** alert messages use alert semantics with assertive announcement
+  priority
 
-#### Scenario: Unsupported constrained option
-- **GIVEN** a shared button, badge, card, field, flash, or icon button receives an option outside its documented closed set
-- **WHEN** the component is constructed
-- **THEN** the component rejects the unknown option instead of silently inventing a style
+#### Scenario: Accessibility regression check
+- **GIVEN** a shared shell, auth shell, or migrated page component is tested
+- **WHEN** frontend component tests run
+- **THEN** configured accessibility checks complete without violations for the
+  covered shell and form interactions

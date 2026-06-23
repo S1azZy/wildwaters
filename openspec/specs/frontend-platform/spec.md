@@ -23,40 +23,42 @@ The system SHALL compile the business frontend from locked npm dependencies into
 - **THEN** verification fails instead of silently serving an incomplete business page
 
 ### Requirement: Isolated frontend runtime ownership
-The system SHALL keep each application route under one browser-rendering runtime during migration.
-
-#### Scenario: Legacy route
-- **GIVEN** a business route has not migrated to Inertia
-- **WHEN** the route is rendered
-- **THEN** it uses the legacy Rails page runtime
-- **AND** it receives the shared stylesheet compiled by the frontend build
+The system SHALL keep application-owned business routes under the Inertia React
+browser runtime.
 
 #### Scenario: Inertia route
-- **GIVEN** a route is implemented as an Inertia page
+- **GIVEN** a route is implemented as an application-owned business page
 - **WHEN** the route is rendered
 - **THEN** it loads the React frontend entrypoint
-- **AND** it does not load Turbo, Stimulus, or the importmap application entrypoint
+- **AND** it does not load Turbo, Stimulus, or the importmap application
+  entrypoint
 
-#### Scenario: Cross-runtime navigation
-- **GIVEN** navigation crosses between a legacy route and an Inertia route
+#### Scenario: External engine navigation
+- **GIVEN** navigation targets external Rails engine UI
 - **WHEN** the visitor follows the navigation
-- **THEN** the browser performs a full document visit without requiring both runtimes to own the same page
+- **THEN** the browser may perform a full document visit
+- **AND** the application does not require its retired legacy business frontend
+  runtime for that engine surface
 
 ### Requirement: Shared visual foundation
-The system SHALL compile the existing Digital Naturalist design tokens and Tailwind styles for both legacy and Inertia pages without requiring parallel Tailwind compilers.
-
-#### Scenario: Legacy page after compiler migration
-- **GIVEN** an existing ERB business page
-- **WHEN** the page is rendered after Tailwind compilation moves to the frontend build
-- **THEN** its referenced utility classes and semantic design tokens are present in the compiled stylesheet
+The system SHALL compile the Digital Naturalist design tokens and Tailwind
+styles for the application-owned Inertia business frontend without requiring
+parallel Tailwind or legacy Rails UI compilers.
 
 #### Scenario: React page styling
 - **GIVEN** an Inertia React page uses the shared tokens and Tailwind utilities
 - **WHEN** the frontend assets are built
 - **THEN** the required styles are present in the same compiled stylesheet family
 
+#### Scenario: Legacy compiler retirement
+- **WHEN** frontend build tooling is inspected
+- **THEN** the application does not require a separate legacy Tailwind,
+  Importmap, Turbo, Stimulus, or ViewComponent build path for business routes
+
 ### Requirement: Shared React application shell
-The system SHALL provide migrated business pages with a typed React application shell that preserves the current site identity, navigation actions, content frame, document title, and accessible flash presentation.
+The system SHALL provide migrated business pages with a typed React application
+shell that preserves the current site identity, navigation actions, content
+frame, document title, and accessible flash presentation.
 
 #### Scenario: Guest shell
 - **GIVEN** a visitor is not authenticated
@@ -82,11 +84,11 @@ The system SHALL provide migrated business pages with a typed React application 
 - **THEN** it contains only namespaced translated labels, Rails-generated navigation URLs, and the authentication state required by the shell
 - **AND** it excludes credentials, raw session data, reset tokens, unnecessary user attributes, and policy internals
 
-#### Scenario: Legacy destination
-- **GIVEN** a shell or page link targets an unmigrated Rails route
+#### Scenario: Engine destination
+- **GIVEN** a shell or page link targets external Rails engine UI
 - **WHEN** the visitor follows that link
-- **THEN** the browser performs a full document visit to the legacy page
-- **AND** the legacy route remains owned by Turbo, Stimulus, and importmap
+- **THEN** the browser performs a full document visit when needed
+- **AND** application-owned business pages remain under the Inertia runtime
 
 ### Requirement: Typed Rails-to-React page contract
 The system SHALL provide explicit TypeScript types for shared and page-specific Inertia props while Rails remains the source of user-facing translations, formatted display values, and application URLs.
@@ -144,8 +146,37 @@ The system SHALL provide deterministic formatting, linting, accessibility, typec
 - **WHEN** the frontend dependency audit runs
 - **THEN** verification fails unless a precise reviewed exception is recorded
 
+### Requirement: Retired legacy business frontend stack
+The system SHALL remove the retired application-owned ERB, Importmap, Turbo,
+Stimulus, and ViewComponent business frontend stack after all current business
+routes migrate to Inertia.
+
+#### Scenario: Direct legacy runtime dependencies retired
+- **WHEN** application dependencies and CI checks are inspected
+- **THEN** Importmap, Turbo, Stimulus, and ViewComponent are absent from the
+  direct application-owned business frontend runtime
+- **AND** CI no longer runs Importmap-specific audit checks
+- **AND** transitive dependencies required by external Rails engine UI do not
+  count as application-owned business frontend runtime
+
+#### Scenario: Legacy source surfaces retired
+- **WHEN** application-owned frontend source files are inspected
+- **THEN** the repository contains no legacy `app/javascript` business entrypoint
+  or Stimulus controllers
+- **AND** it contains no application-owned ViewComponent UI layer or legacy
+  business application layout
+
+#### Scenario: Non-business ERB remains allowed
+- **WHEN** Rails templates are inspected
+- **THEN** mailer templates, the Inertia root layout, and Rails-owned technical
+  templates MAY remain
+- **AND** external Rails engine UI such as Mission Control Jobs does not block
+  legacy business frontend retirement
+
 ### Requirement: Rails integration proof
-The system SHALL prove the frontend platform through production business pages and SHALL remove superseded development/test smoke or legacy page surfaces as their routes migrate.
+The system SHALL prove the frontend platform through production business pages
+and SHALL remove superseded development/test smoke or legacy page surfaces as
+their routes migrate.
 
 #### Scenario: Production business page
 - **GIVEN** a published waterfall exists
@@ -174,7 +205,7 @@ The system SHALL prove the frontend platform through production business pages a
   browser tests
 - **THEN** the tests prove the Rails-to-Inertia-to-React response contract,
   CSRF-backed form submission, accessible interaction, safe validation
-  rendering, flash, and necessary legacy-boundary navigation
+  rendering, flash, and necessary document navigation
 
 #### Scenario: Migrated explore homepage
 - **GIVEN** a visitor opens the public explore homepage or waterfall index
@@ -198,6 +229,12 @@ The system SHALL prove the frontend platform through production business pages a
 - **GIVEN** the production waterfall detail route proves the frontend runtime chain
 - **WHEN** application routes and frontend pages are inspected
 - **THEN** no development/test smoke route, controller, page, copy, or dedicated smoke test remains
+
+#### Scenario: Legacy stack retirement proof
+- **GIVEN** all current application-owned business pages render through Inertia
+- **WHEN** the repository is inspected
+- **THEN** no application-owned legacy business frontend runtime, component
+  layer, or page layout remains
 
 ### Requirement: Protected Dashboard Inertia integration
 The system SHALL deliver the protected Dashboard placeholder as a typed Inertia
@@ -225,7 +262,7 @@ and redirect ownership.
 - **WHEN** the user activates sign-out
 - **THEN** an accessible button initiates the Rails-owned session deletion
   through the supported Inertia request transport
-- **AND** the browser reaches the legacy sign-in page after Rails completes the
+- **AND** the browser reaches the Inertia sign-in page after Rails completes the
   redirect
 
 #### Scenario: Dashboard legacy template retirement
@@ -246,6 +283,8 @@ The system SHALL include frontend installation, verification, and asset compilat
 - **GIVEN** a pull request changes frontend or application integration files
 - **WHEN** CI runs
 - **THEN** it installs locked npm dependencies and executes the frontend quality gate alongside the existing Rails gates
+- **AND** it does not run retired Importmap, Turbo, Stimulus, or ViewComponent
+  business frontend checks
 
 #### Scenario: Production image build
 - **GIVEN** a clean production Docker build

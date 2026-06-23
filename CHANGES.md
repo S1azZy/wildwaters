@@ -1,6 +1,12 @@
 # Changes
 
 ## 2026-06-24
+- Retired the application-owned legacy business frontend stack after completing
+  the Inertia migration: removed direct Importmap, Turbo, Stimulus, and
+  ViewComponent usage, deleted old JavaScript/component/layout surfaces,
+  dropped Importmap CI auditing, and updated frontend docs/specs to reflect the
+  completed Vite/Inertia/React boundary while preserving mailers and
+  gem-hosted UI.
 - Clarified the agent command environment contract so app/runtime commands use
   Makefile-backed container targets first, while host commands are reserved for
   repository inspection, editing, git inspection, Docker orchestration, and

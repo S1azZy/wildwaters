@@ -11,7 +11,6 @@ require "factory_bot_rails"
 require "inertia_rails/rspec"
 require "pundit/rspec"
 require "shoulda/matchers"
-require "view_component/test_helpers"
 
 Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |file| require file }
 
@@ -28,11 +27,6 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   config.use_transactional_fixtures = true
   config.include FactoryBot::Syntax::Methods
-  config.include ViewComponent::TestHelpers, type: :component
-  config.define_derived_metadata(file_path: %r{/spec/components/}) do |metadata|
-    metadata[:type] = :component
-  end
-
   config.before do
     Rails.cache.clear
   end

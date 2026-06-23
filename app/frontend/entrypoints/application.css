@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "../styles/design_tokens.css";
 
-@source "../../components/**/*.rb";
-@source "../../javascript/**/*.js";
 @source "../../views/**/*.erb";
 @source "../**/*.{ts,tsx}";
 
