@@ -57,15 +57,22 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(root.join("app/frontend/test/setup.ts")).to exist
   end
 
-  it "keeps legacy and Inertia JavaScript runtimes in separate layouts" do
-    legacy_layout = root.join("app/views/layouts/application.html.erb").read
+  it "uses the Inertia layout without the retired legacy JavaScript runtime" do
     inertia_layout = root.join("app/views/layouts/inertia.html.erb").read
 
-    expect(legacy_layout).to include("vite_stylesheet_tag")
-    expect(legacy_layout).to include("javascript_importmap_tags")
     expect(inertia_layout).to include("vite_react_refresh_tag")
     expect(inertia_layout).to include('vite_typescript_tag "application.tsx"')
     expect(inertia_layout).not_to include("javascript_importmap_tags", "turbo")
+  end
+
+  it "retires the direct legacy business frontend dependencies and CI checks" do
+    gemfile = root.join("Gemfile").read
+    ci = root.join("config/ci.rb").read
+
+    expect(gemfile).not_to include("importmap-rails", "turbo-rails", "stimulus-rails", "view_component")
+    expect(ci).not_to include("Importmap", "bin/importmap")
+    expect(root.join("config/importmap.rb")).not_to exist
+    expect(root.join("bin/importmap")).not_to exist
   end
 
   it "declares the frontend entrypoints and Rails integration" do
@@ -87,13 +94,20 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(root.join("app/frontend/pages/Frontend/Smoke.tsx")).not_to exist
   end
 
-  it "retires the superseded explore ERB and Stimulus surfaces after migration" do
+  it "retires the application-owned legacy frontend source surfaces" do
+    expect(root.join("app/views/layouts/application.html.erb")).not_to exist
+    expect(Dir.glob(root.join("app/javascript/**/*").to_s).reject { |path| File.directory?(path) }).to be_empty
+    expect(Dir.glob(root.join("app/components/**/*").to_s).reject { |path| File.directory?(path) }).to be_empty
+    expect(Dir.glob(root.join("spec/components/**/*").to_s).reject { |path| File.directory?(path) }).to be_empty
+  end
+
+  it "keeps superseded waterfall ERB and Stimulus surfaces retired" do
     expect(root.join("app/views/waterfalls/index.html.erb")).not_to exist
     expect(root.join("app/views/waterfalls/_waterfall_card.html.erb")).not_to exist
     expect(root.join("app/javascript/controllers/explore_map_controller.js")).not_to exist
   end
 
-  it "preserves representative legacy styles in the Vite stylesheet" do
+  it "preserves representative Inertia styles in the Vite stylesheet" do
     vite_config = JSON.parse(root.join("config/vite.json").read)
     output_dir = vite_config.fetch("test").fetch("publicOutputDir")
     build_dir = root.join("public", output_dir)

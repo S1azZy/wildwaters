@@ -4,23 +4,22 @@
 - Decided: 2026-03-22
 - Normalized to implementation: 2026-06-13
 - Partially superseded: ADR 0005 replaces the ERB/ViewComponent implementation
-  boundary for migrated routes; this ADR continues to own Digital Naturalist
-  and its token vocabulary.
+  boundary for application-owned business routes; this ADR continues to own
+  Digital Naturalist and its token vocabulary.
 
 ## Context
 
 Wild Waters needs a coherent visual language across public discovery and
-authentication screens without replacing Rails views with a client-side UI
-framework.
+authentication screens.
 
-The application uses ERB, Tailwind CSS, Hotwire, and bilingual `ru`/`en` copy.
-Some UI patterns are stable and shared, while page composition and map-specific
-markup remain feature-owned.
+The application uses Tailwind CSS, Inertia React pages, and bilingual `ru`/`en`
+copy. Some UI patterns are stable and shared, while page composition and
+map-specific markup remain feature-owned.
 
 ## Decision
 
 Adopt a design system called **Digital Naturalist** and implement it with
-semantic Tailwind tokens plus a selective ViewComponent layer.
+semantic Tailwind tokens plus application-owned typed React components.
 
 ### Visual direction
 
@@ -70,14 +69,10 @@ ADR.
 
 ### Rendering and component boundary
 
-- ViewComponent owns reusable UI primitives and application-shell elements on
-  unmigrated legacy routes;
-- page structure and feature-specific composition remain in ERB views until a
-  route migrates under ADR 0005;
-- migrated routes port stable primitives into application-owned typed React
-  components while preserving this token vocabulary;
-- Stimulus owns focused interaction behavior without becoming a second
-  rendering architecture;
+- application-owned typed React components own reusable UI primitives and
+  application-shell elements;
+- page structure and feature-specific composition live in React pages under ADR
+  0005;
 - user-facing component and page copy is provided through Rails I18n;
 - component extraction is driven by stable reuse, not by a requirement to turn
   every partial or page fragment into a component.
@@ -106,16 +101,16 @@ the Rails page-composition model.
 
 ### Adopt a client-side component framework
 
-The current interaction model is covered by ERB, Hotwire, Stimulus, and
-ViewComponent. A second frontend application architecture is not justified.
+This was the original implementation stance. ADR 0005 later selected Inertia
+React as the application-owned business frontend architecture.
 
 ## Consequences
 
-- Shared primitives have explicit Ruby APIs and component specs.
+- Shared primitives have explicit TypeScript props and frontend tests.
 - Semantic tokens provide a common vocabulary without forbidding all local
   utility classes.
-- The design system is intentionally hybrid: shared primitives are components,
-  while feature composition remains close to its Rails view.
+- The design system keeps shared primitives componentized while feature
+  composition remains close to its React page.
 - Visual review must check both component consistency and the Digital Naturalist
   direction; component reuse alone is not sufficient.
 - New shared primitives should follow existing component and token patterns.

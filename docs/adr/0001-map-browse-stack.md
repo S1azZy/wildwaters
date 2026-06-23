@@ -10,12 +10,11 @@
 ## Context
 
 Waterfall discovery is map-first. The application is a Rails monolith with
-Hotwire, Stimulus, PostgreSQL, and PostGIS, and it needs an interactive map
-without making a proprietary map SDK part of the application architecture.
+PostgreSQL and PostGIS, and it needs an interactive map without making a
+proprietary map SDK part of the application architecture.
 
-The browse surface must support a server-rendered initial state and progressively
-enhance it with map movement, filtering, marker selection, and result-list
-synchronization.
+The browse surface is now delivered through the ADR 0005 Inertia React frontend,
+while this ADR continues to own the MapLibre/PostGIS data-delivery decisions.
 
 ## Decision
 
@@ -27,9 +26,9 @@ waterfall discovery.
 
 - MapLibre GL JS is the browser renderer.
 - The published MapLibre JavaScript and CSS are vendored in the application,
-  pinned through importmap and Rails assets, and are not loaded from a runtime
-  CDN.
-- Rails, ERB, Hotwire, and Stimulus own page delivery and browser orchestration.
+  served from application-owned assets, and are not loaded from a runtime CDN.
+- Rails, Inertia, React, and Vite own page delivery and browser orchestration
+  under ADR 0005.
 - PostgreSQL with PostGIS owns spatial filtering.
 - Basemap style and tile services are runtime content dependencies selected
   through an application-owned catalog. Stadia Maps and OpenFreeMap are current
@@ -37,14 +36,14 @@ waterfall discovery.
 
 ### Browse delivery
 
-- Rails renders the initial waterfall list and map shell;
-- a Stimulus controller owns MapLibre lifecycle and interaction;
+- Rails renders the initial Inertia props for the waterfall list and map shell;
+- the React explore page owns MapLibre lifecycle and interaction;
 - waterfall points use MapLibre style layers and built-in clustering rather
   than one DOM marker per waterfall;
 - `waterfalls#map_data` returns a compact GeoJSON feature collection;
 - browser movement triggers bounded refreshes, and map requests require visible
   bounds and use a PostGIS envelope query;
-- list and map delivery share the same application query path;
+- initial list and map-data delivery share the same application query path;
 - map styles are selected from an application-owned catalog, while the selected
   style preference is stored in the browser.
 
@@ -75,8 +74,8 @@ product currently needs.
 - The application owns GeoJSON payload shape, query limits, and map/list
   synchronization.
 - PostGIS remains the source of truth for visible-bounds filtering.
-- The initial page remains usable as server-rendered HTML, while the richer map
-  experience depends on JavaScript.
+- The migrated explore page requires JavaScript, with a localized no-JavaScript
+  message provided by the Inertia root document.
 - Basemap availability and attribution must be monitored independently from the
   application.
 - Vendoring the renderer reduces runtime supply-chain and CDN availability

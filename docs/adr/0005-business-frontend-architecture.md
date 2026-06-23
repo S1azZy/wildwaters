@@ -2,12 +2,14 @@
 
 - Status: Accepted
 - Decided: 2026-06-14
-- Implementation: `openspec/changes/frontend-foundation`
+- Implementation: `openspec/changes/archive/2026-06-14-frontend-foundation`
+  and subsequent route migration changes
 
 ## Context
 
-Wild Waters is a Rails monolith whose own browser UI currently uses ERB,
-Hotwire, Stimulus, ViewComponent, importmap, and Tailwind. The application is
+Wild Waters is a Rails monolith whose application-owned business frontend has
+migrated from ERB, Hotwire, Stimulus, ViewComponent, importmap, and Tailwind to
+Vite, Inertia Rails, React, TypeScript, and Tailwind. The application is
 expected to grow beyond the initial public waterfall pages into richer
 interactive product flows and an application-owned admin interface.
 
@@ -63,20 +65,18 @@ change is implemented.
 
 ### Rendering and migration boundary
 
-Migration is route-based rather than component-island-based:
+Migration was route-based rather than component-island-based:
 
-- an application route is entirely legacy Rails UI or entirely an Inertia
-  React page;
-- legacy and Inertia routes use separate layouts so Turbo/Stimulus and Inertia
-  do not compete for browser lifecycle ownership;
-- navigation across that boundary may use a full document visit;
-- existing business routes migrate through separate, reviewable OpenSpec
+- an application route was entirely legacy Rails UI or entirely an Inertia
+  React page during migration;
+- legacy and Inertia routes used separate layouts so Turbo/Stimulus and Inertia
+  did not compete for browser lifecycle ownership;
+- existing business routes migrated through separate, reviewable OpenSpec
   changes;
-- the waterfall detail page is the preferred first business slice;
-- Explore and its MapLibre lifecycle migrate last among current product pages;
+- current application-owned business routes now render through Inertia React;
 - new application-owned admin UI uses the new frontend architecture;
-- a final cleanup change removes the old frontend stack only after no
-  application-owned business route consumes it.
+- the final cleanup change removes the old application-owned frontend stack
+  after no business route consumes it.
 
 The migration preserves current visual design. It is not a redesign program.
 
@@ -159,8 +159,8 @@ later toolkit decision.
   first-class parts of repository verification and production image assembly.
 - Rails continues to enforce security and business boundaries; Inertia props
   become an explicit exposure surface requiring review and tests.
-- The project temporarily maintains two route-level frontend stacks, but never
-  two page runtimes on the same route.
+- The project no longer maintains a legacy application-owned business frontend
+  stack after the cleanup change.
 - Tailwind compilation moves to Vite while the Digital Naturalist visual
   vocabulary remains stable.
 - Migrated pages no longer promise useful operation without JavaScript unless a
