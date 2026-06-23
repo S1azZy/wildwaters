@@ -16,7 +16,7 @@ RSpec.describe "Authentication screens", type: :system do
     end
   end
 
-  it "signs in through the migrated Inertia screen and reaches legacy explore", :aggregate_failures do
+  it "signs in through the migrated Inertia screen and reaches migrated explore", :aggregate_failures do
     user_identity = create(:user_identity, email: "user@example.com")
 
     visit new_session_path
@@ -28,7 +28,7 @@ RSpec.describe "Authentication screens", type: :system do
 
     expect(page).to have_current_path(root_path)
     expect(Session.active.where(user: user_identity.user).count).to eq(1)
-    expect_legacy_runtime
+    expect_explore_inertia_runtime
   end
 
   it "renders safe sign-in errors through the migrated screen", :aggregate_failures do
@@ -112,8 +112,9 @@ RSpec.describe "Authentication screens", type: :system do
     expect(page).to have_css("script[type='module']", visible: false)
   end
 
-  def expect_legacy_runtime
-    expect(page).to have_css("script[type='importmap']", visible: false)
-    expect(page).not_to have_css("[data-page]", visible: false)
+  def expect_explore_inertia_runtime
+    expect(page).to have_css("#explore-home")
+    expect(page).not_to have_css("script[type='importmap']", visible: false)
+    expect(page).to have_css("script[type='module']", visible: false)
   end
 end

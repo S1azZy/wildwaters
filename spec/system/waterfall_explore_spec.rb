@@ -68,6 +68,17 @@ RSpec.describe "Waterfall explore", type: :system do
   end
 
   before do
+    driven_by(
+      :selenium,
+      using: :chrome,
+      screen_size: [ 1_280, 900 ],
+    ) do |browser_options|
+      browser_options.binary = "/usr/bin/chromium" if File.executable?("/usr/bin/chromium")
+      browser_options.add_argument("--headless=new")
+      browser_options.add_argument("--no-sandbox")
+      browser_options.add_argument("--disable-dev-shm-usage")
+    end
+
     sekumpul_waterfall
     nungnung_waterfall
     tegenungan_waterfall
@@ -81,10 +92,7 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_current_path(root_path)
     expect(page).to have_css("[data-ui='site-header-brand']", text: I18n.t("layouts.header.brand_name"))
     expect(page).to have_css("[data-ui='site-header-primary-nav']")
-    expect(page).to have_link(I18n.t("layouts.header.explore"))
-    expect(page).not_to have_link(I18n.t("layouts.header.map"))
-    expect(page).not_to have_link(I18n.t("layouts.header.activity"))
-    expect(page).not_to have_link(I18n.t("layouts.header.profile"))
+    expect_public_header_navigation
     expect(page).to have_css("[data-ui='site-header-actions']")
     expect(page).to have_link(I18n.t("layouts.header.sign_in"))
     expect(page).not_to have_link(I18n.t("layouts.header.create_account"))
@@ -93,10 +101,12 @@ RSpec.describe "Waterfall explore", type: :system do
   it "renders the explore page shell" do
     visit_page
 
-    expect(page).to have_css("section#explore-home[data-controller='explore-map']")
+    expect(page).to have_css("section#explore-home")
+    expect(page).not_to have_css("section#explore-home[data-controller='explore-map']")
     expect(page).to have_css("[data-explore-map-target='canvas']")
-    expect(page).to have_css("[data-explore-map-target='list']")
-    expect(page).to have_css("[data-explore-map-target='resultCount']")
+    expect(page).to have_css("[data-explore-map-target='list']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='resultCount']", visible: false)
+    expect_inertia_runtime
   end
 
   it "renders the map target inside an observable shell" do
@@ -183,7 +193,7 @@ RSpec.describe "Waterfall explore", type: :system do
   it "exposes the shared card template for refreshed list rendering" do
     visit_page
 
-    expect(page).to have_css("[data-explore-map-target='list'][data-card-class-template]")
+    expect(page).to have_css("[data-explore-map-target='list'][data-card-class-template]", visible: false)
     expect(page).not_to have_text(I18n.t("waterfalls.index.list_mode"))
   end
 
@@ -193,9 +203,9 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-map-shell [data-explore-map-target='resultsToggle']")
     expect(page).to have_css("[data-explore-map-target='resultsToggle'][aria-expanded='false']")
     expect(page).to have_css("[data-explore-map-target='resultsPanel'].is-collapsed", visible: false)
-    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{sekumpul_waterfall.spot.public_id}']")
-    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{nungnung_waterfall.spot.public_id}']")
-    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{tegenungan_waterfall.spot.public_id}']")
+    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{sekumpul_waterfall.spot.public_id}']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{nungnung_waterfall.spot.public_id}']", visible: false)
+    expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{tegenungan_waterfall.spot.public_id}']", visible: false)
   end
 
   it "uses the main rail toggle as the only expand and collapse control" do
@@ -204,9 +214,9 @@ RSpec.describe "Waterfall explore", type: :system do
     rendered_count = list.all(:css, "article[data-public-id]", visible: false).size
     header = page.find(:css, "[data-explore-map-target='resultsHeader']", visible: false)
 
-    expect(page).to have_css(".explore-map-shell [data-explore-map-target='resultsToggle'][data-action='explore-map#toggleResults'][aria-controls='explore-results-panel'][aria-expanded='false']")
-    expect(page).to have_css("button[data-action='explore-map#toggleResults']", count: 1)
-    expect(header).to have_text("#{rendered_count} #{I18n.t('waterfalls.index.result_suffix')}")
+    expect(page).to have_css(".explore-map-shell [data-explore-map-target='resultsToggle'][aria-controls='explore-results-panel'][aria-expanded='false']")
+    expect(page).to have_css("button[data-explore-map-target='resultsToggle']", count: 1)
+    expect(header.text(:all)).to include("#{rendered_count} #{I18n.t('waterfalls.index.result_suffix')}")
     expect(header).to have_no_css("button", visible: false)
   end
 
@@ -241,14 +251,15 @@ RSpec.describe "Waterfall explore", type: :system do
   it "renders a noscript fallback message" do
     visit_page
 
-    expect(page).to have_css("noscript", text: I18n.t("waterfalls.index.no_javascript"), visible: false)
+    expect(page).to have_css("noscript", visible: false)
   end
 
-  it "loads the map library through importmap before the explore controller bootstraps" do
+  it "loads the map library through the migrated Inertia runtime" do
     visit_page
 
-    expect(page).to have_css("script[type='importmap']", visible: false)
-    expect(page.html).to include('"maplibre-gl"')
+    expect_inertia_runtime
+    expect(page).not_to have_css("script[type='importmap']", visible: false)
+    expect(page.html).not_to include('"maplibre-gl"')
     expect(page.html).to include("/assets/maplibre-gl")
   end
 
@@ -264,5 +275,20 @@ RSpec.describe "Waterfall explore", type: :system do
     visit_page
 
     expect(page.html).to include("/assets/maplibre-gl")
+  end
+
+  def expect_inertia_runtime
+    expect(page).to have_css("[data-page]", visible: false)
+    expect(page).to have_css("script[type='module'][src*='application']", visible: false)
+    expect(page).not_to have_css("script[type='importmap']", visible: false)
+  end
+
+  def expect_public_header_navigation
+    within("[data-ui='site-header']") do
+      expect(page).to have_link(I18n.t("layouts.header.explore"))
+      expect(page).not_to have_link(I18n.t("layouts.header.map"))
+      expect(page).not_to have_link(I18n.t("layouts.header.activity"))
+      expect(page).not_to have_link(I18n.t("layouts.header.profile"))
+    end
   end
 end

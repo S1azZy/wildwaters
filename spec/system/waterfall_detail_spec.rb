@@ -81,7 +81,7 @@ RSpec.describe "Waterfall detail", type: :system do
     page.current_window.resize_to(1_280, 900)
 
     visit waterfalls_path
-    expect_legacy_runtime
+    expect_explore_inertia_runtime
     open_waterfall_from_explore
 
     expect(page).to have_current_path(waterfall_path(waterfall.spot))
@@ -90,7 +90,7 @@ RSpec.describe "Waterfall detail", type: :system do
     click_link I18n.t("waterfalls.show.back")
 
     expect(page).to have_current_path(waterfalls_path)
-    expect_legacy_runtime
+    expect_explore_inertia_runtime
   end
 
   def open_waterfall_from_explore
@@ -106,8 +106,9 @@ RSpec.describe "Waterfall detail", type: :system do
     expect(page).to have_css("script[type='module']", visible: false)
   end
 
-  def expect_legacy_runtime
-    expect(page).to have_css("script[type='importmap']", visible: false)
-    expect(page).not_to have_css("[data-page]", visible: false)
+  def expect_explore_inertia_runtime
+    expect(page).to have_css("#explore-home")
+    expect(page).not_to have_css("script[type='importmap']", visible: false)
+    expect(page).to have_css("script[type='module']", visible: false)
   end
 end

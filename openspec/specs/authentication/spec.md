@@ -63,7 +63,7 @@ The system SHALL create a persisted session only for an active user with valid p
 #### Scenario: Successful sign-in
 - **GIVEN** an active user with a password identity
 - **WHEN** the user submits the correct password from the migrated sign-in page
-- **THEN** the system creates a session and reaches the legacy explore homepage
+- **THEN** the system creates a session and reaches the migrated explore homepage
   with a full document visit
 
 #### Scenario: Invalid credentials

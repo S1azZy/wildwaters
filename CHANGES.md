@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-24
+- Migrated the public explore homepage/waterfall index from ERB, Stimulus, and
+  importmap to a typed Inertia React page while preserving the current
+  map-first design, localized filters, collapsed results rail, same-origin
+  vendored MapLibre assets, backend-owned map-data filtering, and published-only
+  public result behavior.
+
 ## 2026-06-23
 - Migrated the sign-in, registration, password-reset request, and password-reset
   edit screens from ERB to typed Inertia React pages while preserving the
