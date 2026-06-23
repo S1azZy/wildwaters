@@ -1,12 +1,203 @@
 require "rails_helper"
 
 RSpec.describe "Authentication", type: :request do
-  def expect_auth_shell_response!(body, title:, prompt:, link:, include_locale: false)
-    expect(body).to include("data-ui=\"auth-shell\"")
-    expect(body).to include(title)
-    expect(body).to include(prompt)
-    expect(body).to include(link)
-    expect(body).to include(I18n.t("auth.fields.locale")) if include_locale
+  def expect_auth_page_contract!(component:, expected_props:, status: :ok)
+    expect(response).to have_http_status(status)
+    expect(inertia).to be_inertia_response
+    expect(inertia).to render_component(component)
+    expect(inertia.props.keys).to contain_exactly(*expected_props.keys.map(&:to_s), "errors", "shell")
+    expect(inertia.props.fetch("errors")).to eq({})
+    expect(inertia).to have_props(expected_props.merge(shell: expected_shell_props(locale: I18n.locale)))
+    expect(nested_keys(inertia.props)).not_to include(*auth_sensitive_prop_keys)
+  end
+
+  def expect_auth_inertia_runtime!
+    expect(response.body).to include(I18n.t("frontend.javascript_required"))
+    expect(response.body).to include('href="/vite-test/assets/application-', 'type="module"')
+    expect(response.body).not_to include("javascript_importmap_tags", "data-turbo-track")
+  end
+
+  def expected_guest_shell_labels(locale:)
+    {
+      brandName: I18n.t("layouts.header.brand_name", locale:),
+      brandTagline: I18n.t("layouts.header.brand_tagline", locale:),
+      explore: I18n.t("layouts.header.explore", locale:),
+      profile: I18n.t("layouts.header.profile", locale:),
+      signIn: I18n.t("layouts.header.sign_in", locale:)
+    }
+  end
+
+  def expected_shell_urls
+    {
+      dashboard: dashboard_path,
+      explore: root_path,
+      signIn: new_session_path
+    }
+  end
+
+  def expected_shell_props(locale:, authenticated: false)
+    {
+      authenticated:,
+      labels: expected_guest_shell_labels(locale:),
+      urls: expected_shell_urls
+    }
+  end
+
+  def auth_sensitive_prop_keys
+    %w[
+      credential
+      credentials
+      current_user
+      identity
+      policy
+      primary_email
+      reset_token
+      role
+      session
+      status
+      token
+      user
+    ]
+  end
+
+  def session_new_props(email: nil, alert: nil)
+    {
+      auth: auth_shell_props(
+        variant: "session",
+        panel_label: "Basecamp access",
+        namespace: "auth.sessions.new",
+        alternate_prompt: I18n.t("auth.sessions.new.sign_up_prompt"),
+        alternate_label: I18n.t("auth.sessions.new.sign_up_link"),
+        alternate_url: new_registration_path
+      ),
+      copy: {
+        cardHeading: I18n.t("auth.sessions.new.card_heading"),
+        cardSupporting: I18n.t("auth.sessions.new.card_supporting"),
+        forgotPassword: I18n.t("auth.sessions.new.forgot_password"),
+        submit: I18n.t("auth.sessions.new.submit")
+      },
+      fields: {
+        email: field_props("auth.fields.email", placeholder: "auth.fields.email_placeholder"),
+        password: field_props("auth.fields.password", placeholder: "auth.fields.password_placeholder")
+      },
+      formError: alert,
+      urls: {
+        forgotPassword: new_password_reset_path,
+        submit: session_path
+      },
+      values: {
+        email:
+      }
+    }
+  end
+
+  def registration_new_props(email: nil, locale: "en", form_error: nil)
+    {
+      auth: auth_shell_props(
+        variant: "registration",
+        panel_label: "Field kit setup",
+        namespace: "auth.registrations.new",
+        alternate_prompt: I18n.t("auth.registrations.new.sign_in_prompt"),
+        alternate_label: I18n.t("auth.registrations.new.sign_in_link"),
+        alternate_url: new_session_path
+      ),
+      copy: {
+        cardHeading: I18n.t("auth.registrations.new.card_heading"),
+        cardSupporting: I18n.t("auth.registrations.new.card_supporting"),
+        localeHint: I18n.t("auth.registrations.new.locale_hint"),
+        submit: I18n.t("auth.registrations.new.submit")
+      },
+      fields: {
+        email: field_props("auth.fields.email", placeholder: "auth.fields.email_placeholder"),
+        locale: field_props("auth.fields.locale"),
+        password: field_props("auth.fields.password", placeholder: "auth.fields.password_placeholder"),
+        passwordConfirmation: field_props("auth.fields.password_confirmation", placeholder: "auth.fields.password_placeholder")
+      },
+      formError: form_error,
+      localeOptions: [
+        { label: I18n.t("auth.locales.en"), value: "en" },
+        { label: I18n.t("auth.locales.ru"), value: "ru" }
+      ],
+      urls: {
+        submit: registration_path
+      },
+      values: {
+        email:,
+        locale:
+      }
+    }
+  end
+
+  def password_reset_new_props(email: nil)
+    {
+      auth: auth_shell_props(
+        variant: "recovery",
+        panel_label: "Secure account recovery",
+        namespace: "auth.password_resets.new",
+        alternate_prompt: I18n.t("auth.password_resets.new.sign_in_prompt"),
+        alternate_label: I18n.t("auth.password_resets.new.sign_in_link"),
+        alternate_url: new_session_path
+      ),
+      copy: {
+        cardHeading: I18n.t("auth.password_resets.new.card_heading"),
+        cardSupporting: I18n.t("auth.password_resets.new.card_supporting"),
+        submit: I18n.t("auth.password_resets.new.submit")
+      },
+      fields: {
+        email: field_props("auth.fields.email", placeholder: "auth.fields.email_placeholder")
+      },
+      urls: {
+        submit: password_reset_path
+      },
+      values: {
+        email:
+      }
+    }
+  end
+
+  def password_reset_edit_props(token:, alert: nil)
+    {
+      auth: auth_shell_props(
+        variant: "recovery",
+        panel_label: "Secure account recovery",
+        namespace: "auth.password_resets.edit",
+        alternate_prompt: I18n.t("auth.password_resets.edit.sign_in_prompt"),
+        alternate_label: I18n.t("auth.password_resets.edit.sign_in_link"),
+        alternate_url: new_session_path
+      ),
+      copy: {
+        cardHeading: I18n.t("auth.password_resets.edit.card_heading"),
+        cardSupporting: I18n.t("auth.password_resets.edit.card_supporting"),
+        submit: I18n.t("auth.password_resets.edit.submit")
+      },
+      fields: {
+        password: field_props("auth.fields.password", placeholder: "auth.fields.password_placeholder"),
+        passwordConfirmation: field_props("auth.fields.password_confirmation", placeholder: "auth.fields.password_placeholder")
+      },
+      formError: alert,
+      urls: {
+        submit: password_reset_token_path(token)
+      }
+    }
+  end
+
+  def auth_shell_props(variant:, panel_label:, namespace:, alternate_prompt:, alternate_label:, alternate_url:)
+    {
+      variant:,
+      eyebrow: I18n.t("#{namespace}.eyebrow"),
+      title: I18n.t("#{namespace}.heading"),
+      description: I18n.t("#{namespace}.subheading"),
+      panelLabel: panel_label,
+      alternatePrompt: alternate_prompt,
+      alternateLabel: alternate_label,
+      alternateUrl: alternate_url
+    }
+  end
+
+  def field_props(label_key, placeholder: nil)
+    props = { label: I18n.t(label_key) }
+    props[:placeholder] = I18n.t(placeholder) if placeholder
+    props
   end
 
   def sign_in_with_locale(locale, email: "user@example.com")
@@ -29,14 +220,8 @@ RSpec.describe "Authentication", type: :request do
     it "renders the sign-in page with its recovery and registration links" do
       perform_request
 
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include(I18n.t("auth.sessions.new.forgot_password"))
-      expect_auth_shell_response!(
-        response.body,
-        title: I18n.t("auth.sessions.new.heading"),
-        prompt: ERB::Util.html_escape(I18n.t("auth.sessions.new.sign_up_prompt")),
-        link: I18n.t("auth.sessions.new.sign_up_link")
-      )
+      expect_auth_page_contract!(component: "Sessions/New", expected_props: session_new_props)
+      expect_auth_inertia_runtime!
     end
 
     context "when the user is already authenticated" do
@@ -66,14 +251,8 @@ RSpec.describe "Authentication", type: :request do
     it "renders the sign-up page with its locale field and sign-in link" do
       perform_request
 
-      expect(response).to have_http_status(:ok)
-      expect_auth_shell_response!(
-        response.body,
-        title: I18n.t("auth.registrations.new.heading"),
-        prompt: I18n.t("auth.registrations.new.sign_in_prompt"),
-        link: I18n.t("auth.registrations.new.sign_in_link"),
-        include_locale: true
-      )
+      expect_auth_page_contract!(component: "Registrations/New", expected_props: registration_new_props)
+      expect_auth_inertia_runtime!
     end
   end
 
@@ -83,13 +262,8 @@ RSpec.describe "Authentication", type: :request do
     it "renders the password reset request page inside the shared auth shell" do
       perform_request
 
-      expect(response).to have_http_status(:ok)
-      expect_auth_shell_response!(
-        response.body,
-        title: I18n.t("auth.password_resets.new.heading"),
-        prompt: I18n.t("auth.password_resets.new.sign_in_prompt"),
-        link: I18n.t("auth.password_resets.new.sign_in_link")
-      )
+      expect_auth_page_contract!(component: "PasswordResets/New", expected_props: password_reset_new_props)
+      expect_auth_inertia_runtime!
     end
   end
 
@@ -101,36 +275,17 @@ RSpec.describe "Authentication", type: :request do
     it "renders the password reset form inside the shared auth shell" do
       perform_request
 
-      expect(response).to have_http_status(:ok)
-      expect_auth_shell_response!(
-        response.body,
-        title: I18n.t("auth.password_resets.edit.heading"),
-        prompt: I18n.t("auth.password_resets.edit.sign_in_prompt"),
-        link: I18n.t("auth.password_resets.edit.sign_in_link")
+      expect_auth_page_contract!(
+        component: "PasswordResets/Edit",
+        expected_props: password_reset_edit_props(token:)
       )
-      expect(response.body).to include(I18n.t("auth.password_resets.edit.submit"))
+      expect_auth_inertia_runtime!
     end
   end
 
   describe "GET /dashboard" do
     subject(:perform_request) { get dashboard_path }
 
-    def expected_shell_labels(locale:)
-      {
-        brandName: I18n.t("layouts.header.brand_name", locale:),
-        brandTagline: I18n.t("layouts.header.brand_tagline", locale:),
-        explore: I18n.t("layouts.header.explore", locale:),
-        profile: I18n.t("layouts.header.profile", locale:),
-        signIn: I18n.t("layouts.header.sign_in", locale:)
-      }
-    end
-    let(:expected_shell_urls) do
-      {
-        dashboard: dashboard_path,
-        explore: root_path,
-        signIn: new_session_path
-      }
-    end
     let(:sensitive_prop_keys) do
       %w[
         credential
@@ -173,8 +328,8 @@ RSpec.describe "Authentication", type: :request do
         delete session_path
         get new_session_path
 
-        expect(response.body).to include(I18n.t("auth.sessions.new.heading", locale: :en))
-        expect(response.body).not_to include(I18n.t("auth.sessions.new.heading", locale: :ru))
+        expect(inertia.props.dig("auth", "title")).to eq(I18n.t("auth.sessions.new.heading", locale: :en))
+        expect(inertia.props.dig("auth", "title")).not_to eq(I18n.t("auth.sessions.new.heading", locale: :ru))
       end
     end
 
@@ -220,7 +375,15 @@ RSpec.describe "Authentication", type: :request do
 
       it "renders the form with an error status" do
         expect { perform_request }.not_to change { [ User.count, UserIdentity.count ] }
-        expect(response).to have_http_status(:unprocessable_content)
+        expect_auth_page_contract!(
+          component: "Registrations/New",
+          expected_props: registration_new_props(
+            email: "new@example.com",
+            locale: "en",
+            form_error: "doesn't match Password"
+          ),
+          status: :unprocessable_content
+        )
       end
     end
   end
@@ -256,7 +419,11 @@ RSpec.describe "Authentication", type: :request do
 
       it "shows a generic failure message" do
         expect { perform_request }.not_to change(Session, :count)
-        expect(response.body).to include(I18n.t("auth.sessions.create.failure"))
+        expect_auth_page_contract!(
+          component: "Sessions/New",
+          expected_props: session_new_props(email: "user@example.com", alert: I18n.t("auth.sessions.create.failure")),
+          status: :unprocessable_content
+        )
       end
     end
   end
@@ -317,7 +484,7 @@ RSpec.describe "Authentication", type: :request do
       copy: expected_dashboard_copy(locale:, user:),
       shell: {
         authenticated: true,
-        labels: expected_shell_labels(locale:),
+        labels: expected_guest_shell_labels(locale:),
         urls: expected_shell_urls
       },
       urls: {

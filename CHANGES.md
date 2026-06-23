@@ -1,6 +1,10 @@
 # Changes
 
 ## 2026-06-23
+- Migrated the sign-in, registration, password-reset request, and password-reset
+  edit screens from ERB to typed Inertia React pages while preserving the
+  existing auth shell design, Rails-owned authentication/password-reset
+  semantics, CSRF-backed submissions, generic error behavior, and redirects.
 - Synced the implemented protected Dashboard Inertia contract into the
   authentication and frontend-platform baselines and archived its completed
   OpenSpec change.

@@ -49,17 +49,13 @@ RSpec.describe "Dashboard", type: :system do
   def expect_signed_out(session_record)
     expect(page).to have_current_path(new_session_path)
     expect(page).to have_text(I18n.t("auth.sessions.destroy.success", locale: :en))
+    expect(page).to have_css("[data-auth-page='session']")
     expect(session_record.reload.revoked_at).to be_present
-    expect_legacy_runtime
+    expect_inertia_runtime
   end
 
   def expect_inertia_runtime
     expect(page).not_to have_css("script[type='importmap']", visible: false)
     expect(page).to have_css("script[type='module']", visible: false)
-  end
-
-  def expect_legacy_runtime
-    expect(page).to have_css("script[type='importmap']", visible: false)
-    expect(page).not_to have_css("[data-page]", visible: false)
   end
 end
