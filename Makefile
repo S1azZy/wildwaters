@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 
+# Host-side commands orchestrate Docker, git hooks, and project-local OpenSpec
+# wrappers. Rails, Ruby, frontend runtime, test, lint, audit, and dependency
+# freshness commands run inside the web container through APP.
 COMPOSE := docker compose
 APP := $(COMPOSE) run --rm web
 
@@ -8,6 +11,7 @@ APP := $(COMPOSE) run --rm web
 setup: openspec-install
 	$(COMPOSE) up --build -d
 
+# Host OpenSpec wrapper targets.
 openspec-install:
 	bin/npm ci
 
@@ -17,6 +21,7 @@ openspec-update:
 openspec-validate:
 	bin/openspec validate --all --strict
 
+# Containerized frontend targets.
 frontend-install:
 	$(APP) bin/npm ci
 
@@ -41,6 +46,7 @@ frontend-audit:
 frontend-verify:
 	$(APP) bin/npm run frontend:verify
 
+# Host Git and Docker orchestration targets.
 install-hooks:
 	git config core.hooksPath .githooks
 
@@ -53,6 +59,7 @@ down:
 logs:
 	$(COMPOSE) logs -f web
 
+# Containerized app/runtime targets.
 shell:
 	$(APP) bin/rails console
 

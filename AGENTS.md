@@ -31,6 +31,9 @@ docs unless explicitly requested.
 - Require explicit authorization for every user-owned resource.
 - Add `ru` and `en` locale entries for user-facing text.
 - Never edit `db/structure.sql` by hand.
+- Run app/runtime commands through Make/container targets; use the host shell
+  only for file search, git inspection, editing, and documented host-only
+  tooling.
 - Keep `CHANGES.md` current for behavior, schema, dependency, process, or
   user-facing changes.
 
