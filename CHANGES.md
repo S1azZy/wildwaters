@@ -1,6 +1,9 @@
 # Changes
 
 ## 2026-06-23
+- Synced the implemented protected Dashboard Inertia contract into the
+  authentication and frontend-platform baselines and archived its completed
+  OpenSpec change.
 - Migrated the protected Dashboard placeholder from ERB to an authenticated
   Inertia React page with least-data localized props, preserved visual parity,
   and verified sign-out through Rails-owned session revocation, flash, and a
