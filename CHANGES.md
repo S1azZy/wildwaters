@@ -1,6 +1,10 @@
 # Changes
 
 ## 2026-06-24
+- Clarified the agent command environment contract so app/runtime commands use
+  Makefile-backed container targets first, while host commands are reserved for
+  repository inspection, editing, git inspection, Docker orchestration, and
+  documented OpenSpec tooling.
 - Migrated the public explore homepage/waterfall index from ERB, Stimulus, and
   importmap to a typed Inertia React page while preserving the current
   map-first design, localized filters, collapsed results rail, same-origin

@@ -157,30 +157,66 @@ Migration/schema work:
 
 Prefer `Makefile` targets.
 
-| Need | Command |
-| --- | --- |
-| Build/start local stack | `make setup` |
-| Start app stack | `make up` |
-| Check toolchain | `make doctor` |
-| Install Node/OpenSpec dependencies | `make openspec-install` |
-| Refresh generated OpenSpec adapters | `make openspec-update` |
-| Validate all OpenSpec artifacts | `make openspec-validate` |
-| Install locked frontend dependencies | `make frontend-install` |
-| Run frontend format, lint, typecheck, tests, build, and audit | `make frontend-verify` |
-| Run one frontend gate | `make frontend-format`, `make frontend-lint`, `make frontend-typecheck`, `make frontend-test`, `make frontend-build`, or `make frontend-audit` |
-| Install gems in container | `make bundle` |
-| Rails console | `make shell` |
-| Container shell | `make bash` |
-| Lint with autocorrect | `make lint` |
-| RuboCop with autocorrect | `make rubocop` |
-| ERB lint | `make erb-lint` |
-| Full test suite | `make test` |
-| Security checks | `make security` |
-| Fast local verification | `make verify-fast` |
-| Full local verification | `make verify` |
-| CI entrypoint | `make ci` |
-| Migration skeleton | `make migration NAME=MigrationName` |
-| Dependency freshness | `make outdated` |
+### Command Environment Contract
+
+Choose the command environment before the first executable command. Do not probe
+the host toolchain and then fall back to the container after a failure.
+
+| Environment | Allowed command shape | Use for |
+| --- | --- | --- |
+| Host shell | `rg`, `sed`, `git status/diff/log/show`, file reads, `apply_patch`, documented host-only `make` targets | Repository inspection, editing, git inspection, Docker orchestration, and project-local OpenSpec wrappers |
+| Web container | `make ...` targets backed by `APP := docker compose run --rm web`; targeted `docker compose run --rm web ...` when no Make target fits | Rails, Ruby, Bundler, RSpec, RuboCop, ERB lint, Brakeman, bundler-audit, frontend install/build/test/audit, app dependency freshness, migrations, consoles, and import tasks |
+
+Host-side runtime commands are not the discovery path. Do not run raw `bundle`,
+`rails`, `rspec`, `rubocop`, `brakeman`, `bundler-audit`, `npm`, `npx`, `vite`,
+or `tsc` on the host for app work. Use the Make target first. Examples:
+
+- use `make bundle`, not `bundle install`;
+- use `make frontend-audit`, not `npm audit`;
+- use `make security`, not host `bundle audit`, `bundler-audit`, or `brakeman`;
+- use `make frontend-build` or `make frontend-verify`, not host `vite`;
+- use `make test`, `make verify-fast`, or a targeted
+  `docker compose run --rm web ...` spec command, not host `bundle exec rspec`.
+
+The intentional host exceptions are Docker lifecycle and diagnostics
+(`make setup`, `make up`, `make down`, `make logs`, host portions of
+`make doctor`), git hook setup (`make install-hooks`), repository inspection,
+editing, and OpenSpec wrapper targets (`make openspec-install`,
+`make openspec-update`, `make openspec-validate`).
+
+| Need | Command | Environment |
+| --- | --- | --- |
+| Build/start local stack | `make setup` | Mixed: host OpenSpec install, then host Docker orchestration |
+| Install Git hooks | `make install-hooks` | Host git config |
+| Start app stack | `make up` | Host Docker orchestration |
+| Stop app stack | `make down` | Host Docker orchestration |
+| View web container logs | `make logs` | Host Docker orchestration |
+| Check toolchain | `make doctor` | Mixed: host wrapper/Docker checks plus container Rails checks |
+| Install Node/OpenSpec dependencies | `make openspec-install` | Host OpenSpec wrapper |
+| Refresh generated OpenSpec adapters | `make openspec-update` | Host OpenSpec wrapper |
+| Validate all OpenSpec artifacts | `make openspec-validate` | Host OpenSpec wrapper |
+| Install locked frontend dependencies | `make frontend-install` | Web container |
+| Run frontend format, lint, typecheck, tests, build, and audit | `make frontend-verify` | Web container |
+| Run one frontend gate | `make frontend-format`, `make frontend-lint`, `make frontend-typecheck`, `make frontend-test`, `make frontend-build`, or `make frontend-audit` | Web container |
+| Install gems | `make bundle` | Web container |
+| Rails console | `make shell` | Web container |
+| Container shell | `make bash` | Web container |
+| Lint with autocorrect | `make lint` | Web container |
+| RuboCop with autocorrect | `make rubocop` | Web container |
+| RuboCop with autocorrect alias | `make rubocop-autocorrect` | Web container |
+| ERB lint | `make erb-lint` | Web container |
+| Full test suite | `make test` | Web container |
+| Security checks | `make security` | Web container |
+| Fast local verification | `make verify-fast` | Web container |
+| Full local verification | `make verify` | Mixed: host OpenSpec validation plus container gates |
+| CI entrypoint | `make ci` | Web container |
+| Migration skeleton | `make migration NAME=MigrationName` | Web container |
+| Enqueue GeoNames import | `make import_geonames` | Web container |
+| Retry failed GeoNames import items | `make import_geonames_retry_failed RUN_ID=123` | Web container |
+| Ruby dependency freshness | `make bundle-outdated` | Web container |
+| Frontend dependency freshness | `make frontend-outdated` | Web container |
+| MapLibre dependency freshness | `make maplibre-outdated` | Web container |
+| Dependency freshness | `make outdated` | Web container |
 
 Use narrower `docker compose run --rm web ...` commands only when faster
 feedback is needed.
@@ -211,7 +247,7 @@ Allowed without asking:
 - Read files and search with `rg`.
 - Edit files inside this repository for the active task.
 - Run non-destructive tests, linters, security checks, generators, and schema
-  tasks.
+  tasks through the command environment contract above.
 - Update generated schema artifacts only through Rails tasks or migrations.
 
 Ask first:
@@ -272,6 +308,8 @@ Codex behavior.
 | User asks for a durable cross-cutting change | Agent selects Level 3, requires confirmation, and promotes only the architecture decision to an ADR |
 | Implementation learning changes approved intent | Agent pauses and updates OpenSpec before divergent coding continues |
 | Tool/check fails for unrelated reason | Agent reports the exact failing gate and does not claim full success |
+| User asks to run, install, build, test, audit, or check app dependencies | Agent chooses the Make/container path first and does not try host `bundle`, `rails`, `npm`, `vite`, `rspec`, or security tools |
+| User asks for security or dependency checks | Agent uses `make security`, `make frontend-audit`, `make outdated`, or the relevant containerized target instead of host `npm audit` or host Bundler tools |
 | Context compacts mid-task | Agent preserves task packet, loaded docs, approval state, changed files, and next step |
 
 ## Final Response Contract
