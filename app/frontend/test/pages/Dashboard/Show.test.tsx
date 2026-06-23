@@ -1,0 +1,71 @@
+import { screen, waitFor } from "@testing-library/react"
+import { describe, expect, it } from "vitest"
+
+import Show, {
+  type DashboardShowPageProps,
+} from "../../../pages/Dashboard/Show"
+import { checkAccessibility } from "../../accessibility"
+import { renderInertiaPage } from "../../inertia"
+
+const props: DashboardShowPageProps = {
+  copy: {
+    title: "Dashboard",
+    heading: "Dashboard",
+    signedInAs: "Signed in as user@example.com",
+    signOut: "Sign out",
+  },
+  shell: {
+    authenticated: true,
+    labels: {
+      brandName: "Wild Waters",
+      brandTagline: "Swim the World",
+      explore: "Explore",
+      profile: "Profile",
+      signIn: "Log in",
+    },
+    urls: {
+      dashboard: "/dashboard",
+      explore: "/",
+      signIn: "/session/new",
+    },
+  },
+  urls: {
+    signOut: "/session",
+  },
+}
+
+describe("Dashboard/Show", () => {
+  it("renders the protected placeholder contract and accessible sign-out action", async () => {
+    const { container } = renderInertiaPage(Show, props)
+
+    expect(
+      screen.getByRole("heading", { name: props.copy.heading }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(props.copy.signedInAs)).toBeInTheDocument()
+
+    const signOut = screen.getByRole("button", { name: props.copy.signOut })
+    expect(signOut).toHaveAttribute("type", "button")
+    expect(signOut).toHaveClass("rounded", "border", "px-4", "py-2")
+
+    expect(
+      screen.getByRole("link", { name: props.shell.labels.profile }),
+    ).toHaveAttribute("href", props.shell.urls.dashboard)
+    expect(
+      screen.queryByRole("link", { name: props.shell.labels.signIn }),
+    ).toBeNull()
+
+    expect(container.querySelector("[data-dashboard-page]")).toHaveClass(
+      "max-w-2xl",
+    )
+    await waitFor(() => expect(document.title).toBe(props.copy.title))
+    expect(
+      (
+        await checkAccessibility(container, {
+          rules: {
+            "color-contrast": { enabled: false },
+          },
+        })
+      ).violations,
+    ).toEqual([])
+  })
+})

@@ -9,16 +9,18 @@ RSpec.describe "Authentication", type: :request do
     expect(body).to include(I18n.t("auth.fields.locale")) if include_locale
   end
 
-  def sign_in_with_locale(locale)
+  def sign_in_with_locale(locale, email: "user@example.com")
     user = create(:user, locale:)
-    create(:user_identity, user:, email: "user@example.com")
+    create(:user_identity, user:, email:)
 
     post session_path, params: {
       session: {
-        email: "user@example.com",
+        email:,
         password: "Password123!"
       }
     }
+
+    user
   end
 
   describe "GET /session/new" do
@@ -113,6 +115,41 @@ RSpec.describe "Authentication", type: :request do
   describe "GET /dashboard" do
     subject(:perform_request) { get dashboard_path }
 
+    def expected_shell_labels(locale:)
+      {
+        brandName: I18n.t("layouts.header.brand_name", locale:),
+        brandTagline: I18n.t("layouts.header.brand_tagline", locale:),
+        explore: I18n.t("layouts.header.explore", locale:),
+        profile: I18n.t("layouts.header.profile", locale:),
+        signIn: I18n.t("layouts.header.sign_in", locale:)
+      }
+    end
+    let(:expected_shell_urls) do
+      {
+        dashboard: dashboard_path,
+        explore: root_path,
+        signIn: new_session_path
+      }
+    end
+    let(:sensitive_prop_keys) do
+      %w[
+        credential
+        credentials
+        current_user
+        email
+        identity
+        password
+        policy
+        primary_email
+        reset_token
+        role
+        session
+        status
+        token
+        user
+      ]
+    end
+
     it "redirects unauthenticated users to sign in" do
       I18n.with_locale(:ru) { perform_request }
 
@@ -121,17 +158,17 @@ RSpec.describe "Authentication", type: :request do
     end
 
     context "when authenticated with a Russian locale" do
-      before { sign_in_with_locale("ru") }
+      let!(:user) { sign_in_with_locale("ru", email: "russian@example.com") }
 
-      it "renders translations in Russian" do
+      it "renders the localized Dashboard Inertia page with the exact protected contract" do
         perform_request
 
-        expect(response.body).to include(I18n.t("dashboard.show.heading", locale: :ru))
+        expect_dashboard_inertia_contract!(locale: :ru, user:)
       end
 
       it "does not leak its locale into a later guest request" do
         perform_request
-        expect(response.body).to include(I18n.t("dashboard.show.heading", locale: :ru))
+        expect(inertia.props.dig("copy", "heading")).to eq(I18n.t("dashboard.show.heading", locale: :ru))
 
         delete session_path
         get new_session_path
@@ -142,12 +179,13 @@ RSpec.describe "Authentication", type: :request do
     end
 
     context "when authenticated with an English locale" do
-      before { sign_in_with_locale("en") }
+      let!(:user) { sign_in_with_locale("en", email: "english@example.com") }
 
-      it "renders translations in English" do
+      it "renders the English Dashboard Inertia copy and isolated runtime" do
         perform_request
 
-        expect(response.body).to include(I18n.t("dashboard.show.heading", locale: :en))
+        expect_dashboard_inertia_contract!(locale: :en, user:)
+        expect_dashboard_inertia_runtime!
       end
     end
   end
@@ -251,5 +289,55 @@ RSpec.describe "Authentication", type: :request do
 
       expect(response).to redirect_to(new_session_path)
     end
+  end
+
+  def nested_keys(value)
+    case value
+    when Hash
+      value.flat_map { |key, nested_value| [ key, *nested_keys(nested_value) ] }
+    when Array
+      value.flat_map { |nested_value| nested_keys(nested_value) }
+    else
+      []
+    end
+  end
+
+  def expect_dashboard_inertia_contract!(locale:, user:)
+    expect(response).to have_http_status(:ok)
+    expect(inertia).to be_inertia_response
+    expect(inertia).to render_component("Dashboard/Show")
+    expect_dashboard_props!(locale:, user:)
+    expect(nested_keys(inertia.props)).not_to include(*sensitive_prop_keys)
+  end
+
+  def expect_dashboard_props!(locale:, user:)
+    expect(inertia.props.keys).to contain_exactly("copy", "errors", "shell", "urls")
+    expect(inertia.props.fetch("errors")).to eq({})
+    expect(inertia).to have_props(
+      copy: expected_dashboard_copy(locale:, user:),
+      shell: {
+        authenticated: true,
+        labels: expected_shell_labels(locale:),
+        urls: expected_shell_urls
+      },
+      urls: {
+        signOut: session_path
+      }
+    )
+  end
+
+  def expected_dashboard_copy(locale:, user:)
+    {
+      title: I18n.t("dashboard.show.title", locale:),
+      heading: I18n.t("dashboard.show.heading", locale:),
+      signedInAs: I18n.t("dashboard.show.signed_in_as", locale:, email: user.primary_email),
+      signOut: I18n.t("dashboard.show.sign_out", locale:)
+    }
+  end
+
+  def expect_dashboard_inertia_runtime!
+    expect(response.body).to include(I18n.t("frontend.javascript_required"))
+    expect(response.body).to include('href="/vite-test/assets/application-', 'type="module"')
+    expect(response.body).not_to include("javascript_importmap_tags", "data-turbo-track")
   end
 end

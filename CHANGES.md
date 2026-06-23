@@ -1,6 +1,10 @@
 # Changes
 
 ## 2026-06-23
+- Migrated the protected Dashboard placeholder from ERB to an authenticated
+  Inertia React page with least-data localized props, preserved visual parity,
+  and verified sign-out through Rails-owned session revocation, flash, and a
+  full-document transition back to the legacy sign-in page.
 - Synced the implemented request-scoped user locale contract into the
   authentication baseline and archived its completed OpenSpec change.
 - Applied each authenticated user's stored `en` or `ru` locale to the complete
