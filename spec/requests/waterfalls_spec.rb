@@ -5,7 +5,41 @@ RSpec.describe "Waterfalls", type: :request do
     subject(:perform_request) { get root_path }
 
     let(:published_waterfall) do
-      create(:waterfall, spot: create(:spot, :published, name: "Sekumpul Waterfall"))
+      create(
+        :waterfall,
+        height_meters: 80.0,
+        plunge_pool: true,
+        approach_difficulty: "moderate",
+        spot: create(:spot, :published, name: "Sekumpul Waterfall", summary: "Twin cascades in North Bali.")
+      )
+    end
+    let(:expected_shell_labels) do
+      {
+        brandName: I18n.t("layouts.header.brand_name"),
+        brandTagline: I18n.t("layouts.header.brand_tagline"),
+        explore: I18n.t("layouts.header.explore"),
+        profile: I18n.t("layouts.header.profile"),
+        signIn: I18n.t("layouts.header.sign_in")
+      }
+    end
+    let(:expected_shell_urls) do
+      {
+        dashboard: dashboard_path,
+        explore: root_path,
+        signIn: new_session_path
+      }
+    end
+    let(:sensitive_explore_prop_keys) do
+      %w[
+        created_at
+        password
+        policy
+        published_at
+        reset_token
+        session
+        status
+        updated_at
+      ]
     end
     let(:script_sources) { content_security_policy_directives.fetch("script-src") }
     let(:style_sources) { content_security_policy_directives.fetch("style-src") }
@@ -22,9 +56,35 @@ RSpec.describe "Waterfalls", type: :request do
       perform_request
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('data-controller="explore-map"')
-      expect(response.body).to include(I18n.t("layouts.header.sign_in"))
-      expect(response.body).to include("Sekumpul Waterfall")
+      expect(inertia).to be_inertia_response
+      expect(inertia).to render_component("Waterfalls/Index")
+      expect(inertia).to have_props(expected_explore_page_props)
+    end
+
+    it "sends the exact guest shell contract" do
+      perform_request
+
+      expect(inertia).to have_props(
+        shell: {
+          authenticated: false,
+          labels: expected_shell_labels,
+          urls: expected_shell_urls
+        }
+      )
+    end
+
+    it "uses the isolated Inertia layout and JavaScript fallback" do
+      perform_request
+
+      expect(response.body).to include(I18n.t("frontend.javascript_required"))
+      expect(response.body).to include('href="/vite-test/assets/application-', 'type="module"')
+      expect(response.body).not_to include("javascript_importmap_tags", "data-turbo-track", "data-controller=\"explore-map\"")
+    end
+
+    it "exposes only the approved public explore props" do
+      perform_request
+
+      expect_public_explore_props
     end
 
     it "uses a same-origin default source policy" do
@@ -74,14 +134,19 @@ RSpec.describe "Waterfalls", type: :request do
 
       perform_request
 
-      expect(response.body).to include('data-explore-map-default-style-id-value="positron"')
+      expect(inertia.props.dig("map", "defaultStyleId")).to eq("positron")
     end
 
     it "renders the outdoors map style in the style catalog contract" do
       perform_request
 
-      expect(response.body).to include('data-style-id="outdoors"')
-      expect(response.body).to include("https://tiles.stadiamaps.com/styles/outdoors.json")
+      expect(inertia.props.fetch("mapStyles")).to include(
+        {
+          "id" => "outdoors",
+          "name" => I18n.t("waterfalls.index.map_styles.outdoors"),
+          "styleUrl" => "https://tiles.stadiamaps.com/styles/outdoors.json"
+        }
+      )
     end
   end
 
@@ -191,14 +256,22 @@ RSpec.describe "Waterfalls", type: :request do
       }
     end
 
-    it "renders only matching published waterfalls for the server-rendered catalog" do
+    it "renders only matching published waterfalls for the initial Inertia catalog" do
       perform_request
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Sekumpul Waterfall")
-      expect(response.body).not_to include("Gitgit Waterfall")
-      expect(response.body).not_to include("Sendang Gile")
-      expect(response.body).not_to include("Hidden Draft Falls")
+      expect(inertia).to render_component("Waterfalls/Index")
+
+      rendered_names = inertia.props.dig("waterfalls", "features").map { |feature| feature.dig("properties", "name") }
+
+      expect(rendered_names).to eq([ "Sekumpul Waterfall" ])
+      expect(rendered_names).not_to include("Gitgit Waterfall", "Sendang Gile", "Hidden Draft Falls")
+      expect(inertia.props.fetch("filters")).to include(
+        "approachDifficulty" => "moderate",
+        "minHeightMeters" => "50",
+        "plungePool" => "true",
+        "regionPublicId" => north_bali.public_id
+      )
     end
   end
 
@@ -490,6 +563,22 @@ RSpec.describe "Waterfalls", type: :request do
       expect(json_response.fetch("features").map { |feature| feature.dig("properties", "name") }).to eq([ "Sekumpul Waterfall" ])
     end
 
+    it "permits bounds and filters together without unpermitted parameter noise" do
+      params.merge!(region_public_id: north_bali.public_id)
+      unpermitted_keys = []
+      subscriber = ActiveSupport::Notifications.subscribe("unpermitted_parameters.action_controller") do |_name, _started, _finished, _id, payload|
+        unpermitted_keys.concat(payload.fetch(:keys))
+      end
+
+      begin
+        get map_data_waterfalls_path, params:, headers: { "Accept" => "application/json" }
+      ensure
+        ActiveSupport::Notifications.unsubscribe(subscriber)
+      end
+
+      expect(unpermitted_keys).to be_empty
+    end
+
     it "returns the feature geometry used by the explore UI" do
       params.merge!(region_public_id: north_bali.public_id, plunge_pool: "true")
 
@@ -573,6 +662,99 @@ RSpec.describe "Waterfalls", type: :request do
     JSON.parse(response.body)
   end
 
+  def expected_explore_page_props
+    {
+      copy: expected_explore_copy_props,
+      filters: {
+        approachDifficulty: nil,
+        minHeightMeters: nil,
+        plungePool: nil,
+        regionPublicId: nil
+      },
+      map: {
+        defaultStyleId: "outdoors",
+        initialLatitude: -8.2601,
+        initialLongitude: 115.1889,
+        initialZoom: 7.4,
+        panelOpenClass: "is-expanded",
+        stylePreferenceKey: "wildwaters:explore-map-style"
+      },
+      urls: {
+        explore: waterfalls_path,
+        mapData: map_data_waterfalls_path
+      }
+    }
+  end
+
+  def expected_explore_copy_props
+    {
+      title: I18n.t("waterfalls.index.title"),
+      filters: expected_explore_filter_copy_props,
+      map: expected_explore_map_copy_props
+    }
+  end
+
+  def expected_explore_filter_copy_props
+    {
+      allRegions: I18n.t("waterfalls.index.filters.all_regions"),
+      anyDifficulty: I18n.t("waterfalls.index.filters.any_difficulty"),
+      anyPlungePool: I18n.t("waterfalls.index.filters.any_plunge_pool"),
+      approachDifficulty: I18n.t("waterfalls.index.filters.approach_difficulty"),
+      easy: I18n.t("waterfalls.index.filters.easy"),
+      hard: I18n.t("waterfalls.index.filters.hard"),
+      minHeight: I18n.t("waterfalls.index.filters.min_height"),
+      minHeightPlaceholder: I18n.t("waterfalls.index.filters.min_height_placeholder"),
+      moderate: I18n.t("waterfalls.index.filters.moderate"),
+      plungePool: I18n.t("waterfalls.index.filters.plunge_pool"),
+      plungePoolNo: I18n.t("waterfalls.index.filters.plunge_pool_no"),
+      plungePoolYes: I18n.t("waterfalls.index.filters.plunge_pool_yes"),
+      region: I18n.t("waterfalls.index.filters.region"),
+      reset: I18n.t("waterfalls.index.filters.reset"),
+      search: I18n.t("waterfalls.index.filters.search"),
+      searchPlaceholder: I18n.t("waterfalls.index.filters.search_placeholder")
+    }
+  end
+
+  def expected_explore_map_copy_props
+    {
+      details: I18n.t("waterfalls.index.actions.details"),
+      empty: I18n.t("waterfalls.index.empty"),
+      locate: I18n.t("waterfalls.index.actions.locate"),
+      mapUnavailable: I18n.t("waterfalls.index.map_unavailable"),
+      noJavascript: I18n.t("waterfalls.index.no_javascript"),
+      railToggle: I18n.t("waterfalls.index.rail_toggle"),
+      resultSuffix: I18n.t("waterfalls.index.result_suffix"),
+      styleMenu: I18n.t("waterfalls.index.map_styles.menu_label"),
+      stylePanelHeading: I18n.t("waterfalls.index.map_styles.panel_heading"),
+      visibleLabel: I18n.t("waterfalls.index.visible_label")
+    }
+  end
+
+  def expect_public_explore_props
+    expect(inertia.props.keys).to contain_exactly(
+      "assets",
+      "copy",
+      "errors",
+      "filters",
+      "map",
+      "mapStyles",
+      "regions",
+      "shell",
+      "urls",
+      "waterfalls"
+    )
+    expect(inertia.props.fetch("errors")).to eq({})
+    expect(inertia.props.dig("assets", "maplibreScriptUrl")).to include("/assets/maplibre-gl")
+    expect(inertia.props.dig("assets", "maplibreStylesheetUrl")).to include("/assets/maplibre-gl")
+    expect(inertia.props.dig("waterfalls", "type")).to eq("FeatureCollection")
+    expect(explore_feature_names).to include("Sekumpul Waterfall")
+    expect(nested_keys(inertia.props)).not_to include(*sensitive_explore_prop_keys)
+  end
+
+  def explore_feature_names
+    inertia.props.dig("waterfalls", "features").map { |feature| feature.dig("properties", "name") }
+  end
+
   def content_security_policy_directives
     response
       .headers
@@ -601,5 +783,16 @@ RSpec.describe "Waterfalls", type: :request do
 
   def point(longitude, latitude)
     RGeo::Geographic.spherical_factory(srid: 4326).point(longitude, latitude)
+  end
+
+  def nested_keys(value)
+    case value
+    when Hash
+      value.flat_map { |key, nested_value| [ key, *nested_keys(nested_value) ] }
+    when Array
+      value.flat_map { |nested_value| nested_keys(nested_value) }
+    else
+      []
+    end
   end
 end

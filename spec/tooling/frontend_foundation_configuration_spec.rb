@@ -79,10 +79,18 @@ RSpec.describe FrontendFoundationConfiguration do
     routes = root.join("config/routes.rb").read
     controller = root.join("app/controllers/waterfalls_controller.rb").read
 
+    expect(root.join("app/frontend/pages/Waterfalls/Index.tsx")).to exist
     expect(root.join("app/frontend/pages/Waterfalls/Show.tsx")).to exist
+    expect(controller).to include('render inertia: "Waterfalls/Index"')
     expect(controller).to include('render inertia: "Waterfalls/Show"')
     expect(routes).not_to include("frontend", "smoke")
     expect(root.join("app/frontend/pages/Frontend/Smoke.tsx")).not_to exist
+  end
+
+  it "retires the superseded explore ERB and Stimulus surfaces after migration" do
+    expect(root.join("app/views/waterfalls/index.html.erb")).not_to exist
+    expect(root.join("app/views/waterfalls/_waterfall_card.html.erb")).not_to exist
+    expect(root.join("app/javascript/controllers/explore_map_controller.js")).not_to exist
   end
 
   it "preserves representative legacy styles in the Vite stylesheet" do
