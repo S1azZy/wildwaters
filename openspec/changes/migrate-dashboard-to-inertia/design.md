@@ -84,10 +84,13 @@ migration's first-mutation proof. A plain link using a non-GET method was
 rejected because destructive actions require button semantics.
 
 Rails keeps the existing sign-out result: revoke the persisted session, clear
-browser authentication, issue the localized notice, and redirect with status
-`303 See Other` to the legacy sign-in route. The browser system test is the
-authoritative proof that Inertia performs the cross-runtime transition
-correctly.
+browser authentication, issue the localized notice, and reach the legacy
+sign-in route. Plain Rails requests continue to receive the existing
+`303 See Other` redirect. Inertia sign-out requests use the adapter-supported
+`inertia_location(new_session_path)` response so the browser performs a full
+document visit to the legacy route instead of trying to consume non-Inertia
+HTML as an Inertia response. The browser system test is the authoritative
+proof that Inertia performs the cross-runtime transition correctly.
 
 ### Keep the shared header unchanged
 

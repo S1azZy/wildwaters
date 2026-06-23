@@ -25,6 +25,11 @@ class SessionsController < ApplicationController
     Auth::LogoutUser.call(input: { session: current_session })
     clear_current_session!
 
+    if request.headers["X-Inertia"].present?
+      flash[:notice] = t("auth.sessions.destroy.success")
+      return inertia_location(new_session_path)
+    end
+
     redirect_to new_session_path, notice: t("auth.sessions.destroy.success"), status: :see_other
   end
 
