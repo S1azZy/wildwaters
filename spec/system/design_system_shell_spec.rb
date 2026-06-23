@@ -1,12 +1,25 @@
 require "rails_helper"
 
 RSpec.describe "Design system shell", type: :system do
+  before do
+    driven_by(
+      :selenium,
+      using: :chrome,
+      screen_size: [ 1_280, 900 ],
+    ) do |browser_options|
+      browser_options.binary = "/usr/bin/chromium" if File.executable?("/usr/bin/chromium")
+      browser_options.add_argument("--headless=new")
+      browser_options.add_argument("--no-sandbox")
+      browser_options.add_argument("--disable-dev-shm-usage")
+    end
+  end
+
   it "renders the shared guest header shell" do
     visit root_path
 
     expect(page).to have_css("[data-ui='site-header']")
     expect(page).to have_css("[data-ui='site-header-brand']", text: I18n.t("layouts.header.brand_name"))
-    expect(page).to have_css("[data-ui='site-header-tagline']", text: I18n.t("layouts.header.brand_tagline"))
+    expect(page).to have_css("[data-ui='site-header-tagline']", text: /#{Regexp.escape(I18n.t("layouts.header.brand_tagline"))}/i)
   end
 
   it "renders the shared guest header navigation items" do
@@ -46,6 +59,7 @@ RSpec.describe "Design system shell", type: :system do
 
     expect(page).to have_css("[data-ui='auth-shell'][data-variant='session']")
     expect(page).to have_css("[data-ui='auth-card']")
+    expect_inertia_runtime
     expect(page).not_to have_css("[data-ui='auth-footer']")
   end
 
@@ -54,6 +68,7 @@ RSpec.describe "Design system shell", type: :system do
 
     expect(page).to have_css("[data-ui='auth-shell'][data-variant='registration']")
     expect(page).to have_css("[data-ui='auth-card']")
+    expect_inertia_runtime
     expect(page).not_to have_css("[data-ui='auth-footer']")
   end
 
@@ -62,6 +77,7 @@ RSpec.describe "Design system shell", type: :system do
 
     expect(page).to have_css("[data-ui='auth-shell'][data-variant='recovery']")
     expect(page).to have_css("[data-ui='auth-card']")
+    expect_inertia_runtime
     expect(page).not_to have_css("[data-ui='auth-footer']")
   end
 
@@ -76,5 +92,10 @@ RSpec.describe "Design system shell", type: :system do
     expect(page).to have_current_path(root_path)
     expect(page).to have_link(I18n.t("layouts.header.profile"), href: dashboard_path)
     expect(page).not_to have_link(I18n.t("layouts.header.sign_in"), href: new_session_path)
+  end
+
+  def expect_inertia_runtime
+    expect(page).not_to have_css("script[type='importmap']", visible: false)
+    expect(page).to have_css("script[type='module']", visible: false)
   end
 end
