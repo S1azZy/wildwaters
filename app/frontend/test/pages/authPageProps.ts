@@ -7,6 +7,8 @@ export const guestShell: ShellProps = {
     brandName: "Wild Waters",
     brandTagline: "Swim the World",
     explore: "Explore",
+    primaryMobileNavigation: "Primary mobile navigation",
+    primaryNavigation: "Primary navigation",
     profile: "Profile",
     signIn: "Log in",
   },

@@ -5,8 +5,8 @@ import AuthLayout from "../authLayout"
 import {
   AuthFormError,
   AuthFormIntro,
+  AuthPasswordField,
   AuthSubmit,
-  AuthTextField,
 } from "../authForm"
 import type { AuthPageProps, FieldCopy } from "../authTypes"
 
@@ -55,18 +55,17 @@ export default function Edit({
         />
         <AuthFormError message={formError} />
 
-        <AuthTextField
+        <AuthPasswordField
           autoComplete="new-password"
           copy={fields.password}
           name="password_reset[password]"
           onChange={(password) =>
             setData("password_reset", { ...data.password_reset, password })
           }
-          type="password"
           value={data.password_reset.password}
         />
 
-        <AuthTextField
+        <AuthPasswordField
           autoComplete="new-password"
           copy={fields.passwordConfirmation}
           name="password_reset[password_confirmation]"
@@ -76,7 +75,6 @@ export default function Edit({
               password_confirmation,
             })
           }
-          type="password"
           value={data.password_reset.password_confirmation}
         />
 

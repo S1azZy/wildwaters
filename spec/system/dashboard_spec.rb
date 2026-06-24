@@ -6,16 +6,7 @@ RSpec.describe "Dashboard", type: :system do
   let!(:user_identity) { create(:user_identity, email: "user@example.com") }
 
   before do
-    driven_by(
-      :selenium,
-      using: :chrome,
-      screen_size: [ 1_280, 900 ],
-    ) do |browser_options|
-      browser_options.binary = "/usr/bin/chromium" if File.executable?("/usr/bin/chromium")
-      browser_options.add_argument("--headless=new")
-      browser_options.add_argument("--no-sandbox")
-      browser_options.add_argument("--disable-dev-shm-usage")
-    end
+    use_headless_chrome!
   end
 
   it "renders through Inertia and signs out through the Rails session endpoint", :aggregate_failures do
@@ -52,10 +43,5 @@ RSpec.describe "Dashboard", type: :system do
     expect(page).to have_css("[data-auth-page='session']")
     expect(session_record.reload.revoked_at).to be_present
     expect_inertia_runtime
-  end
-
-  def expect_inertia_runtime
-    expect(page).not_to have_css("script[type='importmap']", visible: false)
-    expect(page).to have_css("script[type='module']", visible: false)
   end
 end

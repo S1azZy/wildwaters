@@ -13,14 +13,12 @@ ru:
       explore: "Explore"
       map: "Map"
       notifications: "Уведомления"
+      primary_mobile_navigation: "Основная мобильная навигация"
+      primary_navigation: "Основная навигация"
       profile: "Профиль"
       settings: "Настройки"
       sign_in: "Войти"
   auth:
-    shared:
-      footer:
-        author: "A. Tselovalnikov"
-        note: "Спокойная временная подпись для будущего футера атласа."
     fields:
       email: "Email"
       email_placeholder: "name@example.com"
@@ -40,6 +38,7 @@ ru:
         eyebrow: "Новый аккаунт"
         heading: "Создайте аккаунт"
         locale_hint: "Выберите язык, на котором хотите видеть интерфейс в первую очередь."
+        panel_label: "Настройка полевого набора"
         sign_in_link: "Войти"
         sign_in_prompt: "Уже есть аккаунт?"
         submit: "Создать аккаунт"
@@ -57,6 +56,7 @@ ru:
         eyebrow: "С возвращением"
         forgot_password: "Забыли пароль?"
         heading: "Вход"
+        panel_label: "Доступ к базе"
         sign_up_link: "Зарегистрироваться"
         sign_up_prompt: "Нет аккаунта?"
         submit: "Войти"
@@ -66,6 +66,8 @@ ru:
     password_resets:
       create:
         success: "Если такой email существует, мы отправили инструкции для сброса пароля."
+      shared:
+        panel_label: "Безопасное восстановление доступа"
       edit:
         card_heading: "Зафиксируйте новый маршрут доступа"
         card_supporting: "Задайте новый пароль и вернитесь к сохранённым картам, водопадам и заметкам."
@@ -121,6 +123,8 @@ ru:
       actions:
         details: "Подробнее"
         locate: "Показать"
+        zoom_in: "Приблизить"
+        zoom_out: "Отдалить"
       chips:
         bounds_loaded: "Загрузка по границам"
         published: "Только опубликованные"
@@ -130,7 +134,6 @@ ru:
         all_regions: "Все регионы"
         any_difficulty: "Любая сложность"
         any_plunge_pool: "Любая купель"
-        apply: "Обновить карту"
         approach_difficulty: "Подход"
         easy: "Лёгкий"
         hard: "Сложный"
@@ -143,15 +146,11 @@ ru:
         region: "Регион"
         reset: "Сбросить"
         search: "Поиск по видимым водопадам"
-        search_hint: "Поиск идёт только по уже загруженным карточкам: по названию, описанию и региону."
         search_placeholder: "Найти в текущем списке"
       heading: "Найдите следующий водопад"
       rail_toggle: "Смотреть водопады"
-      end_of_list: "Конец списка"
       list_heading: "Видимые водопады"
       list_hint: "Двигайте карту или меняйте фильтры, чтобы обновить список."
-      list_mode: "Карта + список"
-      loading: "Обновляем результаты на карте..."
       map_eyebrow: "Explore-экран"
       map_heading: "Выбирайте следующий каскад через карту, а не через длинный список."
       map_styles:
@@ -170,7 +169,6 @@ ru:
       result_suffix: "на экране"
       subheading: "Растущая коллекция красивых каскадов, троп к ним и природных купелей."
       title: "Водопады"
-      visible_label: "видимо"
     show:
       approach_difficulty_label: "Сложность подхода"
       back: "Ко всем водопадам"

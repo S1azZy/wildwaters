@@ -138,6 +138,19 @@ UI-only visual polish:
    rendering logic.
 4. Verify with the narrowest relevant check or browser pass when applicable.
 
+React/Inertia composition and test style:
+
+1. Keep Inertia page files as route-level orchestration. Move repeated or
+   visually distinct page regions into typed feature components, and move
+   browser lifecycle, refs, fetch cancellation, or persistence into local hooks.
+2. Keep Rails-owned route URLs, translated copy, authorization decisions, and
+   data selection in typed Inertia props or bounded JSON endpoints.
+3. Add shared React primitives only when at least two current call sites need
+   the same control contract; otherwise prefer feature-local components.
+4. Tests should assert user-visible behavior, accessibility semantics, security
+   boundaries, and public prop contracts. Avoid migration-era negative checks
+   that only prove an old implementation detail is absent.
+
 Documentation/process changes:
 
 1. Identify the owning document before editing.

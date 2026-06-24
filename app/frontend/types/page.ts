@@ -4,6 +4,8 @@ export interface ShellProps {
     brandName: string
     brandTagline: string
     explore: string
+    primaryMobileNavigation: string
+    primaryNavigation: string
     profile: string
     signIn: string
   }

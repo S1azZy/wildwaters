@@ -57,22 +57,11 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(root.join("app/frontend/test/setup.ts")).to exist
   end
 
-  it "uses the Inertia layout without the retired legacy JavaScript runtime" do
+  it "uses the Inertia layout with the Vite React entrypoint" do
     inertia_layout = root.join("app/views/layouts/inertia.html.erb").read
 
     expect(inertia_layout).to include("vite_react_refresh_tag")
     expect(inertia_layout).to include('vite_typescript_tag "application.tsx"')
-    expect(inertia_layout).not_to include("javascript_importmap_tags", "turbo")
-  end
-
-  it "retires the direct legacy business frontend dependencies and CI checks" do
-    gemfile = root.join("Gemfile").read
-    ci = root.join("config/ci.rb").read
-
-    expect(gemfile).not_to include("importmap-rails", "turbo-rails", "stimulus-rails", "view_component")
-    expect(ci).not_to include("Importmap", "bin/importmap")
-    expect(root.join("config/importmap.rb")).not_to exist
-    expect(root.join("bin/importmap")).not_to exist
   end
 
   it "declares the frontend entrypoints and Rails integration" do
@@ -90,21 +79,7 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(root.join("app/frontend/pages/Waterfalls/Show.tsx")).to exist
     expect(controller).to include('render inertia: "Waterfalls/Index"')
     expect(controller).to include('render inertia: "Waterfalls/Show"')
-    expect(routes).not_to include("frontend", "smoke")
-    expect(root.join("app/frontend/pages/Frontend/Smoke.tsx")).not_to exist
-  end
-
-  it "retires the application-owned legacy frontend source surfaces" do
-    expect(root.join("app/views/layouts/application.html.erb")).not_to exist
-    expect(Dir.glob(root.join("app/javascript/**/*").to_s).reject { |path| File.directory?(path) }).to be_empty
-    expect(Dir.glob(root.join("app/components/**/*").to_s).reject { |path| File.directory?(path) }).to be_empty
-    expect(Dir.glob(root.join("spec/components/**/*").to_s).reject { |path| File.directory?(path) }).to be_empty
-  end
-
-  it "keeps superseded waterfall ERB and Stimulus surfaces retired" do
-    expect(root.join("app/views/waterfalls/index.html.erb")).not_to exist
-    expect(root.join("app/views/waterfalls/_waterfall_card.html.erb")).not_to exist
-    expect(root.join("app/javascript/controllers/explore_map_controller.js")).not_to exist
+    expect(routes).to include("root \"waterfalls#index\"")
   end
 
   it "preserves representative Inertia styles in the Vite stylesheet" do
@@ -147,7 +122,6 @@ RSpec.describe FrontendFoundationConfiguration do
     makefile = root.join("Makefile").read
 
     expect(makefile).to include("frontend-outdated:", "bin/npm outdated")
-    expect(makefile).not_to include("importmap-outdated:")
   end
 
   it "scopes Vite development CSP allowances to development" do

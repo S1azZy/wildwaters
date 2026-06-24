@@ -68,16 +68,7 @@ RSpec.describe "Waterfall explore", type: :system do
   end
 
   before do
-    driven_by(
-      :selenium,
-      using: :chrome,
-      screen_size: [ 1_280, 900 ],
-    ) do |browser_options|
-      browser_options.binary = "/usr/bin/chromium" if File.executable?("/usr/bin/chromium")
-      browser_options.add_argument("--headless=new")
-      browser_options.add_argument("--no-sandbox")
-      browser_options.add_argument("--disable-dev-shm-usage")
-    end
+    use_headless_chrome!
 
     sekumpul_waterfall
     nungnung_waterfall
@@ -102,7 +93,6 @@ RSpec.describe "Waterfall explore", type: :system do
     visit_page
 
     expect(page).to have_css("section#explore-home")
-    expect(page).not_to have_css("section#explore-home[data-controller='explore-map']")
     expect(page).to have_css("[data-explore-map-target='canvas']")
     expect(page).to have_css("[data-explore-map-target='list']", visible: false)
     expect(page).to have_css("[data-explore-map-target='resultCount']", visible: false)
@@ -139,8 +129,6 @@ RSpec.describe "Waterfall explore", type: :system do
 
     expect(page).to have_css(".explore-filter-band [data-explore-map-target='filters']")
     expect(page).to have_css(".explore-filter-band [data-explore-map-target='search']")
-    expect(page).not_to have_button(I18n.t("waterfalls.index.filters.apply"))
-    expect(page).not_to have_css(".explore-filter-band [data-explore-map-target='resultsToggle']")
   end
 
   it "renders the basemap style control on top of the map" do
@@ -154,8 +142,8 @@ RSpec.describe "Waterfall explore", type: :system do
   it "renders custom zoom controls inside the shared map toolbar" do
     visit_page
 
-    expect(page).to have_css(".explore-map-toolbar button[aria-label='Zoom in']")
-    expect(page).to have_css(".explore-map-toolbar button[aria-label='Zoom out']")
+    expect(page).to have_css(".explore-map-toolbar button[aria-label='#{I18n.t('waterfalls.index.actions.zoom_in')}']")
+    expect(page).to have_css(".explore-map-toolbar button[aria-label='#{I18n.t('waterfalls.index.actions.zoom_out')}']")
   end
 
   it "renders the collapsible explore rail toggle on top of the map" do
@@ -194,7 +182,6 @@ RSpec.describe "Waterfall explore", type: :system do
     visit_page
 
     expect(page).to have_css("[data-explore-map-target='list'][data-card-class-template]", visible: false)
-    expect(page).not_to have_text(I18n.t("waterfalls.index.list_mode"))
   end
 
   it "renders a collapsible results panel that is hidden by default" do
@@ -232,14 +219,11 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css("[data-explore-map-target='list'] article[data-public-id='#{overflow_waterfalls.last.spot.public_id}']", visible: false)
   end
 
-  it "keeps a calm rail ending without a visible end label" do
+  it "keeps a compact rail ending spacer" do
     visit_page
     end_cap = page.find(:css, "[data-explore-map-target='endCap']", visible: false)
 
     expect(end_cap).to be_present
-    expect(page).not_to have_text(I18n.t("waterfalls.index.end_of_list", default: "End of list"))
-    expect(page).not_to have_css("[data-explore-map-target='loading']", visible: false)
-    expect(page).not_to have_css("[data-explore-map-target='status']", visible: false)
   end
 
   it "does not render draft waterfalls in the public explore rail" do
@@ -258,8 +242,6 @@ RSpec.describe "Waterfall explore", type: :system do
     visit_page
 
     expect_inertia_runtime
-    expect(page).not_to have_css("script[type='importmap']", visible: false)
-    expect(page.html).not_to include('"maplibre-gl"')
     expect(page.html).to include("/assets/maplibre-gl")
   end
 
@@ -278,9 +260,7 @@ RSpec.describe "Waterfall explore", type: :system do
   end
 
   def expect_inertia_runtime
-    expect(page).to have_css("[data-page]", visible: false)
-    expect(page).to have_css("script[type='module'][src*='application']", visible: false)
-    expect(page).not_to have_css("script[type='importmap']", visible: false)
+    super(page_marker: "[data-page]")
   end
 
   def expect_public_header_navigation

@@ -39,7 +39,7 @@ export default function SiteHeader({
           </a>
 
           <nav
-            aria-label="Primary"
+            aria-label={labels.primaryNavigation}
             className="site-header-primary-nav hidden md:flex"
             data-ui="site-header-primary-nav"
           >
@@ -74,7 +74,7 @@ export default function SiteHeader({
         </div>
 
         <nav
-          aria-label="Primary mobile"
+          aria-label={labels.primaryMobileNavigation}
           className="site-header-mobile-nav md:hidden"
           data-ui="site-header-primary-nav"
         >

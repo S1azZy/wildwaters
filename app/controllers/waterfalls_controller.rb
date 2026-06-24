@@ -86,7 +86,8 @@ class WaterfallsController < ApplicationController
         resultSuffix: t("waterfalls.index.result_suffix"),
         styleMenu: t("waterfalls.index.map_styles.menu_label"),
         stylePanelHeading: t("waterfalls.index.map_styles.panel_heading"),
-        visibleLabel: t("waterfalls.index.visible_label")
+        zoomIn: t("waterfalls.index.actions.zoom_in"),
+        zoomOut: t("waterfalls.index.actions.zoom_out")
       }
     }
   end

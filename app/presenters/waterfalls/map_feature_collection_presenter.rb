@@ -33,9 +33,7 @@ module Waterfalls
           name: spot.name,
           summary: spot.summary,
           region_name: spot.region.name,
-          height_meters: waterfall.height_meters,
           height_label: height_label_for(waterfall),
-          plunge_pool: waterfall.plunge_pool,
           plunge_pool_label: plunge_pool_label_for(waterfall),
           approach_difficulty: waterfall.approach_difficulty
         }

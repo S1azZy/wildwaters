@@ -27,9 +27,9 @@ describe("AuthShell", () => {
     expect(
       screen.getByRole("link", { name: sessionAuth.alternateLabel }),
     ).toHaveAttribute("href", sessionAuth.alternateUrl)
-    expect(container.querySelector("[data-ui='auth-shell']")).toHaveClass(
-      "auth-shell",
-      "auth-shell--session",
+    expect(container.querySelector("[data-ui='auth-shell']")).toHaveAttribute(
+      "data-variant",
+      sessionAuth.variant,
     )
     expect(screen.getByRole("form", { name: "Sign in form" })).toBeVisible()
   })

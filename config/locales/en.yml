@@ -41,14 +41,12 @@ en:
       explore: "Explore"
       map: "Map"
       notifications: "Notifications"
+      primary_mobile_navigation: "Primary mobile navigation"
+      primary_navigation: "Primary navigation"
       profile: "Profile"
       settings: "Settings"
       sign_in: "Log in"
   auth:
-    shared:
-      footer:
-        author: "A. Tselovalnikov"
-        note: "A quiet footer placeholder for the rest of the atlas."
     fields:
       email: "Email"
       email_placeholder: "name@example.com"
@@ -68,6 +66,7 @@ en:
         eyebrow: "New account"
         heading: "Create your account"
         locale_hint: "Choose the language you want to see across the app first."
+        panel_label: "Field kit setup"
         sign_in_link: "Sign in"
         sign_in_prompt: "Already have an account?"
         submit: "Create account"
@@ -85,6 +84,7 @@ en:
         eyebrow: "Welcome back"
         forgot_password: "Forgot your password?"
         heading: "Sign in"
+        panel_label: "Basecamp access"
         sign_up_link: "Sign up"
         sign_up_prompt: "Don't have an account?"
         submit: "Sign in"
@@ -94,6 +94,8 @@ en:
     password_resets:
       create:
         success: "If that email exists, we've sent password reset instructions."
+      shared:
+        panel_label: "Secure account recovery"
       edit:
         card_heading: "Lock in the next route"
         card_supporting: "Choose a fresh password before you head back into saved map views and trip notes."
@@ -149,6 +151,8 @@ en:
       actions:
         details: "Details"
         locate: "Locate"
+        zoom_in: "Zoom in"
+        zoom_out: "Zoom out"
       chips:
         bounds_loaded: "Bounds-based loading"
         published: "Published only"
@@ -158,7 +162,6 @@ en:
         all_regions: "All regions"
         any_difficulty: "Any difficulty"
         any_plunge_pool: "Any plunge pool"
-        apply: "Refresh map"
         approach_difficulty: "Approach"
         easy: "Easy"
         hard: "Hard"
@@ -171,15 +174,11 @@ en:
         region: "Region"
         reset: "Reset"
         search: "Search visible waterfalls"
-        search_hint: "Search within the currently loaded cards by waterfall name, summary, or region."
         search_placeholder: "Search the current list"
       heading: "Find your next waterfall"
       rail_toggle: "Explore waterfalls"
-      end_of_list: "End of list"
       list_heading: "Visible waterfalls"
       list_hint: "Move the map or refine the filters to change the list."
-      list_mode: "Map + list"
-      loading: "Refreshing map results..."
       map_eyebrow: "Explore screen"
       map_heading: "A map-led way to pick the next cascade worth the detour."
       map_styles:
@@ -198,7 +197,6 @@ en:
       result_suffix: "shown"
       subheading: "A growing collection of remarkable cascades, trail approaches, and natural swimming spots."
       title: "Waterfalls"
-      visible_label: "visible"
     show:
       approach_difficulty_label: "Approach"
       back: "Back to all waterfalls"

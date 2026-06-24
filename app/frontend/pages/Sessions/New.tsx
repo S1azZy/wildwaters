@@ -5,6 +5,7 @@ import AuthLayout from "../authLayout"
 import {
   AuthFormError,
   AuthFormIntro,
+  AuthPasswordField,
   AuthSubmit,
   AuthTextField,
 } from "../authForm"
@@ -70,32 +71,23 @@ export default function New({
           value={data.session.email}
         />
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between gap-4">
-            <label className="auth-form__label" htmlFor="session-password">
-              {fields.password.label}
-            </label>
+        <AuthPasswordField
+          autoComplete="current-password"
+          copy={fields.password}
+          name="session[password]"
+          onChange={(password) =>
+            setData("session", {
+              ...data.session,
+              password,
+            })
+          }
+          secondaryAction={
             <a className="auth-form__inline-link" href={urls.forgotPassword}>
               {copy.forgotPassword}
             </a>
-          </div>
-          <input
-            autoComplete="current-password"
-            className="auth-form__input"
-            id="session-password"
-            name="session[password]"
-            onChange={(event) =>
-              setData("session", {
-                ...data.session,
-                password: event.target.value,
-              })
-            }
-            placeholder={fields.password.placeholder}
-            required
-            type="password"
-            value={data.session.password}
-          />
-        </div>
+          }
+          value={data.session.password}
+        />
 
         <AuthSubmit disabled={processing}>{copy.submit}</AuthSubmit>
       </form>

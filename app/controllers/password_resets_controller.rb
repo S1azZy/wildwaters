@@ -1,4 +1,6 @@
 class PasswordResetsController < ApplicationController
+  include AuthPageProps
+
   before_action :redirect_authenticated_user, only: %i[new create]
 
   layout "inertia", only: %i[new edit update]
@@ -43,7 +45,7 @@ class PasswordResetsController < ApplicationController
     {
       auth: auth_shell_props(
         variant: "recovery",
-        panel_label: "Secure account recovery",
+        panel_label_key: "auth.password_resets.shared.panel_label",
         namespace: "auth.password_resets.new",
         alternate_prompt: t("auth.password_resets.new.sign_in_prompt"),
         alternate_label: t("auth.password_resets.new.sign_in_link"),
@@ -70,7 +72,7 @@ class PasswordResetsController < ApplicationController
     {
       auth: auth_shell_props(
         variant: "recovery",
-        panel_label: "Secure account recovery",
+        panel_label_key: "auth.password_resets.shared.panel_label",
         namespace: "auth.password_resets.edit",
         alternate_prompt: t("auth.password_resets.edit.sign_in_prompt"),
         alternate_label: t("auth.password_resets.edit.sign_in_link"),
@@ -90,25 +92,6 @@ class PasswordResetsController < ApplicationController
         submit: password_reset_token_path(params[:token])
       }
     }
-  end
-
-  def auth_shell_props(variant:, panel_label:, namespace:, alternate_prompt:, alternate_label:, alternate_url:)
-    {
-      variant:,
-      eyebrow: t("#{namespace}.eyebrow"),
-      title: t("#{namespace}.heading"),
-      description: t("#{namespace}.subheading"),
-      panelLabel: panel_label,
-      alternatePrompt: alternate_prompt,
-      alternateLabel: alternate_label,
-      alternateUrl: alternate_url
-    }
-  end
-
-  def field_props(label_key, placeholder: nil)
-    props = { label: t(label_key) }
-    props[:placeholder] = t(placeholder) if placeholder
-    props
   end
 
   def redirect_authenticated_user

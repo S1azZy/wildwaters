@@ -13,22 +13,6 @@ RSpec.describe "Waterfalls", type: :request do
         spot: create(:spot, :published, name: "Sekumpul Waterfall", summary: "Twin cascades in North Bali.")
       )
     end
-    let(:expected_shell_labels) do
-      {
-        brandName: I18n.t("layouts.header.brand_name"),
-        brandTagline: I18n.t("layouts.header.brand_tagline"),
-        explore: I18n.t("layouts.header.explore"),
-        profile: I18n.t("layouts.header.profile"),
-        signIn: I18n.t("layouts.header.sign_in")
-      }
-    end
-    let(:expected_shell_urls) do
-      {
-        dashboard: dashboard_path,
-        explore: root_path,
-        signIn: new_session_path
-      }
-    end
     let(:sensitive_explore_prop_keys) do
       %w[
         created_at
@@ -78,7 +62,6 @@ RSpec.describe "Waterfalls", type: :request do
 
       expect(response.body).to include(I18n.t("frontend.javascript_required"))
       expect(response.body).to include('href="/vite-test/assets/application-', 'type="module"')
-      expect(response.body).not_to include("javascript_importmap_tags", "data-turbo-track", "data-controller=\"explore-map\"")
     end
 
     it "exposes only the approved public explore props" do
@@ -278,22 +261,6 @@ RSpec.describe "Waterfalls", type: :request do
   describe "GET /waterfalls/:slugged_public_id" do
     subject(:perform_request) { get waterfall_path(slugged_public_id) }
 
-    let(:expected_shell_labels) do
-      {
-        brandName: I18n.t("layouts.header.brand_name"),
-        brandTagline: I18n.t("layouts.header.brand_tagline"),
-        explore: I18n.t("layouts.header.explore"),
-        profile: I18n.t("layouts.header.profile"),
-        signIn: I18n.t("layouts.header.sign_in")
-      }
-    end
-    let(:expected_shell_urls) do
-      {
-        dashboard: dashboard_path,
-        explore: root_path,
-        signIn: new_session_path
-      }
-    end
     let!(:waterfall) do
       create(
         :waterfall,
@@ -411,7 +378,6 @@ RSpec.describe "Waterfalls", type: :request do
 
       expect(response.body).to include(I18n.t("frontend.javascript_required"))
       expect(response.body).to include('href="/vite-test/assets/application-', 'type="module"')
-      expect(response.body).not_to include("javascript_importmap_tags", "data-turbo-track")
     end
 
     it "exposes only the approved page and shell props" do
@@ -622,7 +588,6 @@ RSpec.describe "Waterfalls", type: :request do
 
       expect(properties).to include(
         "height_label" => I18n.t("waterfalls.shared.height", value: sekumpul.height_meters),
-        "plunge_pool" => true,
         "plunge_pool_label" => I18n.t("waterfalls.index.filters.plunge_pool_yes")
       )
     end
@@ -726,7 +691,8 @@ RSpec.describe "Waterfalls", type: :request do
       resultSuffix: I18n.t("waterfalls.index.result_suffix"),
       styleMenu: I18n.t("waterfalls.index.map_styles.menu_label"),
       stylePanelHeading: I18n.t("waterfalls.index.map_styles.panel_heading"),
-      visibleLabel: I18n.t("waterfalls.index.visible_label")
+      zoomIn: I18n.t("waterfalls.index.actions.zoom_in"),
+      zoomOut: I18n.t("waterfalls.index.actions.zoom_out")
     }
   end
 
