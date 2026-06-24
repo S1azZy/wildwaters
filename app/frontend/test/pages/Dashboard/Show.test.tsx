@@ -20,6 +20,8 @@ const props: DashboardShowPageProps = {
       brandName: "Wild Waters",
       brandTagline: "Swim the World",
       explore: "Explore",
+      primaryMobileNavigation: "Primary mobile navigation",
+      primaryNavigation: "Primary navigation",
       profile: "Profile",
       signIn: "Log in",
     },
@@ -45,7 +47,6 @@ describe("Dashboard/Show", () => {
 
     const signOut = screen.getByRole("button", { name: props.copy.signOut })
     expect(signOut).toHaveAttribute("type", "button")
-    expect(signOut).toHaveClass("rounded", "border", "px-4", "py-2")
 
     expect(
       screen.getByRole("link", { name: props.shell.labels.profile }),
@@ -54,9 +55,7 @@ describe("Dashboard/Show", () => {
       screen.queryByRole("link", { name: props.shell.labels.signIn }),
     ).toBeNull()
 
-    expect(container.querySelector("[data-dashboard-page]")).toHaveClass(
-      "max-w-2xl",
-    )
+    expect(container.querySelector("[data-dashboard-page]")).toBeVisible()
     await waitFor(() => expect(document.title).toBe(props.copy.title))
     expect(
       (

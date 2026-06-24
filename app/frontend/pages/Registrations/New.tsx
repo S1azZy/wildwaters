@@ -5,6 +5,8 @@ import AuthLayout from "../authLayout"
 import {
   AuthFormError,
   AuthFormIntro,
+  AuthPasswordField,
+  AuthSelectField,
   AuthSubmit,
   AuthTextField,
 } from "../authForm"
@@ -78,18 +80,17 @@ export default function New({
           value={data.registration.email}
         />
 
-        <AuthTextField
+        <AuthPasswordField
           autoComplete="new-password"
           copy={fields.password}
           name="registration[password]"
           onChange={(password) =>
             setData("registration", { ...data.registration, password })
           }
-          type="password"
           value={data.registration.password}
         />
 
-        <AuthTextField
+        <AuthPasswordField
           autoComplete="new-password"
           copy={fields.passwordConfirmation}
           name="registration[password_confirmation]"
@@ -99,32 +100,22 @@ export default function New({
               password_confirmation,
             })
           }
-          type="password"
           value={data.registration.password_confirmation}
         />
 
-        <label className="block space-y-2" htmlFor="registration-locale">
-          <span className="auth-form__label">{fields.locale.label}</span>
-          <select
-            className="auth-form__select"
-            id="registration-locale"
-            name="registration[locale]"
-            onChange={(event) =>
-              setData("registration", {
-                ...data.registration,
-                locale: event.target.value,
-              })
-            }
-            value={data.registration.locale}
-          >
-            {localeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <p className="auth-form__supporting">{copy.localeHint}</p>
-        </label>
+        <AuthSelectField
+          copy={fields.locale}
+          name="registration[locale]"
+          onChange={(locale) =>
+            setData("registration", {
+              ...data.registration,
+              locale,
+            })
+          }
+          options={localeOptions}
+          supporting={copy.localeHint}
+          value={data.registration.locale}
+        />
 
         <AuthSubmit disabled={processing}>{copy.submit}</AuthSubmit>
       </form>

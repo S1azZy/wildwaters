@@ -44,9 +44,9 @@ describe("Sessions/New", () => {
       "type",
       "password",
     )
-    expect(screen.getByRole("button", { name: props.copy.submit })).toHaveClass(
-      "auth-form__submit",
-    )
+    expect(
+      screen.getByRole("button", { name: props.copy.submit }),
+    ).toHaveAttribute("type", "submit")
     expect(
       screen.getByRole("link", { name: props.copy.forgotPassword }),
     ).toHaveAttribute("href", props.urls.forgotPassword)

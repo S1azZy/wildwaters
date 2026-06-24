@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  include AuthPageProps
+
   before_action :redirect_authenticated_user, only: %i[new create]
   before_action :require_authentication, only: :destroy
 
@@ -52,7 +54,7 @@ class SessionsController < ApplicationController
     {
       auth: auth_shell_props(
         variant: "session",
-        panel_label: "Basecamp access",
+        panel_label_key: "auth.sessions.new.panel_label",
         namespace: "auth.sessions.new",
         alternate_prompt: t("auth.sessions.new.sign_up_prompt"),
         alternate_label: t("auth.sessions.new.sign_up_link"),
@@ -77,25 +79,6 @@ class SessionsController < ApplicationController
         email: params.dig(:session, :email)&.strip&.downcase
       }
     }
-  end
-
-  def auth_shell_props(variant:, panel_label:, namespace:, alternate_prompt:, alternate_label:, alternate_url:)
-    {
-      variant:,
-      eyebrow: t("#{namespace}.eyebrow"),
-      title: t("#{namespace}.heading"),
-      description: t("#{namespace}.subheading"),
-      panelLabel: panel_label,
-      alternatePrompt: alternate_prompt,
-      alternateLabel: alternate_label,
-      alternateUrl: alternate_url
-    }
-  end
-
-  def field_props(label_key, placeholder: nil)
-    props = { label: t(label_key) }
-    props[:placeholder] = t(placeholder) if placeholder
-    props
   end
 
   def redirect_authenticated_user

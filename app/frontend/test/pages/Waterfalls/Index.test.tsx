@@ -45,7 +45,8 @@ const props: WaterfallIndexPageProps = {
       resultSuffix: "shown",
       styleMenu: "Maps",
       stylePanelHeading: "Map Views",
-      visibleLabel: "visible",
+      zoomIn: "Zoom in",
+      zoomOut: "Zoom out",
     },
   },
   filters: {
@@ -81,6 +82,8 @@ const props: WaterfallIndexPageProps = {
       brandName: "Wild Waters",
       brandTagline: "Swim the World",
       explore: "Explore",
+      primaryMobileNavigation: "Primary mobile navigation",
+      primaryNavigation: "Primary navigation",
       profile: "Profile",
       signIn: "Log in",
     },
@@ -106,10 +109,8 @@ const props: WaterfallIndexPageProps = {
         properties: {
           approach_difficulty: "moderate",
           height_label: "80.0 m",
-          height_meters: 80,
           name: "Sekumpul Waterfall",
           path: "/waterfalls/sekumpul",
-          plunge_pool: true,
           plunge_pool_label: "Plunge pool",
           public_id: "sekumpul-id",
           region_name: "North Bali",
@@ -125,10 +126,8 @@ const props: WaterfallIndexPageProps = {
         properties: {
           approach_difficulty: "easy",
           height_label: "35.0 m",
-          height_meters: 35,
           name: "Gitgit Waterfall",
           path: "/waterfalls/gitgit",
-          plunge_pool: false,
           plunge_pool_label: null,
           public_id: "gitgit-id",
           region_name: "North Bali",
@@ -155,13 +154,16 @@ describe("Waterfalls/Index", () => {
     expect(
       screen.getByLabelText(props.copy.filters.approachDifficulty),
     ).toHaveValue("")
-    expect(screen.queryByRole("button", { name: "Refresh map" })).toBeNull()
 
     expect(
       screen.getByRole("button", { name: props.copy.map.railToggle }),
     ).toHaveAttribute("aria-expanded", "false")
-    expect(screen.getByRole("button", { name: "Zoom in" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Zoom out" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: props.copy.map.zoomIn }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: props.copy.map.zoomOut }),
+    ).toBeInTheDocument()
     expect(
       screen.getByText(props.copy.map.stylePanelHeading),
     ).toBeInTheDocument()
@@ -225,13 +227,12 @@ describe("Waterfalls/Index", () => {
     )
 
     expect(toggle).toHaveAttribute("aria-expanded", "false")
-    expect(panel).toHaveClass("is-collapsed")
+    expect(panel).toHaveAttribute("data-results-state", "collapsed")
 
     await user.click(toggle)
 
     expect(toggle).toHaveAttribute("aria-expanded", "true")
-    expect(panel).not.toHaveClass("is-collapsed")
-    expect(panel).toHaveClass(props.map.panelOpenClass)
+    expect(panel).toHaveAttribute("data-results-state", "expanded")
   })
 })
 

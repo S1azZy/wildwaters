@@ -1,4 +1,6 @@
 class RegistrationsController < ApplicationController
+  include AuthPageProps
+
   before_action :redirect_authenticated_user, only: %i[new create]
 
   layout "inertia", only: %i[new create]
@@ -34,7 +36,7 @@ class RegistrationsController < ApplicationController
     {
       auth: auth_shell_props(
         variant: "registration",
-        panel_label: "Field kit setup",
+        panel_label_key: "auth.registrations.new.panel_label",
         namespace: "auth.registrations.new",
         alternate_prompt: t("auth.registrations.new.sign_in_prompt"),
         alternate_label: t("auth.registrations.new.sign_in_link"),
@@ -73,25 +75,6 @@ class RegistrationsController < ApplicationController
   def selected_locale
     locale = params.dig(:registration, :locale).presence || I18n.default_locale.to_s
     I18n.available_locales.map(&:to_s).include?(locale) ? locale : I18n.default_locale.to_s
-  end
-
-  def auth_shell_props(variant:, panel_label:, namespace:, alternate_prompt:, alternate_label:, alternate_url:)
-    {
-      variant:,
-      eyebrow: t("#{namespace}.eyebrow"),
-      title: t("#{namespace}.heading"),
-      description: t("#{namespace}.subheading"),
-      panelLabel: panel_label,
-      alternatePrompt: alternate_prompt,
-      alternateLabel: alternate_label,
-      alternateUrl: alternate_url
-    }
-  end
-
-  def field_props(label_key, placeholder: nil)
-    props = { label: t(label_key) }
-    props[:placeholder] = t(placeholder) if placeholder
-    props
   end
 
   def redirect_authenticated_user

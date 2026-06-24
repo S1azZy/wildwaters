@@ -4,16 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Authentication screens", type: :system do
   before do
-    driven_by(
-      :selenium,
-      using: :chrome,
-      screen_size: [ 1_280, 900 ],
-    ) do |browser_options|
-      browser_options.binary = "/usr/bin/chromium" if File.executable?("/usr/bin/chromium")
-      browser_options.add_argument("--headless=new")
-      browser_options.add_argument("--no-sandbox")
-      browser_options.add_argument("--disable-dev-shm-usage")
-    end
+    use_headless_chrome!
   end
 
   it "signs in through the migrated Inertia screen and reaches migrated explore", :aggregate_failures do
@@ -107,14 +98,7 @@ RSpec.describe "Authentication screens", type: :system do
     click_button I18n.t("auth.password_resets.edit.submit")
   end
 
-  def expect_inertia_runtime
-    expect(page).not_to have_css("script[type='importmap']", visible: false)
-    expect(page).to have_css("script[type='module']", visible: false)
-  end
-
   def expect_explore_inertia_runtime
-    expect(page).to have_css("#explore-home")
-    expect(page).not_to have_css("script[type='importmap']", visible: false)
-    expect(page).to have_css("script[type='module']", visible: false)
+    expect_inertia_runtime(page_marker: "#explore-home")
   end
 end

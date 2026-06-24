@@ -17,6 +17,8 @@ const props: WaterfallShowPageProps = {
       brandName: "Wild Waters",
       brandTagline: "Swim the World",
       explore: "Explore",
+      primaryMobileNavigation: "Primary mobile navigation",
+      primaryNavigation: "Primary navigation",
       profile: "Profile",
       signIn: "Log in",
     },
@@ -76,10 +78,7 @@ describe("Waterfalls/Show", () => {
     explore.focus()
     expect(explore).toHaveFocus()
 
-    expect(container.querySelector("[data-waterfall-detail]")).toHaveClass(
-      "max-w-3xl",
-      "flex-col",
-    )
+    expect(container.querySelector("[data-waterfall-detail]")).toBeVisible()
     await waitFor(() => expect(document.title).toBe(props.waterfall.name))
     expect(
       (

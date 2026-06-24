@@ -21,16 +21,7 @@ RSpec.describe "Waterfall detail", type: :system do
   end
 
   before do
-    driven_by(
-      :selenium,
-      using: :chrome,
-      screen_size: [ 1_280, 900 ],
-    ) do |browser_options|
-      browser_options.binary = "/usr/bin/chromium" if File.executable?("/usr/bin/chromium")
-      browser_options.add_argument("--headless=new")
-      browser_options.add_argument("--no-sandbox")
-      browser_options.add_argument("--disable-dev-shm-usage")
-    end
+    use_headless_chrome!
   end
 
   it "renders the guest detail page through React at desktop width", :aggregate_failures do
@@ -101,14 +92,12 @@ RSpec.describe "Waterfall detail", type: :system do
   end
 
   def expect_inertia_runtime
-    expect(page).to have_css("[data-waterfall-detail='#{waterfall.spot.public_id}']")
-    expect(page).not_to have_css("script[type='importmap']", visible: false)
-    expect(page).to have_css("script[type='module']", visible: false)
+    expect(page).to have_css("[data-waterfall-detail='#{waterfall.spot.public_id}']", visible: false)
+    expect(page).to have_css("script[type='module'][src*='application']", visible: false)
   end
 
   def expect_explore_inertia_runtime
-    expect(page).to have_css("#explore-home")
-    expect(page).not_to have_css("script[type='importmap']", visible: false)
-    expect(page).to have_css("script[type='module']", visible: false)
+    expect(page).to have_css("#explore-home", visible: false)
+    expect(page).to have_css("script[type='module'][src*='application']", visible: false)
   end
 end

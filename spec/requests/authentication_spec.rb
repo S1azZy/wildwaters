@@ -1,70 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "Authentication", type: :request do
-  def expect_auth_page_contract!(component:, expected_props:, status: :ok)
-    expect(response).to have_http_status(status)
-    expect(inertia).to be_inertia_response
-    expect(inertia).to render_component(component)
-    expect(inertia.props.keys).to contain_exactly(*expected_props.keys.map(&:to_s), "errors", "shell")
-    expect(inertia.props.fetch("errors")).to eq({})
-    expect(inertia).to have_props(expected_props.merge(shell: expected_shell_props(locale: I18n.locale)))
-    expect(nested_keys(inertia.props)).not_to include(*auth_sensitive_prop_keys)
-  end
-
-  def expect_auth_inertia_runtime!
-    expect(response.body).to include(I18n.t("frontend.javascript_required"))
-    expect(response.body).to include('href="/vite-test/assets/application-', 'type="module"')
-    expect(response.body).not_to include("javascript_importmap_tags", "data-turbo-track")
-  end
-
-  def expected_guest_shell_labels(locale:)
-    {
-      brandName: I18n.t("layouts.header.brand_name", locale:),
-      brandTagline: I18n.t("layouts.header.brand_tagline", locale:),
-      explore: I18n.t("layouts.header.explore", locale:),
-      profile: I18n.t("layouts.header.profile", locale:),
-      signIn: I18n.t("layouts.header.sign_in", locale:)
-    }
-  end
-
-  def expected_shell_urls
-    {
-      dashboard: dashboard_path,
-      explore: root_path,
-      signIn: new_session_path
-    }
-  end
-
-  def expected_shell_props(locale:, authenticated: false)
-    {
-      authenticated:,
-      labels: expected_guest_shell_labels(locale:),
-      urls: expected_shell_urls
-    }
-  end
-
-  def auth_sensitive_prop_keys
-    %w[
-      credential
-      credentials
-      current_user
-      identity
-      policy
-      primary_email
-      reset_token
-      role
-      session
-      status
-      token
-      user
-    ]
-  end
-
   def session_new_props(email: nil, alert: nil)
     {
       auth: auth_shell_props(
         variant: "session",
-        panel_label: "Basecamp access",
+        panel_label_key: "auth.sessions.new.panel_label",
         namespace: "auth.sessions.new",
         alternate_prompt: I18n.t("auth.sessions.new.sign_up_prompt"),
         alternate_label: I18n.t("auth.sessions.new.sign_up_link"),
@@ -95,7 +36,7 @@ RSpec.describe "Authentication", type: :request do
     {
       auth: auth_shell_props(
         variant: "registration",
-        panel_label: "Field kit setup",
+        panel_label_key: "auth.registrations.new.panel_label",
         namespace: "auth.registrations.new",
         alternate_prompt: I18n.t("auth.registrations.new.sign_in_prompt"),
         alternate_label: I18n.t("auth.registrations.new.sign_in_link"),
@@ -132,7 +73,7 @@ RSpec.describe "Authentication", type: :request do
     {
       auth: auth_shell_props(
         variant: "recovery",
-        panel_label: "Secure account recovery",
+        panel_label_key: "auth.password_resets.shared.panel_label",
         namespace: "auth.password_resets.new",
         alternate_prompt: I18n.t("auth.password_resets.new.sign_in_prompt"),
         alternate_label: I18n.t("auth.password_resets.new.sign_in_link"),
@@ -159,7 +100,7 @@ RSpec.describe "Authentication", type: :request do
     {
       auth: auth_shell_props(
         variant: "recovery",
-        panel_label: "Secure account recovery",
+        panel_label_key: "auth.password_resets.shared.panel_label",
         namespace: "auth.password_resets.edit",
         alternate_prompt: I18n.t("auth.password_resets.edit.sign_in_prompt"),
         alternate_label: I18n.t("auth.password_resets.edit.sign_in_link"),
@@ -179,25 +120,6 @@ RSpec.describe "Authentication", type: :request do
         submit: password_reset_token_path(token)
       }
     }
-  end
-
-  def auth_shell_props(variant:, panel_label:, namespace:, alternate_prompt:, alternate_label:, alternate_url:)
-    {
-      variant:,
-      eyebrow: I18n.t("#{namespace}.eyebrow"),
-      title: I18n.t("#{namespace}.heading"),
-      description: I18n.t("#{namespace}.subheading"),
-      panelLabel: panel_label,
-      alternatePrompt: alternate_prompt,
-      alternateLabel: alternate_label,
-      alternateUrl: alternate_url
-    }
-  end
-
-  def field_props(label_key, placeholder: nil)
-    props = { label: I18n.t(label_key) }
-    props[:placeholder] = I18n.t(placeholder) if placeholder
-    props
   end
 
   def sign_in_with_locale(locale, email: "user@example.com")
@@ -221,7 +143,7 @@ RSpec.describe "Authentication", type: :request do
       perform_request
 
       expect_auth_page_contract!(component: "Sessions/New", expected_props: session_new_props)
-      expect_auth_inertia_runtime!
+      expect_inertia_runtime_document!
     end
 
     context "when the user is already authenticated" do
@@ -252,7 +174,7 @@ RSpec.describe "Authentication", type: :request do
       perform_request
 
       expect_auth_page_contract!(component: "Registrations/New", expected_props: registration_new_props)
-      expect_auth_inertia_runtime!
+      expect_inertia_runtime_document!
     end
   end
 
@@ -263,7 +185,7 @@ RSpec.describe "Authentication", type: :request do
       perform_request
 
       expect_auth_page_contract!(component: "PasswordResets/New", expected_props: password_reset_new_props)
-      expect_auth_inertia_runtime!
+      expect_inertia_runtime_document!
     end
   end
 
@@ -279,7 +201,7 @@ RSpec.describe "Authentication", type: :request do
         component: "PasswordResets/Edit",
         expected_props: password_reset_edit_props(token:)
       )
-      expect_auth_inertia_runtime!
+      expect_inertia_runtime_document!
     end
   end
 
@@ -340,7 +262,7 @@ RSpec.describe "Authentication", type: :request do
         perform_request
 
         expect_dashboard_inertia_contract!(locale: :en, user:)
-        expect_dashboard_inertia_runtime!
+        expect_inertia_runtime_document!
       end
     end
   end
@@ -458,17 +380,6 @@ RSpec.describe "Authentication", type: :request do
     end
   end
 
-  def nested_keys(value)
-    case value
-    when Hash
-      value.flat_map { |key, nested_value| [ key, *nested_keys(nested_value) ] }
-    when Array
-      value.flat_map { |nested_value| nested_keys(nested_value) }
-    else
-      []
-    end
-  end
-
   def expect_dashboard_inertia_contract!(locale:, user:)
     expect(response).to have_http_status(:ok)
     expect(inertia).to be_inertia_response
@@ -484,7 +395,7 @@ RSpec.describe "Authentication", type: :request do
       copy: expected_dashboard_copy(locale:, user:),
       shell: {
         authenticated: true,
-        labels: expected_guest_shell_labels(locale:),
+        labels: expected_shell_labels(locale:),
         urls: expected_shell_urls
       },
       urls: {
@@ -500,11 +411,5 @@ RSpec.describe "Authentication", type: :request do
       signedInAs: I18n.t("dashboard.show.signed_in_as", locale:, email: user.primary_email),
       signOut: I18n.t("dashboard.show.sign_out", locale:)
     }
-  end
-
-  def expect_dashboard_inertia_runtime!
-    expect(response.body).to include(I18n.t("frontend.javascript_required"))
-    expect(response.body).to include('href="/vite-test/assets/application-', 'type="module"')
-    expect(response.body).not_to include("javascript_importmap_tags", "data-turbo-track")
   end
 end

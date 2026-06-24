@@ -15,6 +15,8 @@ class ApplicationController < ActionController::Base
           brandName: t("layouts.header.brand_name"),
           brandTagline: t("layouts.header.brand_tagline"),
           explore: t("layouts.header.explore"),
+          primaryMobileNavigation: t("layouts.header.primary_mobile_navigation"),
+          primaryNavigation: t("layouts.header.primary_navigation"),
           profile: t("layouts.header.profile"),
           signIn: t("layouts.header.sign_in")
         },

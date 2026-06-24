@@ -1,6 +1,11 @@
 # Changes
 
 ## 2026-06-24
+- Refactored the migrated Inertia frontend for reuse: centralized auth page
+  props, localized remaining React/Rails labels, split the waterfall explore
+  page into feature components and a map lifecycle hook, narrowed public map
+  props, removed dead CSS and migration-era test assertions, and documented the
+  React/Inertia composition and test-style rules.
 - Retired the application-owned legacy business frontend stack after completing
   the Inertia migration: removed direct Importmap, Turbo, Stimulus, and
   ViewComponent usage, deleted old JavaScript/component/layout surfaces,
