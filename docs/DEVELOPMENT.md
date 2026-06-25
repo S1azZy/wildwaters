@@ -5,6 +5,17 @@ verification. Product and architecture rules live in `docs/FOUNDATIONS.md`.
 Security and testing policy lives in `docs/QUALITY_SECURITY.md`. Task-specific
 context loading lives in `docs/CONTEXT_MAP.md`.
 
+## SDD Gate
+
+Every repository task starts with SDD classification. Level 0 and Level 1 are
+still SDD outcomes; they are not permission to skip the gate.
+
+Before tests, implementation edits, generated artifacts, or task-specific app
+commands, identify the task type, SDD level, behavior impact, OpenSpec need,
+approval need, and verification path. The user can explicitly opt out of SDD or
+OpenSpec for a request, but the opt-out must be treated as a scoped exception,
+not as a new default.
+
 ## Task Router
 
 Before editing, classify the task and load only the required context.
@@ -35,6 +46,7 @@ Choose the lightest level that preserves useful discovery and review.
 
 | Level | Use for | Required flow |
 | --- | --- | --- |
+| 0: Non-functional maintenance | Documentation, process rules, comments, formatting, or other edits that change no runtime behavior, product acceptance criteria, schema, dependencies, or security posture | Classify, edit the owning source of truth, verify with the docs/style gate; no OpenSpec change or ADR |
 | 1: Direct | Copy, visual polish, obvious narrow bugs, small contract-preserving refactors, evidence-backed baseline corrections | Existing execution loop; no OpenSpec change or ADR |
 | 2: Specified feature | Meaningful behavior, interacting mechanisms, uncertain requirements, persistent acceptance criteria | Explore, confirm, propose, review, apply, verify, archive |
 | 3: Architectural feature | Level 2 plus a durable, cross-cutting, difficult-to-reverse decision | Level 2 plus an ADR for the confirmed architectural decision |
@@ -97,7 +109,7 @@ editing. It is the handoff shape to preserve if context compacts.
 ```text
 Task:
 Task type:
-SDD level: 1 | 2 | 3
+SDD level: 0 | 1 | 2 | 3
 OpenSpec change: none | change-name
 ADR: none | required | path
 Behavior change: yes/no
@@ -113,6 +125,8 @@ Done condition:
 
 Rules:
 
+- Run the SDD gate for every repository task unless the user explicitly opts
+  out or provides a narrower workflow.
 - Do not fill the packet with prose. Keep it short and factual.
 - `Behavior change: yes` requires a red test before production code.
 - `Approval required: yes` blocks mutation until the user approves.
@@ -308,6 +322,9 @@ Codex behavior.
 
 | Scenario | Expected behavior |
 | --- | --- |
+| User asks for any repository change | Agent states the SDD level, OpenSpec need, and verification path before writing tests, implementation code, generated artifacts, or task-specific app commands |
+| User explicitly opts out of SDD or OpenSpec | Agent follows the narrowed request, records the opt-out as scoped to that task, and does not treat it as a default for later work |
+| User asks for docs, process rules, comments, formatting, or other non-functional maintenance | Agent selects Level 0 when no runtime behavior, product acceptance criteria, schema, dependency, or security posture changes |
 | User asks for behavior change | Agent writes or updates a failing spec before production code |
 | User asks for visual-only polish | Agent does not invent artificial behavior specs |
 | User asks for migration/schema work | Agent reads recent migrations and never edits `db/structure.sql` by hand |

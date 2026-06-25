@@ -40,6 +40,8 @@ docs unless explicitly requested.
 ## Start Every Task
 
 1. Classify the task type and SDD level with `docs/DEVELOPMENT.md`.
+   This gate runs for every repository task unless the user explicitly opts out
+   or narrows the request to a different workflow.
 2. Load task-specific context from `docs/CONTEXT_MAP.md`.
 3. Identify whether the task changes behavior, schema, security, dependencies,
    or only documentation/style.

@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-25
+- Tightened the agent workflow harness so every repository task starts with an
+  explicit SDD gate, added Level 0 for non-functional maintenance, and clarified
+  regression checks for SDD opt-outs and documentation/process changes.
+
 ## 2026-06-24
 - Refactored the migrated Inertia frontend for reuse: centralized auth page
   props, localized remaining React/Rails labels, split the waterfall explore
