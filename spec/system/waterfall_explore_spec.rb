@@ -166,15 +166,24 @@ RSpec.describe "Waterfall explore", type: :system do
     visit_page
 
     expect(page).to have_field("explore_search")
-    expect(page).to have_select("region_public_id")
+    expect(page).to have_css(
+      "button#region_public_id[role='combobox']",
+      text: I18n.t("waterfalls.index.filters.all_regions")
+    )
     expect(page).to have_field("min_height_meters")
   end
 
   it "renders the select filter controls" do
     visit_page
 
-    expect(page).to have_select("plunge_pool")
-    expect(page).to have_select("approach_difficulty")
+    expect(page).to have_css(
+      "button#plunge_pool[role='combobox']",
+      text: I18n.t("waterfalls.index.filters.any_plunge_pool")
+    )
+    expect(page).to have_css(
+      "button#approach_difficulty[role='combobox']",
+      text: I18n.t("waterfalls.index.filters.any_difficulty")
+    )
     expect(page).to have_css("form[action='#{waterfalls_path}'][method='get']")
   end
 

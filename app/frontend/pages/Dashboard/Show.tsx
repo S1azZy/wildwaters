@@ -1,6 +1,9 @@
 import { Link } from "@inertiajs/react"
 
+import { Button } from "@/components/ui/button"
+
 import AppShell from "../../components/AppShell"
+import { PageHeader, ProductCard } from "../../components/ww"
 import type { SharedPageProps } from "../../types/page"
 
 export interface DashboardShowPageProps extends SharedPageProps {
@@ -19,22 +22,24 @@ export default function Show({ copy, shell, urls }: DashboardShowPageProps) {
   return (
     <AppShell shell={shell} title={copy.title}>
       <div className="mx-auto w-full max-w-2xl" data-dashboard-page>
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold">{copy.heading}</h1>
-            <p className="mt-2 text-sm text-slate-600">{copy.signedInAs}</p>
-          </div>
-
-          <Link
-            as="button"
-            className="rounded border px-4 py-2 text-sm font-medium"
-            href={urls.signOut}
-            method="delete"
-            type="button"
-          >
-            {copy.signOut}
-          </Link>
-        </div>
+        <ProductCard>
+          <PageHeader
+            actions={
+              <Button asChild variant="outline">
+                <Link
+                  as="button"
+                  href={urls.signOut}
+                  method="delete"
+                  type="button"
+                >
+                  {copy.signOut}
+                </Link>
+              </Button>
+            }
+            description={copy.signedInAs}
+            title={copy.heading}
+          />
+        </ProductCard>
       </div>
     </AppShell>
   )

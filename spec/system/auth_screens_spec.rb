@@ -43,7 +43,7 @@ RSpec.describe "Authentication screens", type: :system do
     fill_in I18n.t("auth.fields.email"), with: "new@example.com"
     fill_in I18n.t("auth.fields.password"), with: "Password123!"
     fill_in I18n.t("auth.fields.password_confirmation"), with: "Password123!"
-    select I18n.t("auth.locales.en"), from: I18n.t("auth.fields.locale")
+    expect(page).to have_css("button[role='combobox']", text: I18n.t("auth.locales.en"))
     click_button I18n.t("auth.registrations.new.submit")
 
     expect(page).to have_current_path(dashboard_path)

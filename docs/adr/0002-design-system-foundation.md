@@ -6,6 +6,8 @@
 - Partially superseded: ADR 0005 replaces the ERB/ViewComponent implementation
   boundary for application-owned business routes; this ADR continues to own
   Digital Naturalist and its token vocabulary.
+- Partially superseded: ADR 0006 replaces the custom-only React primitive
+  boundary with shadcn-backed primitives and Wild Waters wrappers.
 
 ## Context
 

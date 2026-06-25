@@ -49,7 +49,7 @@ describe("Registrations/New", () => {
     ).toBeInTheDocument()
     expect(
       screen.getByRole("combobox", { name: /Language/ }),
-    ).toHaveDisplayValue("English")
+    ).toHaveTextContent("English")
     expect(
       screen.getByRole("button", { name: props.copy.submit }),
     ).toBeInTheDocument()

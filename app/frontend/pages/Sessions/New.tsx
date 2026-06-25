@@ -55,7 +55,7 @@ export default function New({
 
   return (
     <AuthLayout auth={auth} page="session" shell={shell}>
-      <form className="space-y-5" onSubmit={submit}>
+      <form className="flex flex-col gap-5" onSubmit={submit}>
         <AuthFormIntro
           heading={copy.cardHeading}
           supporting={copy.cardSupporting}

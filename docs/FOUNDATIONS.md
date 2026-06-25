@@ -65,9 +65,11 @@ Stable architecture rules:
 - Authorization stays explicit through policies for domain resources or a
   dedicated guard for a bounded admin engine.
 - The application-owned business frontend uses Vite, Inertia Rails, React,
-  TypeScript, and Tailwind under ADR 0005. New application-owned business and
-  admin UI must use this stack instead of reintroducing ERB, Hotwire, Stimulus,
-  or ViewComponent pages.
+  TypeScript, Tailwind, and shadcn/ui under ADR 0005 and ADR 0006. New
+  application-owned business and admin UI must use this stack instead of
+  reintroducing ERB, Hotwire, Stimulus, or ViewComponent pages.
+- Shared application-owned business and admin UI should use shadcn primitives
+  and Wild Waters wrappers before adding page-local custom controls.
 - Rails continues to own web routing, sessions, CSRF, authorization, I18n, and
   business use cases. Mailer ERB and third-party Rails engine interfaces are
   outside the business frontend architecture.
@@ -84,6 +86,8 @@ Concrete cross-cutting decisions live in ADRs:
   `docs/adr/0004-geonames-queued-import-orchestration.md`
 - Business frontend architecture:
   `docs/adr/0005-business-frontend-architecture.md`
+- Shadcn UI component foundation:
+  `docs/adr/0006-shadcn-ui-component-foundation.md`
 
 ## Domain Boundary
 

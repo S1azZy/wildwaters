@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FormEvent, useMemo, useState } from "react"
+import { type FormEvent, useMemo, useState } from "react"
 
 import AppShell from "../../components/AppShell"
 import ExploreFilterBar from "./ExploreFilterBar"
@@ -56,13 +56,10 @@ export default function Index({
     [features, search],
   )
 
-  function changeFilter(
-    key: keyof ExploreFilters,
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) {
+  function changeFilter(key: keyof ExploreFilters, value: string) {
     setFilters((currentFilters) => ({
       ...currentFilters,
-      [key]: event.target.value === "" ? null : event.target.value,
+      [key]: value === "" ? null : value,
     }))
   }
 

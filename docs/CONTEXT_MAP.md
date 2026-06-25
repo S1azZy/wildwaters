@@ -65,12 +65,13 @@ rules, or making cross-cutting decisions.
 | Task area | Start with | Then inspect |
 | --- | --- | --- |
 | Frontend architecture or runtime boundary | `docs/adr/0005-business-frontend-architecture.md`, relevant OpenSpec capability/change | `app/frontend/`, `app/views/layouts/inertia.html.erb`, matching request/component/system specs |
+| Frontend UI kit or design workflow | `docs/adr/0006-shadcn-ui-component-foundation.md`, `docs/frontend/DESIGN_GUIDE.md`, relevant OpenSpec capability/change | `app/frontend/components/ui/`, `app/frontend/components/ww/`, relevant page/component tests |
 | Inertia page or layout | `app/views/layouts/inertia.html.erb`, relevant page in `app/frontend/pages/` | Rails controller/request spec, page prop types, React Testing Library test, routing/system coverage |
 | Auth screens | Relevant page in `app/frontend/pages/Sessions/`, `app/frontend/pages/Registrations/`, or `app/frontend/pages/PasswordResets/` | Auth controller/request specs, React page tests, locale files |
 | Waterfall pages | Relevant page in `app/frontend/pages/Waterfalls/` | `app/controllers/waterfalls_controller.rb`, waterfall presenter/query, request/system specs |
 | Explore map UI | `app/frontend/pages/Waterfalls/Index.tsx`, `app/frontend/lib/maplibre.ts` | `app/presenters/waterfalls/map_style_catalog.rb`, MapLibre ADR, map system/request specs, local MapLibre assets |
-| UI components | Relevant `app/frontend/components/*` TypeScript files | Matching React component/page tests, neighboring component APIs, design-system ADR |
-| Styles/design tokens | `app/frontend/styles/design_tokens.css`, `app/frontend/entrypoints/application.css` | Relevant React page/component, component/system specs, production Vite manifest |
+| UI components | `docs/frontend/DESIGN_GUIDE.md`, relevant `app/frontend/components/*` TypeScript files | Matching React component/page tests, neighboring component APIs, ADR 0002 and ADR 0006 when shared patterns change |
+| Styles/design tokens | `app/frontend/styles/design_tokens.css`, `app/frontend/entrypoints/application.css`, `docs/frontend/DESIGN_GUIDE.md` | Relevant React page/component, component/system specs, production Vite manifest |
 | Frontend tooling | `package.json`, `vite.config.ts`, `config/vite.json`, `eslint.config.mjs`, `tsconfig.json` | `spec/tooling/frontend_foundation_configuration_spec.rb`, `Makefile`, CI and Docker build files |
 | I18n copy | `config/locales/en.yml`, `config/locales/ru.yml` | UI code using the keys, request/system coverage when behavior changes |
 
@@ -103,6 +104,7 @@ rules, or making cross-cutting decisions.
 | Proposed feature changes, design, and tasks | `openspec/changes/` |
 | Known unimplemented work | `docs/TODO.md` |
 | Durable architecture decisions | `docs/adr/` |
+| Frontend design workflow | `docs/frontend/DESIGN_GUIDE.md` |
 | Routes | `config/routes.rb` |
 | Commands | `Makefile` |
 | Dependencies | `Gemfile`, `Gemfile.lock`, `package.json`, `package-lock.json` |

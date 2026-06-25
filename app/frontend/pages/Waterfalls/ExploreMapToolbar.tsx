@@ -1,3 +1,7 @@
+import { LayersIcon, MinusIcon, PlusIcon } from "lucide-react"
+
+import { Button } from "../../components/ui/button"
+import { IconControlButton } from "../../components/ww"
 import type { ExploreCopy, ExploreMapStyle } from "./exploreTypes"
 
 interface ExploreMapToolbarProps {
@@ -29,42 +33,20 @@ export default function ExploreMapToolbar({
           className="explore-map-style-menu relative"
           data-explore-map-target="styleMenu"
         >
-          <summary
-            aria-label={copy.styleMenu}
-            className="explore-map-style-toggle explore-map-toolbar-button flex cursor-pointer list-none items-center justify-center"
+          <Button
+            asChild
+            className="explore-map-style-toggle explore-map-toolbar-button rounded-full"
+            size="icon"
+            variant="outline"
           >
-            <svg
-              aria-hidden="true"
-              className="h-[1.45rem] w-[1.45rem] text-slate-700"
-              focusable="false"
-              viewBox="0 0 24 24"
+            <summary
+              aria-label={copy.styleMenu}
+              className="flex cursor-pointer list-none items-center justify-center"
             >
-              <path
-                d="M12 3.6 4.8 6.9 12 10.2l7.2-3.3z"
-                fill="none"
-                stroke="currentColor"
-                strokeLinejoin="round"
-                strokeWidth="1.65"
-              />
-              <path
-                d="M4.8 11.1 12 14.4l7.2-3.3"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.65"
-              />
-              <path
-                d="M4.8 15.3 12 18.6l7.2-3.3"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.65"
-              />
-            </svg>
-            <span className="sr-only">{copy.styleMenu}</span>
-          </summary>
+              <LayersIcon aria-hidden="true" />
+              <span className="sr-only">{copy.styleMenu}</span>
+            </summary>
+          </Button>
 
           <div className="explore-map-style-panel absolute right-[calc(100%+0.9rem)] top-0 z-20 w-[min(22rem,calc(100vw-2.5rem))] rounded-[1.5rem] border border-stone-200 bg-white/98 p-5 text-slate-900 shadow-[0_28px_90px_rgba(15,23,42,0.22)]">
             <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -73,7 +55,7 @@ export default function ExploreMapToolbar({
 
             <div className="grid grid-cols-2 gap-4">
               {mapStyles.map((style) => (
-                <button
+                <Button
                   aria-pressed={style.id === activeStyleId}
                   className={`explore-map-style-option group text-left transition ${
                     style.id === activeStyleId
@@ -86,6 +68,7 @@ export default function ExploreMapToolbar({
                   key={style.id}
                   onClick={() => onStyleSelect(style.id)}
                   type="button"
+                  variant="ghost"
                 >
                   <span
                     className={`explore-map-style-preview explore-map-style-preview--${style.id}`}
@@ -95,55 +78,29 @@ export default function ExploreMapToolbar({
                   <span className="mt-2 block text-lg font-semibold leading-tight text-slate-800">
                     {style.name}
                   </span>
-                </button>
+                </Button>
               ))}
             </div>
           </div>
         </details>
 
-        <button
-          aria-label={copy.zoomIn}
+        <IconControlButton
           className="explore-map-toolbar-button"
+          label={copy.zoomIn}
           onClick={onZoomIn}
-          type="button"
+          tooltip={copy.zoomIn}
         >
-          <svg
-            aria-hidden="true"
-            className="h-[1.42rem] w-[1.42rem] text-slate-800"
-            focusable="false"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M12 5v14M5 12h14"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeWidth="1.75"
-            />
-          </svg>
-        </button>
+          <PlusIcon aria-hidden="true" />
+        </IconControlButton>
 
-        <button
-          aria-label={copy.zoomOut}
+        <IconControlButton
           className="explore-map-toolbar-button"
+          label={copy.zoomOut}
           onClick={onZoomOut}
-          type="button"
+          tooltip={copy.zoomOut}
         >
-          <svg
-            aria-hidden="true"
-            className="h-[1.42rem] w-[1.42rem] text-slate-800"
-            focusable="false"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M5 12h14"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeWidth="1.75"
-            />
-          </svg>
-        </button>
+          <MinusIcon aria-hidden="true" />
+        </IconControlButton>
       </div>
     </div>
   )

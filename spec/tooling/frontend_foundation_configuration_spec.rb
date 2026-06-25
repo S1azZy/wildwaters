@@ -10,6 +10,16 @@ RSpec.describe FrontendFoundationConfiguration do
   let(:root) { Pathname(__dir__).join("../..").expand_path }
   let(:package) { JSON.parse(root.join("package.json").read) }
   let(:scripts) { package.fetch("scripts") }
+  let(:shadcn_config) { JSON.parse(root.join("components.json").read) }
+  let(:shadcn_inventory) do
+    %w[
+      alert alert-dialog avatar badge breadcrumb button card carousel checkbox
+      command dialog drawer dropdown-menu empty field hover-card input
+      input-group label pagination popover progress radio-group scroll-area
+      select separator sheet skeleton sonner spinner switch table tabs textarea
+      toggle toggle-group tooltip
+    ]
+  end
 
   it "pins the approved frontend runtime and build dependencies" do
     expect(package.fetch("dependencies")).to include(
@@ -30,7 +40,7 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(scripts).to include(
       "frontend:audit" => "npm audit --audit-level=high",
       "frontend:build" => "RAILS_ENV=production vite build",
-      "frontend:format" => 'prettier --check "app/frontend/**/*.{ts,tsx,css}" vite.config.ts eslint.config.mjs package.json tsconfig.json',
+      "frontend:format" => 'prettier --check "app/frontend/**/*.{ts,tsx,css}" vite.config.ts eslint.config.mjs package.json tsconfig.json components.json',
       "frontend:lint" => "eslint .",
       "frontend:test" => "vitest run --coverage --passWithNoTests",
       "frontend:typecheck" => "tsc --noEmit"
@@ -122,6 +132,69 @@ RSpec.describe FrontendFoundationConfiguration do
     makefile = root.join("Makefile").read
 
     expect(makefile).to include("frontend-outdated:", "bin/npm outdated")
+  end
+
+  it "configures the shadcn Radix preset for Vite React" do
+    expect(shadcn_config).to include(
+      "style" => "radix-nova",
+      "rsc" => false,
+      "tsx" => true,
+      "iconLibrary" => "lucide"
+    )
+  end
+
+  it "routes shadcn CSS and generated imports through frontend paths" do
+    expect(shadcn_config.fetch("tailwind")).to include(
+      "css" => "app/frontend/entrypoints/application.css",
+      "cssVariables" => true
+    )
+    expect(shadcn_config.fetch("aliases")).to include(
+      "components" => "@/components",
+      "ui" => "@/components/ui",
+      "utils" => "@/lib/utils",
+    )
+  end
+
+  it "pins the shadcn core dependency graph in npm" do
+    expect(package.fetch("dependencies")).to include(
+      "class-variance-authority" => "^0.7.1",
+      "clsx" => "^2.1.1",
+      "lucide-react" => "^1.21.0",
+      "radix-ui" => "^1.6.0",
+      "shadcn" => "^4.11.0",
+      "tailwind-merge" => "^3.6.0"
+    )
+  end
+
+  it "pins the shadcn generated component dependencies in npm" do
+    expect(package.fetch("dependencies")).to include(
+      "cmdk" => "^1.1.1",
+      "embla-carousel-react" => "^8.6.0",
+      "sonner" => "^2.0.7",
+      "tw-animate-css" => "^1.4.0",
+      "vaul" => "^1.1.2"
+    )
+  end
+
+  it "provides the initial shadcn primitive inventory" do
+    ui_dir = root.join("app/frontend/components/ui")
+    missing_components = shadcn_inventory.reject { |component| ui_dir.join("#{component}.tsx").exist? }
+
+    expect(ui_dir).to exist
+    expect(missing_components).to be_empty
+  end
+
+  it "maps shadcn semantic tokens to the Digital Naturalist vocabulary" do
+    stylesheet = root.join("app/frontend/entrypoints/application.css").read
+
+    expect(stylesheet).to include(
+      "--primary: var(--color-primary-500)",
+      "--secondary: var(--color-secondary-100)",
+      "--accent: var(--color-tertiary-100)",
+      "--background: var(--color-surface-base)",
+      "--radius: var(--radius-ui-md)",
+    )
+    expect(stylesheet).not_to include("Geist Variable")
   end
 
   it "scopes Vite development CSP allowances to development" do
