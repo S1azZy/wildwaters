@@ -43,6 +43,7 @@
 
 # Local machine/editor artifacts
 .DS_Store
+.playwright-mcp/
 
 # JetBrains IDE settings (RubyMine, IntelliJ, etc.)
 .idea/
