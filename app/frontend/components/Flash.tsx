@@ -1,4 +1,5 @@
 import type { InertiaFlash } from "../types/page"
+import { FeedbackMessage } from "./ww"
 
 interface FlashMessageProps {
   message: string
@@ -6,21 +7,14 @@ interface FlashMessageProps {
 }
 
 function FlashMessage({ message, tone }: FlashMessageProps) {
-  const isAlert = tone === "alert"
-
   return (
-    <section
-      aria-atomic="true"
-      aria-live={isAlert ? "assertive" : "polite"}
+    <FeedbackMessage
       className="ui-flash"
-      data-tone={tone}
-      data-ui="flash"
-      role={isAlert ? "alert" : "status"}
-    >
-      <p className="ui-flash__message" data-ui="flash-message">
-        {message}
-      </p>
-    </section>
+      message={message}
+      messageDataUi="flash-message"
+      rootDataUi="flash"
+      tone={tone}
+    />
   )
 }
 

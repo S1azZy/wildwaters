@@ -48,7 +48,7 @@ export default function Edit({
 
   return (
     <AuthLayout auth={auth} page="password-reset-edit" shell={shell}>
-      <form className="space-y-5" onSubmit={submit}>
+      <form className="flex flex-col gap-5" onSubmit={submit}>
         <AuthFormIntro
           heading={copy.cardHeading}
           supporting={copy.cardSupporting}

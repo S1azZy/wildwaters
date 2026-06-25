@@ -1,5 +1,8 @@
 import type { ReactNode } from "react"
 
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+
 export type AuthShellVariant = "session" | "registration" | "recovery"
 
 export interface AuthShellProps {
@@ -40,18 +43,20 @@ export default function AuthShell({ auth, children }: AuthShellComponentProps) {
           <p className="auth-shell__description">{auth.description}</p>
         </div>
 
-        <div className="auth-card" data-ui="auth-card">
-          <div className="auth-card__header">
-            <p className="auth-card__label">{auth.panelLabel}</p>
-          </div>
-          <div className="auth-card__body">{children}</div>
-          <p className="auth-card__alternate">
+        <Card className="auth-card" data-ui="auth-card">
+          <CardHeader className="auth-card__header">
+            <Badge className="auth-card__label" variant="secondary">
+              {auth.panelLabel}
+            </Badge>
+          </CardHeader>
+          <CardContent className="auth-card__body">{children}</CardContent>
+          <CardFooter className="auth-card__alternate">
             <span>{auth.alternatePrompt}</span>
             <a className="auth-card__alternate-link" href={auth.alternateUrl}>
               {auth.alternateLabel}
             </a>
-          </p>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
     </section>
   )

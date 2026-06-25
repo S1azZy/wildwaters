@@ -34,3 +34,4 @@ code and RSpec.
 - [ADR 0003: Import Architecture and Region Ingestion](0003-import-architecture-and-region-ingestion.md)
 - [ADR 0004: GeoNames Queued Import Orchestration](0004-geonames-queued-import-orchestration.md)
 - [ADR 0005: Business Frontend Architecture](0005-business-frontend-architecture.md)
+- [ADR 0006: Shadcn UI Component Foundation](0006-shadcn-ui-component-foundation.md)

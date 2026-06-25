@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button"
+
 import type { ShellProps } from "../types/page"
 
 export default function SiteHeader({
@@ -43,14 +45,20 @@ export default function SiteHeader({
             className="site-header-primary-nav hidden md:flex"
             data-ui="site-header-primary-nav"
           >
-            <a
+            <Button
+              asChild
               className="site-header-nav-link site-header-nav-link--prominent"
-              data-current="false"
-              data-ui="site-header-nav-item"
-              href={urls.explore}
+              size="sm"
+              variant="ghost"
             >
-              {labels.explore}
-            </a>
+              <a
+                data-current="false"
+                data-ui="site-header-nav-item"
+                href={urls.explore}
+              >
+                {labels.explore}
+              </a>
+            </Button>
           </nav>
 
           <div className="site-header-actions" data-ui="site-header-actions">
@@ -66,9 +74,9 @@ export default function SiteHeader({
                   : "site-header-guest-actions"
               }
             >
-              <a className="site-header-cta" href={action.url}>
-                {action.label}
-              </a>
+              <Button asChild className="site-header-cta" size="sm">
+                <a href={action.url}>{action.label}</a>
+              </Button>
             </div>
           </div>
         </div>
@@ -78,14 +86,20 @@ export default function SiteHeader({
           className="site-header-mobile-nav md:hidden"
           data-ui="site-header-primary-nav"
         >
-          <a
+          <Button
+            asChild
             className="site-header-mobile-link"
-            data-current="false"
-            data-ui="site-header-nav-item"
-            href={urls.explore}
+            size="sm"
+            variant="ghost"
           >
-            {labels.explore}
-          </a>
+            <a
+              data-current="false"
+              data-ui="site-header-nav-item"
+              href={urls.explore}
+            >
+              {labels.explore}
+            </a>
+          </Button>
         </nav>
       </div>
     </header>

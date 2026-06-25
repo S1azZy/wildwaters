@@ -4,6 +4,8 @@
 - Decided: 2026-06-14
 - Implementation: `openspec/changes/archive/2026-06-14-frontend-foundation`
   and subsequent route migration changes
+- Partially superseded: ADR 0006 resolves the deferred UI-kit decision for
+  application-owned business and admin React interfaces.
 
 ## Context
 
@@ -110,15 +112,14 @@ the browser test layer.
 
 ### Component-system boundary
 
-The migration initially ports stable UI primitives into application-owned,
-typed React components. It does not adopt a visual UI kit during foundation
+The migration initially ported stable UI primitives into application-owned,
+typed React components and did not adopt a visual UI kit during foundation
 work.
 
-Before substantial application-owned admin UI is built, the project will
-evaluate an accessibility-first or headless UI toolkit against Digital
-Naturalist, React compatibility, maintenance health, and migration cost. That
-future decision requires its own approved architecture change if it alters the
-component foundation.
+ADR 0006 later selected shadcn/ui as the preferred component foundation for
+application-owned business and admin React interfaces. This ADR continues to
+own the Inertia React architecture, while ADR 0006 owns the UI-kit and
+component-layer decision.
 
 ## Alternatives Considered
 

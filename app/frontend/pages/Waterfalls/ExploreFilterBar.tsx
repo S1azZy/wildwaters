@@ -1,5 +1,7 @@
-import type { ChangeEvent, FormEvent } from "react"
+import type { FormEvent } from "react"
 
+import { Button } from "../../components/ui/button"
+import { SelectField, TextField } from "../../components/ww"
 import type {
   ExploreFilterCopy,
   ExploreFilters,
@@ -10,10 +12,7 @@ import type {
 interface ExploreFilterBarProps {
   copy: ExploreFilterCopy
   filters: ExploreFilters
-  onFilterChange: (
-    key: keyof ExploreFilters,
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void
+  onFilterChange: (key: keyof ExploreFilters, value: string) => void
   onSearchChange: (value: string) => void
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
   regions: RegionOption[]
@@ -22,7 +21,16 @@ interface ExploreFilterBarProps {
 }
 
 const controlClassName =
-  "w-full rounded-full border border-stone-200 bg-white px-4 py-[0.82rem] text-[0.93rem] text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+  "h-11 w-full rounded-full bg-white/95 px-4 text-[0.93rem] shadow-sm"
+const allFilterValue = "__all__"
+
+function filterValue(value: string | null) {
+  return value ?? allFilterValue
+}
+
+function selectedFilterValue(value: string) {
+  return value === allFilterValue ? "" : value
+}
 
 export default function ExploreFilterBar({
   copy,
@@ -44,14 +52,13 @@ export default function ExploreFilterBar({
         data-desktop-layout="single-row"
       >
         <div className="explore-filter-search min-w-0">
-          <label className="sr-only" htmlFor="explore_search">
-            {copy.search}
-          </label>
-          <input
+          <TextField
             autoComplete="off"
-            className={`${controlClassName} placeholder:text-slate-400`}
+            className={controlClassName}
             data-explore-map-target="search"
+            hideLabel
             id="explore_search"
+            label={copy.search}
             name="explore_search"
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder={copy.searchPlaceholder}
@@ -69,36 +76,35 @@ export default function ExploreFilterBar({
           onSubmit={onSubmit}
         >
           <div className="explore-filter-field grid min-w-0 gap-2">
-            <label className="sr-only" htmlFor="region_public_id">
-              {copy.region}
-            </label>
-            <select
-              className={controlClassName}
+            <SelectField
+              hideLabel
               id="region_public_id"
+              label={copy.region}
               name="region_public_id"
-              onChange={(event) => onFilterChange("regionPublicId", event)}
-              value={filters.regionPublicId ?? ""}
-            >
-              <option value="">{copy.allRegions}</option>
-              {regions.map((region) => (
-                <option key={region.value} value={region.value}>
-                  {region.label}
-                </option>
-              ))}
-            </select>
+              onValueChange={(value) =>
+                onFilterChange("regionPublicId", selectedFilterValue(value))
+              }
+              options={[
+                { label: copy.allRegions, value: allFilterValue },
+                ...regions,
+              ]}
+              triggerClassName={controlClassName}
+              value={filterValue(filters.regionPublicId)}
+            />
           </div>
 
           <div className="explore-filter-field grid min-w-0 gap-2">
-            <label className="sr-only" htmlFor="min_height_meters">
-              {copy.minHeight}
-            </label>
-            <input
+            <TextField
               autoComplete="off"
               className={controlClassName}
+              hideLabel
               id="min_height_meters"
+              label={copy.minHeight}
               min="0"
               name="min_height_meters"
-              onChange={(event) => onFilterChange("minHeightMeters", event)}
+              onChange={(event) =>
+                onFilterChange("minHeightMeters", event.target.value)
+              }
               placeholder={copy.minHeightPlaceholder}
               step="5"
               type="number"
@@ -107,47 +113,48 @@ export default function ExploreFilterBar({
           </div>
 
           <div className="explore-filter-field grid min-w-0 gap-2">
-            <label className="sr-only" htmlFor="plunge_pool">
-              {copy.plungePool}
-            </label>
-            <select
-              className={controlClassName}
+            <SelectField
+              hideLabel
               id="plunge_pool"
+              label={copy.plungePool}
               name="plunge_pool"
-              onChange={(event) => onFilterChange("plungePool", event)}
-              value={filters.plungePool ?? ""}
-            >
-              <option value="">{copy.anyPlungePool}</option>
-              <option value="true">{copy.plungePoolYes}</option>
-              <option value="false">{copy.plungePoolNo}</option>
-            </select>
+              onValueChange={(value) =>
+                onFilterChange("plungePool", selectedFilterValue(value))
+              }
+              options={[
+                { label: copy.anyPlungePool, value: allFilterValue },
+                { label: copy.plungePoolYes, value: "true" },
+                { label: copy.plungePoolNo, value: "false" },
+              ]}
+              triggerClassName={controlClassName}
+              value={filterValue(filters.plungePool)}
+            />
           </div>
 
           <div className="explore-filter-field grid min-w-0 gap-2">
-            <label className="sr-only" htmlFor="approach_difficulty">
-              {copy.approachDifficulty}
-            </label>
-            <select
-              className={controlClassName}
+            <SelectField
+              hideLabel
               id="approach_difficulty"
+              label={copy.approachDifficulty}
               name="approach_difficulty"
-              onChange={(event) => onFilterChange("approachDifficulty", event)}
-              value={filters.approachDifficulty ?? ""}
-            >
-              <option value="">{copy.anyDifficulty}</option>
-              <option value="easy">{copy.easy}</option>
-              <option value="moderate">{copy.moderate}</option>
-              <option value="hard">{copy.hard}</option>
-            </select>
+              onValueChange={(value) =>
+                onFilterChange("approachDifficulty", selectedFilterValue(value))
+              }
+              options={[
+                { label: copy.anyDifficulty, value: allFilterValue },
+                { label: copy.easy, value: "easy" },
+                { label: copy.moderate, value: "moderate" },
+                { label: copy.hard, value: "hard" },
+              ]}
+              triggerClassName={controlClassName}
+              value={filterValue(filters.approachDifficulty)}
+            />
           </div>
 
           <div className="explore-filter-actions flex items-center gap-2.5 whitespace-nowrap">
-            <a
-              className="inline-flex min-h-[2.85rem] items-center justify-center rounded-full border border-stone-300 bg-white px-4 text-[0.92rem] font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-950"
-              href={urls.explore}
-            >
-              {copy.reset}
-            </a>
+            <Button asChild className="rounded-full" variant="outline">
+              <a href={urls.explore}>{copy.reset}</a>
+            </Button>
           </div>
         </form>
       </div>

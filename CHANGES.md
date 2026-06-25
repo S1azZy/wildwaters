@@ -1,5 +1,13 @@
 # Changes
 
+## 2026-06-26
+- Adopted shadcn/ui as the selected application-owned business/admin UI kit
+  direction, added ADR 0006, introduced the frontend design guide, installed
+  the Vite/Tailwind shadcn foundation, added Wild Waters wrappers, and migrated
+  the shared shell, auth forms, dashboard placeholder, waterfall detail page,
+  and Explore chrome toward shadcn-backed components while preserving Digital
+  Naturalist, Rails, Inertia, and MapLibre ownership boundaries.
+
 ## 2026-06-25
 - Tightened the agent workflow harness so every repository task starts with an
   explicit SDD gate, added Level 0 for non-functional maintenance, and clarified

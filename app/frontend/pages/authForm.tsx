@@ -1,5 +1,11 @@
 import type { ReactNode } from "react"
 
+import {
+  FeedbackMessage,
+  SelectField,
+  SubmitButton,
+  TextField,
+} from "../components/ww"
 import type { FieldCopy } from "./authTypes"
 
 interface AuthFormIntroProps {
@@ -40,25 +46,18 @@ export function AuthTextField({
   const inputId = name.replace(/\W+/g, "-")
 
   return (
-    <div className="block space-y-2">
-      <div className="flex items-center justify-between gap-4">
-        <label className="auth-form__label" htmlFor={inputId}>
-          {copy.label}
-        </label>
-        {secondaryAction}
-      </div>
-      <input
-        autoComplete={autoComplete}
-        className="auth-form__input"
-        id={inputId}
-        name={name}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={copy.placeholder}
-        required={required}
-        type={type}
-        value={value}
-      />
-    </div>
+    <TextField
+      autoComplete={autoComplete}
+      id={inputId}
+      label={copy.label}
+      name={name}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={copy.placeholder}
+      required={required}
+      secondaryAction={secondaryAction}
+      type={type}
+      value={value}
+    />
   )
 }
 
@@ -86,25 +85,15 @@ export function AuthSelectField({
   const inputId = name.replace(/\W+/g, "-")
 
   return (
-    <label className="block space-y-2" htmlFor={inputId}>
-      <span className="auth-form__label">{copy.label}</span>
-      <select
-        className="auth-form__select"
-        id={inputId}
-        name={name}
-        onChange={(event) => onChange(event.target.value)}
-        value={value}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      {supporting ? (
-        <span className="auth-form__supporting">{supporting}</span>
-      ) : null}
-    </label>
+    <SelectField
+      description={supporting}
+      id={inputId}
+      label={copy.label}
+      name={name}
+      onValueChange={onChange}
+      options={options}
+      value={value}
+    />
   )
 }
 
@@ -118,9 +107,11 @@ export function AuthFormError({ message }: AuthFormErrorProps) {
   }
 
   return (
-    <p className="auth-form__error" role="alert">
-      {message}
-    </p>
+    <FeedbackMessage
+      className="auth-form__error"
+      message={message}
+      tone="alert"
+    />
   )
 }
 
@@ -131,8 +122,12 @@ interface AuthSubmitProps {
 
 export function AuthSubmit({ children, disabled }: AuthSubmitProps) {
   return (
-    <button className="auth-form__submit" disabled={disabled} type="submit">
+    <SubmitButton
+      className="auth-form__submit"
+      isPending={disabled}
+      type="submit"
+    >
       {children}
-    </button>
+    </SubmitButton>
   )
 }

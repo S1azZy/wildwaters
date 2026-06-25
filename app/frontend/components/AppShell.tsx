@@ -1,6 +1,8 @@
 import { Head, usePage } from "@inertiajs/react"
 import type { ReactNode } from "react"
 
+import { TooltipProvider } from "@/components/ui/tooltip"
+
 import type { ShellProps } from "../types/page"
 import Flash from "./Flash"
 import SiteHeader from "./SiteHeader"
@@ -38,7 +40,13 @@ export default function AppShell({
   return (
     <>
       <Head title={title} />
-      {pageClassName ? <div className={pageClassName}>{content}</div> : content}
+      <TooltipProvider>
+        {pageClassName ? (
+          <div className={pageClassName}>{content}</div>
+        ) : (
+          content
+        )}
+      </TooltipProvider>
     </>
   )
 }
