@@ -52,6 +52,14 @@ RSpec.describe "Admin jobs", type: :request do
 
         expect(response).to have_http_status(:ok)
       end
+
+      it "is not shadowed by the application-owned admin Inertia page" do
+        perform_request
+
+        expect(response).to have_http_status(:ok)
+        expect(response.media_type).to eq("text/html")
+        expect(response.body).not_to include("Admin/ServiceActions/Index")
+      end
     end
   end
 end

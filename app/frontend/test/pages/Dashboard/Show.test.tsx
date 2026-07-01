@@ -22,13 +22,18 @@ const props: DashboardShowPageProps = {
       explore: "Explore",
       primaryMobileNavigation: "Primary mobile navigation",
       primaryNavigation: "Primary navigation",
+      accountMenu: "Account",
+      admin: "Admin",
+      mainPage: "Main page",
       profile: "Profile",
+      signOut: "Log out",
       signIn: "Log in",
     },
     urls: {
       dashboard: "/dashboard",
       explore: "/",
       signIn: "/session/new",
+      signOut: "/session",
     },
   },
   urls: {
@@ -49,8 +54,8 @@ describe("Dashboard/Show", () => {
     expect(signOut).toHaveAttribute("type", "button")
 
     expect(
-      screen.getByRole("link", { name: props.shell.labels.profile }),
-    ).toHaveAttribute("href", props.shell.urls.dashboard)
+      screen.getByRole("button", { name: props.shell.labels.accountMenu }),
+    ).toBeInTheDocument()
     expect(
       screen.queryByRole("link", { name: props.shell.labels.signIn }),
     ).toBeNull()

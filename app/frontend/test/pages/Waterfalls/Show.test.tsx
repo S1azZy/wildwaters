@@ -19,13 +19,18 @@ const props: WaterfallShowPageProps = {
       explore: "Explore",
       primaryMobileNavigation: "Primary mobile navigation",
       primaryNavigation: "Primary navigation",
+      accountMenu: "Account",
+      admin: "Admin",
+      mainPage: "Main page",
       profile: "Profile",
+      signOut: "Log out",
       signIn: "Log in",
     },
     urls: {
       dashboard: "/dashboard",
       explore: "/",
       signIn: "/session/new",
+      signOut: "/session",
     },
   },
   urls: {

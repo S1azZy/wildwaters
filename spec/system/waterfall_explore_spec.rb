@@ -122,6 +122,11 @@ RSpec.describe "Waterfall explore", type: :system do
     expect(page).to have_css(".explore-filter-row[data-desktop-layout='single-row']")
     expect(page).to have_css(".explore-filter-form[data-desktop-wrap='never']")
     expect(page).to have_css(".explore-map-shell--viewport-fit[data-explore-map-target='shell']")
+
+    filter_layout = explore_filter_layout
+
+    expect(filter_layout).to include("position" => "sticky", "zIndex" => "40")
+    expect(filter_layout.fetch("top")).to eq(filter_layout.fetch("headerOffset"))
   end
 
   it "renders the search and filter controls inside the filter bar" do
@@ -279,5 +284,23 @@ RSpec.describe "Waterfall explore", type: :system do
       expect(page).not_to have_link(I18n.t("layouts.header.activity"))
       expect(page).not_to have_link(I18n.t("layouts.header.profile"))
     end
+  end
+
+  def explore_filter_layout
+    page.evaluate_script(<<~JAVASCRIPT)
+      (function() {
+        var filterBand = document.querySelector(".explore-filter-band");
+        var layoutShell = document.querySelector("#explore-home");
+        var filterStyles = window.getComputedStyle(filterBand);
+        var layoutStyles = window.getComputedStyle(layoutShell);
+
+        return {
+          headerOffset: layoutStyles.getPropertyValue("--explore-header-offset").trim(),
+          position: filterStyles.position,
+          top: filterStyles.top,
+          zIndex: filterStyles.zIndex,
+        };
+      })()
+    JAVASCRIPT
   end
 end

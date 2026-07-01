@@ -99,11 +99,12 @@ export function useExploreMap({
     const headerHeight =
       document.querySelector<HTMLElement>("[data-ui='site-header']")
         ?.offsetHeight ?? 0
+    const headerOffset = `${headerHeight}px`
 
-    shellRef.current?.style.setProperty(
-      "--explore-header-offset",
-      `${headerHeight}px`,
-    )
+    document
+      .querySelector<HTMLElement>("#explore-home")
+      ?.style.setProperty("--explore-header-offset", headerOffset)
+    shellRef.current?.style.setProperty("--explore-header-offset", headerOffset)
   }, [])
 
   const syncMapSource = useCallback((nextFeatures: WaterfallFeature[]) => {
