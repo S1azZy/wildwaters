@@ -6,13 +6,19 @@ export interface ShellProps {
     explore: string
     primaryMobileNavigation: string
     primaryNavigation: string
+    accountMenu: string
+    admin: string
+    mainPage: string
     profile: string
+    signOut: string
     signIn: string
   }
   urls: {
+    admin?: string
     dashboard: string
     explore: string
     signIn: string
+    signOut: string
   }
 }
 

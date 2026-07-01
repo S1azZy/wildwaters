@@ -23,24 +23,32 @@ module InertiaPropsHelpers
       explore: I18n.t("layouts.header.explore", locale:),
       primaryMobileNavigation: I18n.t("layouts.header.primary_mobile_navigation", locale:),
       primaryNavigation: I18n.t("layouts.header.primary_navigation", locale:),
+      accountMenu: I18n.t("layouts.header.account_menu", locale:),
+      admin: I18n.t("layouts.header.admin", locale:),
+      mainPage: I18n.t("layouts.header.main_page", locale:),
       profile: I18n.t("layouts.header.profile", locale:),
+      signOut: I18n.t("layouts.header.sign_out", locale:),
       signIn: I18n.t("layouts.header.sign_in", locale:)
     }
   end
 
-  def expected_shell_urls
-    {
+  def expected_shell_urls(admin: false)
+    urls = {
       dashboard: dashboard_path,
       explore: root_path,
-      signIn: new_session_path
+      signIn: new_session_path,
+      signOut: session_path
     }
+
+    urls[:admin] = admin_service_actions_path if admin
+    urls
   end
 
-  def expected_shell_props(locale: I18n.locale, authenticated: false)
+  def expected_shell_props(locale: I18n.locale, authenticated: false, admin: false)
     {
       authenticated:,
       labels: expected_shell_labels(locale:),
-      urls: expected_shell_urls
+      urls: expected_shell_urls(admin:)
     }
   end
 

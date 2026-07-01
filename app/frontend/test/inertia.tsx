@@ -9,6 +9,7 @@ export function renderInertiaPage<Props extends PageProps>(
   Component: ComponentType<Props>,
   props: Props,
   flash: FlashData = {},
+  url = "/test",
 ) {
   const page: Page<Props> = {
     component: "Test/Page",
@@ -16,7 +17,7 @@ export function renderInertiaPage<Props extends PageProps>(
       ...props,
       errors: {},
     },
-    url: "/test",
+    url,
     version: null,
     rescuedProps: [],
     flash,

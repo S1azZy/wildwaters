@@ -33,19 +33,34 @@ en:
   admin:
     authorization:
       required: "You are not allowed to access that page."
+    navigation:
+      service_actions: "Service actions"
+    service_actions:
+      index:
+        description: "A quiet workspace for operational commands that need explicit admin access."
+        heading: "Service actions"
+        placeholder_description: "Import controls and other service commands will appear here after their operational behavior is specified."
+        placeholder_title: "Service commands will live here"
+        title: "Service actions"
+    shell:
+      toolbar_label: "Admin workspace"
   layouts:
     header:
+      account_menu: "Account"
+      admin: "Admin"
       activity: "Activity"
       brand_name: "Wild Waters"
       brand_tagline: "Swim the World"
       explore: "Explore"
       map: "Map"
       notifications: "Notifications"
+      main_page: "Main page"
       primary_mobile_navigation: "Primary mobile navigation"
       primary_navigation: "Primary navigation"
       profile: "Profile"
       settings: "Settings"
       sign_in: "Log in"
+      sign_out: "Log out"
   auth:
     fields:
       email: "Email"

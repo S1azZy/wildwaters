@@ -1,5 +1,17 @@
 # Changes
 
+## 2026-07-01
+- Added the first application-owned admin namespace with an admin-only
+  service-actions placeholder, a shadcn-backed admin workspace shell, and an
+  authenticated account dropdown that keeps Profile disabled, shows Admin only
+  to admins, and preserves Rails-owned sign-out behavior.
+- Polished the shared authenticated shell so flash messages render as compact
+  auto-dismissing overlays, the account dropdown trigger is visibly labeled,
+  and admin pages offer a Main page account action instead of linking back to
+  the current admin area.
+- Kept the Explore filter bar pinned directly under the sticky header while the
+  map page scrolls.
+
 ## 2026-06-26
 - Adopted shadcn/ui as the selected application-owned business/admin UI kit
   direction, added ADR 0006, introduced the frontend design guide, installed

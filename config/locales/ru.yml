@@ -4,8 +4,21 @@ ru:
   admin:
     authorization:
       required: "У вас нет доступа к этой странице."
+    navigation:
+      service_actions: "Сервисные действия"
+    service_actions:
+      index:
+        description: "Спокойное рабочее место для операционных команд, требующих явного доступа администратора."
+        heading: "Сервисные действия"
+        placeholder_description: "Управление импортами и другие сервисные команды появятся здесь после отдельного описания их поведения."
+        placeholder_title: "Здесь будут сервисные команды"
+        title: "Сервисные действия"
+    shell:
+      toolbar_label: "Админская область"
   layouts:
     header:
+      account_menu: "Аккаунт"
+      admin: "Админка"
       activity: "Активность"
       brand_name: "Wild Waters"
       brand_tagline: "Swim the World"
@@ -13,11 +26,13 @@ ru:
       explore: "Explore"
       map: "Map"
       notifications: "Уведомления"
+      main_page: "Главная"
       primary_mobile_navigation: "Основная мобильная навигация"
       primary_navigation: "Основная навигация"
       profile: "Профиль"
       settings: "Настройки"
       sign_in: "Войти"
+      sign_out: "Выйти"
   auth:
     fields:
       email: "Email"

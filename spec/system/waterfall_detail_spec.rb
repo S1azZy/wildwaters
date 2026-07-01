@@ -51,21 +51,16 @@ RSpec.describe "Waterfall detail", type: :system do
 
   it "renders the authenticated header state without exposing identity data" do
     page.current_window.resize_to(1_280, 900)
-    create(:user_identity, email: "user@example.com")
-
-    visit new_session_path
-    fill_in I18n.t("auth.fields.email"), with: "user@example.com"
-    fill_in I18n.t("auth.fields.password"), with: "Password123!"
-    click_button I18n.t("auth.sessions.new.submit")
+    user_identity = sign_in_with_unique_identity("waterfall-detail")
 
     expect(page).to have_current_path(root_path)
-    expect(page).to have_link(I18n.t("layouts.header.profile"), href: dashboard_path)
+    expect_authenticated_account_menu
 
     visit waterfall_path(waterfall.spot)
 
-    expect(page).to have_link(I18n.t("layouts.header.profile"), href: dashboard_path)
+    expect_authenticated_account_menu
     expect(page).not_to have_link(I18n.t("layouts.header.sign_in"), href: new_session_path)
-    expect(page).not_to have_text("user@example.com")
+    expect(page).not_to have_text(user_identity.email)
   end
 
   it "crosses the legacy and Inertia runtime boundary with full document visits" do
@@ -99,5 +94,26 @@ RSpec.describe "Waterfall detail", type: :system do
   def expect_explore_inertia_runtime
     expect(page).to have_css("#explore-home", visible: false)
     expect(page).to have_css("script[type='module'][src*='application']", visible: false)
+  end
+
+  def sign_in_with_unique_identity(prefix)
+    email = "#{prefix}-#{SecureRandom.hex(4)}@example.com"
+    user_identity = create(:user_identity, user: create(:user, primary_email: email), email:)
+
+    visit new_session_path
+    fill_in I18n.t("auth.fields.email"), with: user_identity.email
+    fill_in I18n.t("auth.fields.password"), with: "Password123!"
+    click_button I18n.t("auth.sessions.new.submit")
+
+    user_identity
+  end
+
+  def expect_authenticated_account_menu
+    account_menu = find("button[aria-label='#{I18n.t("layouts.header.account_menu")}']")
+    account_menu.click
+    expect(page).to have_css("[role='menuitem'][aria-disabled='true']", text: I18n.t("layouts.header.profile"))
+    expect(page).to have_css("[role='menuitem']", text: I18n.t("layouts.header.sign_out"))
+    expect(page).not_to have_css("[role='menuitem']", text: I18n.t("layouts.header.admin"))
+    find("body").send_keys(:escape)
   end
 end
