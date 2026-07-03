@@ -5,6 +5,7 @@
   container binary, adding compact `make agent-*` feedback commands for RSpec,
   RuboCop, Vitest, TypeScript, ESLint, and Prettier, and documenting balanced
   RTK usage for host search, git, Docker diagnostics, and final verification.
+- Updated `crass` to 1.0.7 to satisfy the Ruby dependency security guard.
 - Rewrote the project-local waterfall UI skill so future waterfall discovery UI
   work routes through the current Inertia React, shadcn/ui, Rails-owned prop
   and copy, and MapLibre ownership boundaries instead of the retired

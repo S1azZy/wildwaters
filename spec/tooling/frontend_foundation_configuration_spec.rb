@@ -128,8 +128,7 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(dockerfile).to include("npm ci", "npm run frontend:build")
   end
 
-  it "provides RTK-backed agent commands for compact local feedback" do
-    makefile = root.join("Makefile").read
+  it "installs RTK in the development container for compact local feedback" do
     dev_dockerfile = root.join("Dockerfile.dev").read
 
     expect(dev_dockerfile).to include(
@@ -138,6 +137,11 @@ RSpec.describe FrontendFoundationConfiguration do
       "RTK_TELEMETRY_DISABLED=1",
       "RTK_TEE_DIR=/app/tmp/rtk/tee",
     )
+  end
+
+  it "provides RTK-backed agent commands for compact local feedback" do
+    makefile = root.join("Makefile").read
+
     expect(makefile).to include(
       "agent-rspec:",
       "WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec $(SPEC)",
