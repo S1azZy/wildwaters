@@ -34,6 +34,9 @@ docs unless explicitly requested.
 - Run app/runtime commands through Make/container targets; use the host shell
   only for file search, git inspection, editing, and documented host-only
   tooling.
+- Prefer documented RTK-backed host commands and `make agent-*` targets when
+  they preserve needed detail; use raw `rg`, `sed`, git, or Make commands when
+  exact output matters.
 - Keep `CHANGES.md` current for behavior, schema, dependency, process, or
   user-facing changes.
 

@@ -3,9 +3,12 @@
 ARG RUBY_VERSION=4.0.5
 ARG RUBYGEMS_VERSION=4.0.14
 ARG NODE_VERSION=24.16.0
+ARG RTK_VERSION=0.43.0
 FROM node:${NODE_VERSION}-bookworm-slim AS node
 
 FROM ruby:${RUBY_VERSION}-slim
+ARG RTK_VERSION
+ARG TARGETARCH
 
 WORKDIR /app
 
@@ -35,11 +38,27 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
   postgresql-client-18 \
   && rm -rf /var/lib/apt/lists/*
 
+RUN case "${TARGETARCH}" in \
+    amd64) rtk_target="x86_64-unknown-linux-musl" ;; \
+    arm64) rtk_target="aarch64-unknown-linux-gnu" ;; \
+    *) echo "Unsupported RTK architecture: ${TARGETARCH}" >&2; exit 1 ;; \
+  esac \
+  && curl -fsSL \
+    "https://github.com/rtk-ai/rtk/releases/download/v${RTK_VERSION}/rtk-${rtk_target}.tar.gz" \
+    -o /tmp/rtk.tar.gz \
+  && tmpdir="$(mktemp -d)" \
+  && tar -xzf /tmp/rtk.tar.gz -C "${tmpdir}" \
+  && find "${tmpdir}" -type f -name rtk -exec install -m 0755 {} /usr/local/bin/rtk \; -quit \
+  && rtk --version \
+  && rm -rf "${tmpdir}" /tmp/rtk.tar.gz
+
 RUN gem update --system ${RUBYGEMS_VERSION}
 
 ENV BUNDLE_PATH=/usr/local/bundle \
     BUNDLE_JOBS=4 \
-    BUNDLE_RETRY=3
+    BUNDLE_RETRY=3 \
+    RTK_TELEMETRY_DISABLED=1 \
+    RTK_TEE_DIR=/app/tmp/rtk/tee
 
 COPY Gemfile Gemfile.lock .ruby-version ./
 RUN --mount=type=cache,target=/usr/local/bundle/cache \

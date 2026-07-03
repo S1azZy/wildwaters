@@ -128,6 +128,28 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(dockerfile).to include("npm ci", "npm run frontend:build")
   end
 
+  it "provides RTK-backed agent commands for compact local feedback" do
+    makefile = root.join("Makefile").read
+    dev_dockerfile = root.join("Dockerfile.dev").read
+
+    expect(dev_dockerfile).to include(
+      "ARG RTK_VERSION=0.43.0",
+      "github.com/rtk-ai/rtk/releases/download/v${RTK_VERSION}",
+      "RTK_TELEMETRY_DISABLED=1",
+      "RTK_TEE_DIR=/app/tmp/rtk/tee",
+    )
+    expect(makefile).to include(
+      "agent-rspec:",
+      "WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec $(SPEC)",
+      "rtk rspec $(SPEC)",
+      "agent-frontend-test: frontend-install",
+      "rtk vitest run --coverage --passWithNoTests",
+      "agent-rubocop:",
+      "rtk rubocop -A --config /app/.rubocop.yml",
+      "agent-verify-fast: frontend-install",
+    )
+  end
+
   it "exposes npm dependency freshness through Make" do
     makefile = root.join("Makefile").read
 

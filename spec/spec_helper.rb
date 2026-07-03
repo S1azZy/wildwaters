@@ -1,4 +1,4 @@
-if Dir.glob(File.expand_path("**/*_spec.rb", __dir__)).any?
+if ENV["WW_SKIP_SIMPLECOV"] != "1" && Dir.glob(File.expand_path("**/*_spec.rb", __dir__)).any?
   require "simplecov"
 
   SimpleCov.start "rails" do
