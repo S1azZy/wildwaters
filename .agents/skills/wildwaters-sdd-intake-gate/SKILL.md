@@ -1,6 +1,6 @@
 ---
 name: wildwaters-sdd-intake-gate
-description: Use before starting any Wild Waters repository task, before tests, implementation edits, generated artifacts, or task-specific app commands. Classifies SDD Level 0-3, records OpenSpec/ADR need, chooses context from docs/CONTEXT_MAP.md, applies the Make/container command contract, identifies approvals, and states the verification path.
+description: Use before starting any Wild Waters repository task, before tests, implementation edits, generated artifacts, or task-specific app commands. Classifies SDD Level 0-3, records OpenSpec/ADR need, chooses context from docs/CONTEXT_MAP.md, tracks loaded context and do-not-repeat checks, applies the Make/container command contract, identifies approvals, and states the verification path.
 ---
 
 # Wild Waters SDD Intake Gate
@@ -25,6 +25,28 @@ If not already loaded in this turn:
 
 Do not scan the whole repository unless the user asked for repository-wide work
 or classification cannot be resolved from the owning docs and neighboring files.
+
+## Budget Context
+
+Before reading more files or running repeated checks, set a small budget:
+
+```text
+Context budget: tiny | normal | broad
+Already loaded:
+Do not reload:
+Already checked:
+Skip now because:
+```
+
+- Use `tiny` for Level 0, copy, small docs/process, or one-file questions.
+- Use `normal` for bounded implementation or review in one feature area.
+- Use `broad` only for repository-wide analysis, security scans, architecture
+  discovery, or explicit audits.
+
+Do not re-read a file, re-run a search, or re-run a verification command when a
+fresh result is already in the active turn or compaction handoff. Reuse the
+recorded evidence unless the file changed, the branch changed, the command was
+invalidated, or the user asks for a fresh run.
 
 ## Classify Before Action
 
@@ -54,9 +76,14 @@ OpenSpec change: none | change-name | needed
 ADR: none | required | path
 Behavior change: yes/no
 Risk class: docs_only | low | medium | high
+Context budget: tiny | normal | broad
 Docs loaded:
 Context map entries used:
 Neighboring files to inspect:
+Already loaded:
+Do not reload:
+Already checked:
+Skip now because:
 Red test required: yes/no
 Approval required: yes/no
 Planned verification:
@@ -67,6 +94,11 @@ Use the packet as the handoff shape after compaction, approval waits, or long
 tool runs.
 
 ## Route The Work
+
+Use project-local skills and docs before global role skills. Do not layer broad
+generic planning, delivery, coding, review, or frontend-design skills on top of
+this gate for ordinary Wild Waters work; route through the SDD level, context
+map, and the narrow project skill instead.
 
 - **Level 0:** edit the owning source of truth, avoid duplicating rules, update
   `CHANGES.md` when the process, harness, user-facing docs, dependencies, or
@@ -122,8 +154,10 @@ user asks for speed.
 Before claiming completion:
 
 1. Run the planned verification or report the exact blocker.
-2. Check whether `CHANGES.md` is required.
-3. Summarize files changed, verification commands and results, remaining
+2. Do not re-run a green check only to have fresh-looking output; re-run only
+   when touched files or dependencies invalidated it.
+3. Check whether `CHANGES.md` is required.
+4. Summarize files changed, verification commands and results, remaining
    failures or skipped checks, and branch/PR details when applicable.
 
 Do not present heuristic inspection as mechanical proof. Tests, strict

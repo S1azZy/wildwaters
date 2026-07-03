@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wild Waters Workspace State"
+  short_description: "Snapshot branch, diff, PR, and reusable checks"
+  default_prompt: "Use $wildwaters-workspace-state to summarize the current Wild Waters branch, diff, PR, and reusable verification state."

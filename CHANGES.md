@@ -14,6 +14,10 @@
   verification before task-specific work starts.
 - Updated the OpenSpec tooling regression spec to validate project-local skills
   from `.agents/skills`.
+- Added context-budget and do-not-repeat fields to the project SDD intake gate,
+  added a workspace-state skill for cheap branch/diff/PR orientation, and made
+  Wild Waters UI routing prefer project skills over broad generic design
+  guidance.
 
 ## 2026-07-01
 - Added the first application-owned admin namespace with an admin-only
