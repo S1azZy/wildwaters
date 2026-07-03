@@ -11,6 +11,9 @@ metadata:
 
 Sync delta specs from a change to main specs.
 
+**Wild Waters CLI rule:** run OpenSpec through the repository wrapper:
+`bin/openspec ...`. Do not use a bare `openspec` command in this checkout.
+
 This is an **agent-driven** operation - you will read delta specs and directly edit main specs to apply the changes. This allows intelligent merging (e.g., adding a scenario without copying the entire requirement).
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
@@ -19,7 +22,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
 1. **If no change name provided, prompt for selection**
 
-   Run `openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
+   Run `bin/openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
 
    Show changes that have delta specs (under `specs/` directory).
 
@@ -29,7 +32,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
    Run:
    ```bash
-   openspec status --change "<name>" --json
+   bin/openspec status --change "<name>" --json
    ```
 
    If status reports `actionContext.mode: "workspace-planning"`, explain that workspace spec sync is not supported in this slice and STOP. Do not fall back to repo-local paths or edit linked repos.
@@ -56,6 +59,14 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
    c. **Apply changes intelligently**:
 
+      Before editing, write a compact per-requirement merge plan:
+      - capability
+      - delta section (`ADDED`, `MODIFIED`, `REMOVED`, or `RENAMED`)
+      - requirement name before
+      - requirement name after
+      - exact scenarios to add, modify, preserve, remove, or rename
+      - expected main-spec result
+
       **ADDED Requirements:**
       - If requirement doesn't exist in main spec → add it
       - If requirement already exists → update it to match (treat as implicit MODIFIED)
@@ -79,11 +90,22 @@ This is an **agent-driven** operation - you will read delta specs and directly e
       - Add Purpose section (can be brief, mark as TBD)
       - Add Requirements section with the ADDED requirements
 
+   e. **Verify idempotency for this capability**
+      - Re-read the updated main spec.
+      - Re-apply the same delta mentally against the updated file.
+      - If the second pass would add, remove, or rename anything again, fix the
+        merge before moving on.
+      - Record `Idempotency: no second-pass changes` in the summary.
+
 5. **Show summary**
 
    After applying all changes, summarize:
    - Which capabilities were updated
-   - What changes were made (requirements added/modified/removed/renamed)
+   - What changed for each requirement:
+     - before requirement/scenario state
+     - after requirement/scenario state
+     - preserved scenarios/content
+     - idempotency result
 
 **Delta Spec Format Reference**
 
@@ -119,7 +141,8 @@ The system SHALL do something new.
 Unlike programmatic merging, you can apply **partial updates**:
 - To add a scenario, just include that scenario under MODIFIED - don't copy existing scenarios
 - The delta represents *intent*, not a wholesale replacement
-- Use your judgment to merge changes sensibly
+- The merge must be explainable requirement-by-requirement; do not rely on a
+  vague "sensible merge" without before/after evidence.
 
 **Output On Success**
 
@@ -130,7 +153,13 @@ Updated main specs:
 
 **<capability-1>**:
 - Added requirement: "New Feature"
-- Modified requirement: "Existing Feature" (added 1 scenario)
+  - Before: absent
+  - After: requirement with 1 scenario
+  - Idempotency: no second-pass changes
+- Modified requirement: "Existing Feature"
+  - Before: 2 scenarios
+  - After: 3 scenarios (added "New scenario"; preserved existing scenarios)
+  - Idempotency: no second-pass changes
 
 **<capability-2>**:
 - Created new spec file
@@ -143,5 +172,6 @@ Main specs are now updated. The change remains active - archive when implementat
 - Read both delta and main specs before making changes
 - Preserve existing content not mentioned in delta
 - If something is unclear, ask for clarification
-- Show what you're changing as you go
-- The operation should be idempotent - running twice should give same result
+- Show the per-requirement before/after plan before or while changing specs
+- The operation must be idempotent: running the same sync twice should produce
+  no additional spec changes

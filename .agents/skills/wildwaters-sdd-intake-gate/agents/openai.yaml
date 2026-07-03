@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wild Waters SDD Intake Gate"
+  short_description: "Classify Wild Waters tasks before work starts"
+  default_prompt: "Use $wildwaters-sdd-intake-gate before changing the Wild Waters repository."

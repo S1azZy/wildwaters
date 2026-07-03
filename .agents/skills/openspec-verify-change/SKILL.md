@@ -11,13 +11,21 @@ metadata:
 
 Verify that an implementation matches the change artifacts (specs, tasks, design).
 
+**Wild Waters CLI rule:** run OpenSpec through the repository wrapper:
+`bin/openspec ...`. Do not use a bare `openspec` command in this checkout.
+
+**Proof model:** this skill produces an agentic verification report. Keyword
+search, file-path analysis, and implementation inference are advisory evidence,
+not blocking proof. Only mechanical validation, narrow tests, and project gates
+from `docs/DEVELOPMENT.md` can prove readiness to archive or merge.
+
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
 
 1. **If no change name provided, prompt for selection**
 
-   Run `openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
+   Run `bin/openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
 
    Show changes that have implementation tasks (tasks artifact exists).
    Include the schema used for each change if available.
@@ -27,7 +35,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
 2. **Check status to understand the schema**
    ```bash
-   openspec status --change "<name>" --json
+   bin/openspec status --change "<name>" --json
    ```
    Parse the JSON to understand:
    - `schemaName`: The workflow being used (e.g., "spec-driven")
@@ -39,7 +47,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 3. **Get planning context and load artifacts**
 
    ```bash
-   openspec instructions apply --change "<name>" --json
+   bin/openspec instructions apply --change "<name>" --json
    ```
 
    This returns the change directory and `contextFiles` (artifact ID -> array of concrete file paths). Read all available artifacts from `contextFiles`.
@@ -68,9 +76,11 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
      - Extract all requirements (marked with "### Requirement:")
      - For each requirement:
        - Search codebase for keywords related to the requirement
-       - Assess if implementation likely exists
+       - Assess whether implementation evidence likely exists
      - If requirements appear unimplemented:
-       - Add CRITICAL issue: "Requirement not found: <requirement name>"
+       - Add WARNING unless mechanical evidence proves the requirement is
+         missing. Use CRITICAL only for objective task/spec/gate blockers.
+         "Requirement evidence not found: <requirement name>"
        - Recommendation: "Implement requirement X: <description>"
 
 6. **Verify Correctness**
@@ -117,23 +127,26 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
    ## Verification Report: <change-name>
 
    ### Summary
-   | Dimension    | Status           |
-   |--------------|------------------|
-   | Completeness | X/Y tasks, N reqs|
-   | Correctness  | M/N reqs covered |
-   | Coherence    | Followed/Issues  |
+   | Dimension            | Status                 |
+   |----------------------|------------------------|
+   | Mechanical proof     | tests/gates run or missing |
+   | Completeness         | X/Y tasks, N reqs      |
+   | Agentic mapping      | M/N reqs have evidence |
+   | Coherence            | Followed/Issues        |
    ```
 
    **Issues by Priority**:
 
    1. **CRITICAL** (Must fix before archive):
       - Incomplete tasks
-      - Missing requirement implementations
+      - Missing required mechanical validation
+      - Mechanically proven missing requirement implementations
       - Each with specific, actionable recommendation
 
    2. **WARNING** (Should fix):
       - Spec/design divergences
       - Missing scenario coverage
+      - Requirements with weak or missing search evidence
       - Each with specific recommendation
 
    3. **SUGGESTION** (Nice to fix):
@@ -143,16 +156,26 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
    **Final Assessment**:
    - If CRITICAL issues: "X critical issue(s) found. Fix before archiving."
-   - If only warnings: "No critical issues. Y warning(s) to consider. Ready for archive (with noted improvements)."
-   - If all clear: "All checks passed. Ready for archive."
+   - If only warnings and mechanical proof is present: "No critical issues. Y warning(s) to consider. Mechanically ready if the recorded gates passed."
+   - If all clear and mechanical proof is present: "Agentic checks found no issues; recorded mechanical gates are the readiness proof."
+   - If mechanical proof is missing: "Agentic checks completed, but readiness is unproven until required gates run."
 
 **Verification Heuristics**
 
 - **Completeness**: Focus on objective checklist items (checkboxes, requirements list)
-- **Correctness**: Use keyword search, file path analysis, reasonable inference - don't require perfect certainty
+- **Correctness**: Use keyword search, file path analysis, reasonable inference - don't require perfect certainty and do not present inference as proof
 - **Coherence**: Look for glaring inconsistencies, don't nitpick style
-- **False Positives**: When uncertain, prefer SUGGESTION over WARNING, WARNING over CRITICAL
+- **False Positives**: When uncertain, prefer SUGGESTION over WARNING, WARNING over CRITICAL. Reserve CRITICAL for objective artifact, task, spec, or gate blockers.
 - **Actionability**: Every issue must have a specific recommendation with file/line references where applicable
+
+**Mechanical Proof Required**
+
+Before saying a change is ready to archive, record:
+- `bin/openspec validate <change> --strict` when validating one change, or
+  `bin/openspec validate --all --strict` when checking all artifacts
+- the narrow specs/tests required by the change
+- the applicable `docs/DEVELOPMENT.md` verification gate
+- any unrelated existing blocker exactly
 
 **Graceful Degradation**
 
