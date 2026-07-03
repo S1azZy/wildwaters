@@ -17,12 +17,17 @@ Read `AGENTS.md` and the classification rules in `docs/DEVELOPMENT.md`.
 
 | Level | Use for | Workflow |
 | --- | --- | --- |
+| 0: Non-functional maintenance | Documentation, process rules, comments, formatting, skill text, or other edits that change no runtime behavior, product acceptance criteria, schema, dependencies, or security posture | Classify, edit the owning source of truth, verify with docs/style gate; no OpenSpec change or ADR |
 | 1: Direct | Copy, visual polish, obvious narrow bugs, small contract-preserving refactors | Existing project loop only |
 | 2: Specified feature | Meaningful behavior, interacting mechanisms, uncertain requirements, persistent acceptance criteria | Explore, approve, propose, apply, verify, archive |
 | 3: Architectural feature | Level 2 plus a durable, cross-cutting, difficult-to-reverse decision | Level 2 plus ADR promotion |
 
-State the selected level and reason. Level 1 creates no OpenSpec change and no
-ADR.
+State the selected level and reason. Level 0 and Level 1 create no OpenSpec
+change and no ADR.
+
+For Level 0, identify the owning document or skill, make the narrow text change,
+update `CHANGES.md` when the process or agent harness changes, and run
+`git diff --check`.
 
 ## Discover Level 2 And 3 Work
 

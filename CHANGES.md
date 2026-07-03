@@ -1,5 +1,20 @@
 # Changes
 
+## 2026-07-03
+- Rewrote the project-local waterfall UI skill so future waterfall discovery UI
+  work routes through the current Inertia React, shadcn/ui, Rails-owned prop
+  and copy, and MapLibre ownership boundaries instead of the retired
+  ERB/Hotwire-era frontend assumptions.
+- Tightened project-local OpenSpec skills so Wild Waters agents treat Level 0
+  process work as a first-class SDD outcome, use the repo-local `bin/openspec`
+  wrapper, require deterministic spec-sync before/after evidence, and separate
+  heuristic verification from mechanical gates.
+- Added a project-local SDD intake gate skill that forces Wild Waters agents to
+  classify repository tasks, select context, choose approvals, and state
+  verification before task-specific work starts.
+- Updated the OpenSpec tooling regression spec to validate project-local skills
+  from `.agents/skills`.
+
 ## 2026-07-01
 - Added the first application-owned admin namespace with an admin-only
   service-actions placeholder, a shadcn-backed admin workspace shell, and an

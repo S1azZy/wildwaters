@@ -13,7 +13,7 @@ RSpec.describe OpenSpecConfiguration do
   let(:makefile) { root.join("Makefile").read }
   let(:workflow) { root.join(".github/workflows/ci.yml").read }
   let(:skill_names) do
-    Dir[root.join(".codex/skills/openspec-*/SKILL.md")]
+    Dir[root.join(".agents/skills/openspec-*/SKILL.md")]
       .map { |path| Pathname(path).dirname.basename.to_s }
   end
   let(:spec_paths) { Dir[root.join("openspec/specs/*/spec.md")].map { |path| Pathname(path) } }
