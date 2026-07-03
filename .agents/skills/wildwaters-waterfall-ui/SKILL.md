@@ -15,6 +15,11 @@ feature-owned map engine.
 This skill is for the public waterfall product surface. It is not a generic
 frontend design skill.
 
+Do not use broad visual-design skills for Wild Waters waterfall UI unless the
+user explicitly asks for a new visual concept. Preserve ADR 0005, ADR 0006,
+`docs/frontend/DESIGN_GUIDE.md`, existing Tailwind tokens, and nearby
+components before inventing a new aesthetic direction.
+
 ## Task packet
 
 Before editing, classify through `docs/DEVELOPMENT.md`.
