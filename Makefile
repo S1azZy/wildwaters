@@ -5,8 +5,9 @@ SHELL := /bin/bash
 # freshness commands run inside the web container through APP.
 COMPOSE := docker compose
 APP := $(COMPOSE) run --rm web
+RTK_FRONTEND_FORMAT_ARGS := --check 'app/frontend/**/*.{ts,tsx,css}' vite.config.ts eslint.config.mjs package.json tsconfig.json components.json
 
-.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify frontend-outdated install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated maplibre-outdated outdated
+.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify frontend-outdated agent-rtk agent-frontend-format agent-frontend-lint agent-frontend-typecheck agent-frontend-test agent-rubocop agent-rspec agent-test agent-verify-fast install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated maplibre-outdated outdated
 
 setup: openspec-install
 	$(COMPOSE) up --build -d
@@ -45,6 +46,35 @@ frontend-audit:
 
 frontend-verify:
 	$(APP) bin/npm run frontend:verify
+
+# RTK-backed agent commands keep app/runtime work inside the web container while
+# filtering noisy tool output before it reaches the agent context.
+agent-rtk:
+	$(APP) rtk --version
+
+agent-frontend-format:
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk prettier $(RTK_FRONTEND_FORMAT_ARGS)"
+
+agent-frontend-lint:
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk lint ."
+
+agent-frontend-typecheck:
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk tsc --noEmit"
+
+agent-frontend-test: frontend-install
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk vitest run --coverage --passWithNoTests"
+
+agent-rubocop:
+	$(APP) env RUBOCOP_CACHE_ROOT=/app/tmp/rubocop rtk rubocop -A --config /app/.rubocop.yml
+
+agent-rspec:
+	$(APP) bash -lc "RAILS_ENV=test bin/rails db:prepare && WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec $(SPEC)"
+
+agent-test: frontend-install
+	$(APP) bash -lc "bin/npm run frontend:build:test && RAILS_ENV=test bin/rails db:prepare && WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec"
+
+agent-verify-fast: frontend-install
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk prettier $(RTK_FRONTEND_FORMAT_ARGS) && PATH=/app/node_modules/.bin:$$PATH rtk lint . && PATH=/app/node_modules/.bin:$$PATH rtk tsc --noEmit && PATH=/app/node_modules/.bin:$$PATH rtk vitest run --coverage --passWithNoTests && bin/npm run frontend:build:test && RUBOCOP_CACHE_ROOT=/app/tmp/rubocop rtk rubocop -A --config /app/.rubocop.yml && bin/erb_lint --lint-all && RAILS_ENV=test bin/rails db:prepare && WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec"
 
 # Host Git and Docker orchestration targets.
 install-hooks:
@@ -106,9 +136,10 @@ doctor:
 	@bin/node --version
 	@bin/npm --version
 	@bin/openspec --version
+	@rtk --version
 	@docker compose version
 	@docker info --format '{{.ServerVersion}}'
-	$(APP) bash -lc "ruby -v && bundle -v && bin/rails about"
+	$(APP) bash -lc "ruby -v && bundle -v && rtk --version && bin/rails about"
 
 import_geonames:
 	$(APP) bin/rails imports:geonames:enqueue

@@ -191,8 +191,8 @@ the host toolchain and then fall back to the container after a failure.
 
 | Environment | Allowed command shape | Use for |
 | --- | --- | --- |
-| Host shell | `rg`, `sed`, `git status/diff/log/show`, file reads, `apply_patch`, documented host-only `make` targets | Repository inspection, editing, git inspection, Docker orchestration, and project-local OpenSpec wrappers |
-| Web container | `make ...` targets backed by `APP := docker compose run --rm web`; targeted `docker compose run --rm web ...` when no Make target fits | Rails, Ruby, Bundler, RSpec, RuboCop, ERB lint, Brakeman, bundler-audit, frontend install/build/test/audit, app dependency freshness, migrations, consoles, and import tasks |
+| Host shell | `rtk rg`, raw `rg`, `sed`, `rtk git ...`, raw `git status/diff/log/show`, file reads, `apply_patch`, documented host-only `make` targets | Repository inspection, editing, git inspection, Docker orchestration, project-local OpenSpec wrappers, and token-efficient output filtering |
+| Web container | `make ...` targets backed by `APP := docker compose run --rm web`; RTK-backed `make agent-*` targets; targeted `docker compose run --rm web ...` when no Make target fits | Rails, Ruby, Bundler, RSpec, RuboCop, ERB lint, Brakeman, bundler-audit, frontend install/build/test/audit, app dependency freshness, migrations, consoles, and import tasks |
 
 Host-side runtime commands are not the discovery path. Do not run raw `bundle`,
 `rails`, `rspec`, `rubocop`, `brakeman`, `bundler-audit`, `npm`, `npx`, `vite`,
@@ -247,6 +247,47 @@ editing, and OpenSpec wrapper targets (`make openspec-install`,
 
 Use narrower `docker compose run --rm web ...` commands only when faster
 feedback is needed.
+
+### RTK Token-Efficient Workflow
+
+RTK is installed on the host and in the development web container. It is a
+token filter, not a source of truth. Prefer RTK when it preserves the evidence
+needed for the current decision; use raw commands when full context, exact
+formatting, or line-level proof matters.
+
+Host-side repository inspection:
+
+- Use `rtk rg ...` for broad discovery and noisy cross-repository searches.
+  Do not run `rtk init` automatically; if host RTK prints a no-hook advisory,
+  ignore it when the compact output is still useful or switch to raw `rg`.
+- Use raw `rg -n ...`, `rg --files`, and `sed -n ...` when exact matches,
+  line numbers, or surrounding source are needed before editing.
+- Use `rtk git status`, `rtk git diff`, `rtk git log`, `rtk git show`, and
+  RTK-backed `gh` commands for orientation. Use raw git output for patch
+  review, staging decisions, rebases, conflict resolution, and commit details.
+- Use `rtk docker ...` for container status or logs when compact output is
+  enough; keep Make as the entrypoint for app/runtime commands.
+- Use `rtk gain`, `rtk discover`, and `rtk session` to inspect savings and
+  missed opportunities. These are advisory, not verification gates.
+
+Container app/runtime commands:
+
+- Use `make agent-rspec SPEC=path/to/spec.rb` for targeted RSpec feedback.
+- Use `make agent-test` for the Rails test path with compact RSpec output.
+- Use `make agent-frontend-format`, `make agent-frontend-lint`,
+  `make agent-frontend-typecheck`, and `make agent-frontend-test` for focused
+  frontend gates.
+- Use `make agent-rubocop` for compact RuboCop autocorrect output.
+- Use `make agent-verify-fast` while iterating with an agent when compact
+  output is more useful than full logs.
+- RTK-backed RSpec agent targets set `WW_SKIP_SIMPLECOV=1` so RTK can parse
+  clean RSpec JSON output. Use ordinary Make targets for coverage proof.
+- Use the ordinary `make test`, `make verify-fast`, `make verify`, and CI
+  targets as final proof when a task requires the canonical project gate.
+
+Do not use RTK to hide required evidence. If an RTK summary is ambiguous,
+rerun the narrow raw command or read the saved tee output path that RTK prints
+on failure. Disable RTK for one host command with `RTK_DISABLED=1` when needed.
 
 ## Verification Matrix
 

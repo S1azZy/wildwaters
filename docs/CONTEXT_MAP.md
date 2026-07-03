@@ -34,6 +34,7 @@ rules, or making cross-cutting decisions.
 | Product/domain/database boundaries | `docs/FOUNDATIONS.md` |
 | Security/testing/merge gates | `docs/QUALITY_SECURITY.md` |
 | Spec-driven task levels and lifecycle | `docs/DEVELOPMENT.md` |
+| Token-efficient agent commands | `docs/DEVELOPMENT.md`, `Makefile` |
 | Current capability behavior | `openspec/specs/` |
 | Active feature changes | `openspec/changes/`, `bin/openspec list --json` |
 | Prioritized unimplemented work | `docs/TODO.md` |
