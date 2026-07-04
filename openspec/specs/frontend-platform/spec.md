@@ -69,7 +69,7 @@ frame, document title, and accessible flash presentation.
 #### Scenario: Authenticated shell
 - **GIVEN** a visitor is authenticated
 - **WHEN** a migrated business page renders
-- **THEN** the shell displays the profile action targeting the Rails dashboard
+- **THEN** the shell displays the account dropdown with authenticated user actions
 - **AND** it does not display the guest sign-in action
 
 #### Scenario: Shell flash message
@@ -291,3 +291,39 @@ The system SHALL include frontend installation, verification, and asset compilat
 - **WHEN** the image is assembled
 - **THEN** frontend assets are compiled during the build
 - **AND** the final Rails runtime image can serve them without running a Node or SSR process
+
+### Requirement: Shadcn dependency and build integration
+The system SHALL treat shadcn-generated component source and its locked npm
+dependencies as first-class inputs to the business frontend build.
+
+#### Scenario: Locked shadcn dependency graph
+- **WHEN** frontend dependencies are installed from the lockfile
+- **THEN** shadcn-required packages are resolved from the locked npm graph
+- **AND** the install does not require a separate frontend package manager or runtime outside the existing repository contract
+
+#### Scenario: Production build with shadcn primitives
+- **GIVEN** an Inertia page imports shared shadcn-backed primitives
+- **WHEN** the production frontend build runs
+- **THEN** the page compiles into Rails-resolvable frontend assets with the shared shadcn and Digital Naturalist styles present
+
+#### Scenario: Frontend quality gate covers UI kit
+- **WHEN** the frontend verification gate runs
+- **THEN** formatting, linting, typechecking, component tests, production build, and dependency audit cover shadcn-generated source and Wild Waters wrappers
+
+### Requirement: Protected admin Inertia integration
+The system SHALL deliver application-owned admin pages through the existing
+Inertia React frontend runtime while Rails retains routes, sessions,
+authorization, localization, and data selection.
+
+#### Scenario: Admin page runtime
+- **GIVEN** an authenticated admin opens an application-owned admin page
+- **WHEN** Rails renders the response
+- **THEN** Rails returns the expected Admin Inertia component and typed props
+- **AND** the response loads the React frontend entrypoint through the Inertia layout
+- **AND** it does not require Turbo, Stimulus, Importmap, SSR, or a separate frontend application
+
+#### Scenario: Admin page typed props
+- **GIVEN** Rails prepares the application-owned admin page response
+- **WHEN** the response is serialized
+- **THEN** the page receives localized display-ready copy, Rails-generated admin navigation URLs, and the shared shell contract
+- **AND** React renders those props without importing Rails locale files, duplicating route generation, or receiving server-only authorization state
