@@ -1,12 +1,11 @@
-import { WrenchIcon } from "lucide-react"
+import { LayoutDashboardIcon } from "lucide-react"
 
-import { Separator } from "@/components/ui/separator"
 import { ProductEmptyState } from "@/components/ww"
 
 import type { SharedPageProps } from "../../../types/page"
 import AdminLayout, { type AdminNavigationSection } from "../AdminLayout"
 
-export interface AdminServiceActionsPageProps extends SharedPageProps {
+export interface AdminDashboardPageProps extends SharedPageProps {
   copy: {
     title: string
     heading: string
@@ -18,16 +17,13 @@ export interface AdminServiceActionsPageProps extends SharedPageProps {
   navigation: {
     sections: AdminNavigationSection[]
   }
-  urls: {
-    serviceActions: string
-  }
 }
 
 export default function Index({
   copy,
   navigation,
   shell,
-}: AdminServiceActionsPageProps) {
+}: AdminDashboardPageProps) {
   return (
     <AdminLayout
       description={copy.description}
@@ -37,12 +33,16 @@ export default function Index({
       title={copy.title}
       toolbarLabel={copy.toolbarLabel}
     >
-      <Separator />
+      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+        <div className="aspect-video rounded-lg border bg-muted/50" />
+        <div className="aspect-video rounded-lg border bg-muted/50" />
+        <div className="aspect-video rounded-lg border bg-muted/50" />
+      </div>
 
       <ProductEmptyState
-        className="min-h-80 border"
+        className="min-h-96 border bg-background"
         description={copy.placeholderDescription}
-        icon={<WrenchIcon />}
+        icon={<LayoutDashboardIcon />}
         title={<h2>{copy.placeholderTitle}</h2>}
       />
     </AdminLayout>

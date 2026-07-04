@@ -2,19 +2,20 @@ import { screen, waitFor } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 
 import Index, {
-  type AdminServiceActionsPageProps,
-} from "../../../../pages/Admin/ServiceActions/Index"
+  type AdminDashboardPageProps,
+} from "../../../../pages/Admin/Dashboard/Index"
 import { checkAccessibility } from "../../../accessibility"
 import { renderInertiaPage } from "../../../inertia"
 
-const props: AdminServiceActionsPageProps = {
+const props: AdminDashboardPageProps = {
   copy: {
-    title: "Service actions",
-    heading: "Service actions",
-    description: "Run and monitor operational commands.",
+    title: "Dashboard",
+    heading: "Dashboard",
+    description: "Admin overview will appear here as models mature.",
     toolbarLabel: "Admin workspace",
-    placeholderTitle: "Service commands will live here",
-    placeholderDescription: "Import controls are not available yet.",
+    placeholderTitle: "Dashboard is ready",
+    placeholderDescription:
+      "Metrics and operational snapshots will appear here later.",
   },
   navigation: {
     sections: [
@@ -26,14 +27,14 @@ const props: AdminServiceActionsPageProps = {
             icon: "dashboard",
             label: "Dashboard",
             url: "/admin",
-            current: false,
+            current: true,
           },
           {
             key: "service_actions",
             icon: "wrench",
             label: "Service actions",
             url: "/admin/service-actions",
-            current: true,
+            current: false,
           },
         ],
       },
@@ -75,50 +76,39 @@ const props: AdminServiceActionsPageProps = {
       signOut: "/session",
     },
   },
-  urls: {
-    serviceActions: "/admin/service-actions",
-  },
 }
 
-describe("Admin/ServiceActions/Index", () => {
-  it("renders the admin shell and non-actionable service actions placeholder", async () => {
+describe("Admin/Dashboard/Index", () => {
+  it("renders an empty dashboard in the grouped admin shell", async () => {
     const { container } = renderInertiaPage(Index, props)
 
     expect(
       screen.getByRole("banner", { name: props.copy.toolbarLabel }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByRole("navigation", { name: props.copy.toolbarLabel }),
-    ).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
-      "href",
-      "/admin",
+      "aria-current",
+      "page",
     )
     expect(
       screen.getByRole("link", { name: "Service actions" }),
-    ).toHaveAttribute("aria-current", "page")
+    ).toHaveAttribute("href", "/admin/service-actions")
     expect(screen.getByText("Models")).toBeVisible()
     expect(screen.getByRole("link", { name: "Users" })).toHaveAttribute(
       "href",
       "/admin/users",
     )
     expect(
-      document.querySelector('[data-admin-nav-icon="wrench"]'),
+      document.querySelector('[data-admin-nav-icon="dashboard"]'),
     ).toBeInTheDocument()
     expect(
       screen.getByRole("heading", { name: props.copy.heading, level: 1 }),
     ).toBeInTheDocument()
-    expect(screen.getByText(props.copy.description)).toBeInTheDocument()
     expect(
       screen.getByRole("heading", {
         name: props.copy.placeholderTitle,
         level: 2,
       }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByText(props.copy.placeholderDescription),
-    ).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: /start import/i })).toBeNull()
 
     await waitFor(() => expect(document.title).toBe(props.copy.title))
     expect(

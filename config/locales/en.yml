@@ -33,8 +33,18 @@ en:
   admin:
     authorization:
       required: "You are not allowed to access that page."
+    dashboard:
+      index:
+        description: "Admin overview will appear here as models mature."
+        heading: "Dashboard"
+        placeholder_description: "Metrics and operational snapshots will appear here later."
+        placeholder_title: "Dashboard is ready"
+        title: "Dashboard"
     navigation:
+      dashboard: "Dashboard"
+      models: "Models"
       service_actions: "Service actions"
+      users: "Users"
     service_actions:
       index:
         description: "A quiet workspace for operational commands that need explicit admin access."
@@ -44,6 +54,66 @@ en:
         title: "Service actions"
     shell:
       toolbar_label: "Admin workspace"
+    users:
+      actions:
+        edit: "Edit"
+        reactivate: "Reactivate"
+        suspend: "Suspend"
+      edit:
+        back: "Back to users"
+        description: "Change only the fields admins are allowed to manage."
+        details:
+          created_at: "Created"
+          email: "Email"
+          locale: "Locale"
+          updated_at: "Updated"
+        details_heading: "Account details"
+        fields:
+          display_name:
+            label: "Display name"
+            placeholder: "Public name"
+          role:
+            label: "Role"
+          status:
+            label: "Status"
+        form_heading: "Editable fields"
+        heading: "Edit user"
+        submit: "Save changes"
+        title: "Edit user"
+      flash:
+        reactivated: "User reactivated."
+        suspended: "User suspended."
+        updated: "User updated."
+      index:
+        columns:
+          actions: "Actions"
+          created_at: "Created"
+          display_name: "Display name"
+          email: "Email"
+          locale: "Locale"
+          role: "Role"
+          status: "Status"
+        description: "Search and manage application users."
+        empty_description: "Try another search term."
+        empty_display_name: "Not set"
+        empty_title: "No users found"
+        heading: "Users"
+        pagination:
+          label: "Users pages"
+          next: "Next"
+          previous: "Previous"
+          summary: "Showing %{from}-%{to} of %{count} users"
+        search_label: "Search users"
+        search_placeholder: "Email or display name"
+        search_submit: "Search"
+        table_caption: "Application users"
+        title: "Users"
+      roles:
+        admin: "Admin"
+        member: "Member"
+      statuses:
+        active: "Active"
+        suspended: "Suspended"
   layouts:
     header:
       account_menu: "Account"

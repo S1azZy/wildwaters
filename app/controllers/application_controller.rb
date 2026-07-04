@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
       signOut: session_path
     }
 
-    urls[:admin] = admin_service_actions_path if current_user&.admin?
+    urls[:admin] = admin_root_path if current_user&.admin?
     urls
   end
 
