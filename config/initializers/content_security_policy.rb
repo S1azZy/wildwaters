@@ -2,6 +2,7 @@
 
 Rails.application.configure do
   config.content_security_policy do |policy|
+    vite_script_sources = Rails.env.development? ? [ :self, :unsafe_inline ] : [ :self ]
     vite_websocket_sources = Rails.env.development? ? [ "ws://localhost:3036", "ws://127.0.0.1:3036" ] : []
 
     policy.default_src :self
@@ -14,7 +15,7 @@ Rails.application.configure do
     policy.frame_ancestors :none
     policy.img_src :self, :data, :blob, "https://tiles.openfreemap.org", "https://tiles.stadiamaps.com"
     policy.object_src :none
-    policy.script_src :self
+    policy.script_src(*vite_script_sources)
     policy.style_src :self, :unsafe_inline, "https://fonts.googleapis.com"
     policy.style_src_attr :unsafe_inline
     policy.worker_src :self, :blob

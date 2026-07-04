@@ -23,14 +23,7 @@ RSpec.describe "Admin service actions", type: :request do
         placeholderDescription: I18n.t("admin.service_actions.index.placeholder_description", locale:)
       },
       navigation: {
-        items: [
-          {
-            key: "service_actions",
-            label: I18n.t("admin.navigation.service_actions", locale:),
-            url: admin_service_actions_path,
-            current: true
-          }
-        ]
+        sections: admin_navigation_sections(current: "service_actions", locale:)
       },
       urls: {
         serviceActions: admin_service_actions_path
@@ -107,7 +100,6 @@ RSpec.describe "Admin service actions", type: :request do
     end
   end
 
-  it_behaves_like "admin service actions access", :admin_root_path
   it_behaves_like "admin service actions access", :admin_service_actions_path
 
   describe "shared shell admin navigation" do
@@ -128,9 +120,46 @@ RSpec.describe "Admin service actions", type: :request do
 
       get root_path
 
-      expect(inertia.props.dig("shell", "urls", "admin")).to eq(admin_service_actions_path)
+      expect(inertia.props.dig("shell", "urls", "admin")).to eq(admin_root_path)
       expect(nested_keys(inertia.props.fetch("shell"))).not_to include("role", "user", "current_user")
     end
+  end
+
+  def admin_navigation_sections(current:, locale: I18n.locale)
+    [
+      {
+        key: "primary",
+        items: [
+          {
+            key: "dashboard",
+            icon: "dashboard",
+            label: I18n.t("admin.navigation.dashboard", locale:),
+            url: admin_root_path,
+            current: current == "dashboard"
+          },
+          {
+            key: "service_actions",
+            icon: "wrench",
+            label: I18n.t("admin.navigation.service_actions", locale:),
+            url: admin_service_actions_path,
+            current: current == "service_actions"
+          }
+        ]
+      },
+      {
+        key: "models",
+        label: I18n.t("admin.navigation.models", locale:),
+        items: [
+          {
+            key: "users",
+            icon: "users",
+            label: I18n.t("admin.navigation.users", locale:),
+            url: admin_users_path,
+            current: current == "users"
+          }
+        ]
+      }
+    ]
   end
 
   def admin_sensitive_prop_keys

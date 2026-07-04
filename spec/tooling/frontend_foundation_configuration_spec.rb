@@ -228,7 +228,9 @@ RSpec.describe FrontendFoundationConfiguration do
 
     expect(content_security_policy).to include(
       "Rails.env.development?",
+      "vite_script_sources = Rails.env.development? ? [ :self, :unsafe_inline ] : [ :self ]",
       "ws://localhost:3036",
+      "policy.script_src(*vite_script_sources)",
     )
     expect(content_security_policy).not_to include("http://localhost:3036")
   end

@@ -18,8 +18,11 @@ Rails.application.routes.draw do
   patch "password-reset/:token" => "password_resets#update", as: :password_reset_token
 
   namespace :admin do
-    root "service_actions#index"
+    root "dashboard#index"
     get "service-actions" => "service_actions#index", as: :service_actions
+    resources :users, only: %i[index edit update] do
+      patch :status, on: :member
+    end
   end
 
   get "dashboard" => "dashboard#show", as: :dashboard

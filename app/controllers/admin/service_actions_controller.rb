@@ -18,16 +18,7 @@ module Admin
           placeholderTitle: t("admin.service_actions.index.placeholder_title"),
           placeholderDescription: t("admin.service_actions.index.placeholder_description")
         },
-        navigation: {
-          items: [
-            {
-              key: "service_actions",
-              label: t("admin.navigation.service_actions"),
-              url: admin_service_actions_path,
-              current: true
-            }
-          ]
-        },
+        navigation: admin_navigation(current: "service_actions"),
         urls: {
           serviceActions: admin_service_actions_path
         }

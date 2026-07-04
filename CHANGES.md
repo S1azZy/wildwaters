@@ -1,5 +1,16 @@
 # Changes
 
+## 2026-07-04
+- Added the admin users directory with admin-only search, Pagy-backed
+  pagination, least-data user rows, editable `display_name`/role/status fields,
+  list-level suspend/reactivate actions, and password/identity/session data
+  excluded from admin props and forms.
+- Added an empty admin dashboard as the `/admin` entrypoint and reshaped the
+  admin sidebar into Dashboard, Service Actions, and a separated Models section
+  with Users.
+- Fixed the development CSP so Vite React Fast Refresh can run its inline
+  preamble without weakening non-development `script-src`.
+
 ## 2026-07-03
 - Integrated RTK into the agent harness by installing the pinned development
   container binary, adding compact `make agent-*` feedback commands for RSpec,

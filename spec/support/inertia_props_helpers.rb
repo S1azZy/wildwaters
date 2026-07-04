@@ -40,7 +40,7 @@ module InertiaPropsHelpers
       signOut: session_path
     }
 
-    urls[:admin] = admin_service_actions_path if admin
+    urls[:admin] = admin_root_path if admin
     urls
   end
 

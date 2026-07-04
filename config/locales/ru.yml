@@ -4,8 +4,18 @@ ru:
   admin:
     authorization:
       required: "У вас нет доступа к этой странице."
+    dashboard:
+      index:
+        description: "Здесь появится обзор админки по мере развития моделей."
+        heading: "Дашборд"
+        placeholder_description: "Метрики и операционные сводки появятся здесь позже."
+        placeholder_title: "Дашборд готов"
+        title: "Дашборд"
     navigation:
+      dashboard: "Дашборд"
+      models: "Models"
       service_actions: "Сервисные действия"
+      users: "Пользователи"
     service_actions:
       index:
         description: "Спокойное рабочее место для операционных команд, требующих явного доступа администратора."
@@ -15,6 +25,66 @@ ru:
         title: "Сервисные действия"
     shell:
       toolbar_label: "Админская область"
+    users:
+      actions:
+        edit: "Редактировать"
+        reactivate: "Разблокировать"
+        suspend: "Заблокировать"
+      edit:
+        back: "К пользователям"
+        description: "Изменяйте только поля, доступные администраторам."
+        details:
+          created_at: "Создан"
+          email: "Email"
+          locale: "Локаль"
+          updated_at: "Обновлён"
+        details_heading: "Данные аккаунта"
+        fields:
+          display_name:
+            label: "Отображаемое имя"
+            placeholder: "Публичное имя"
+          role:
+            label: "Роль"
+          status:
+            label: "Статус"
+        form_heading: "Редактируемые поля"
+        heading: "Редактирование пользователя"
+        submit: "Сохранить"
+        title: "Редактирование пользователя"
+      flash:
+        reactivated: "Пользователь разблокирован."
+        suspended: "Пользователь заблокирован."
+        updated: "Пользователь обновлён."
+      index:
+        columns:
+          actions: "Действия"
+          created_at: "Создан"
+          display_name: "Отображаемое имя"
+          email: "Email"
+          locale: "Локаль"
+          role: "Роль"
+          status: "Статус"
+        description: "Поиск и управление пользователями приложения."
+        empty_description: "Попробуйте другой поисковый запрос."
+        empty_display_name: "Не задано"
+        empty_title: "Пользователи не найдены"
+        heading: "Пользователи"
+        pagination:
+          label: "Страницы пользователей"
+          next: "Вперёд"
+          previous: "Назад"
+          summary: "Показаны %{from}-%{to} из %{count} пользователей"
+        search_label: "Поиск пользователей"
+        search_placeholder: "Email или отображаемое имя"
+        search_submit: "Найти"
+        table_caption: "Пользователи приложения"
+        title: "Пользователи"
+      roles:
+        admin: "Администратор"
+        member: "Участник"
+      statuses:
+        active: "Активен"
+        suspended: "Заблокирован"
   layouts:
     header:
       account_menu: "Аккаунт"
