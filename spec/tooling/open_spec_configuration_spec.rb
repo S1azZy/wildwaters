@@ -18,6 +18,22 @@ RSpec.describe OpenSpecConfiguration do
   end
   let(:spec_paths) { Dir[root.join("openspec/specs/*/spec.md")].map { |path| Pathname(path) } }
   let(:spec_names) { spec_paths.map { |path| path.dirname.basename.to_s } }
+  let(:expected_spec_names) do
+    %w[
+      admin-job-operations
+      admin-service-actions
+      admin-users-directory
+      authentication
+      design-system-shell
+      frontend-platform
+      frontend-ui-system
+      geonames-region-import
+      password-reset
+      region-management
+      spot-waterfall-domain
+      waterfall-discovery
+    ]
+  end
 
   it "pins the shared Node and OpenSpec versions" do
     expect(root.join(".tool-versions").read).to include("nodejs 24.16.0")
@@ -64,17 +80,7 @@ RSpec.describe OpenSpecConfiguration do
   end
 
   it "keeps a capability baseline for implemented behavior" do
-    expect(spec_names).to contain_exactly(
-        "admin-job-operations",
-        "authentication",
-        "design-system-shell",
-        "frontend-platform",
-        "geonames-region-import",
-        "password-reset",
-        "region-management",
-        "spot-waterfall-domain",
-        "waterfall-discovery",
-    )
+    expect(spec_names).to match_array(expected_spec_names)
   end
 
   it "keeps every capability specification structurally valid" do

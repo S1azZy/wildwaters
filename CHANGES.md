@@ -8,6 +8,8 @@
 - Added an empty admin dashboard as the `/admin` entrypoint and reshaped the
   admin sidebar into Dashboard, Service Actions, and a separated Models section
   with Users.
+- Synced and archived the completed OpenSpec changes for shadcn/ui adoption,
+  the admin service-actions shell, and the admin users directory.
 - Fixed the development CSP so Vite React Fast Refresh can run its inline
   preamble without weakening non-development `script-src`.
 

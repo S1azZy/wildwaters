@@ -51,11 +51,10 @@
   placeholder, admin-only account entry, and preserved sign-out behavior.
 - [x] 4.2 Run `bin/openspec validate add-admin-service-actions --strict` and
   resolve artifact issues.
-- [ ] 4.3 Run the narrow request/component specs, then `make security` for the
+- [x] 4.3 Run the narrow request/component specs, then `make security` for the
   admin/auth boundary.
-  - Narrow request/component specs passed. `make security` is blocked by
-    `crass 1.0.6` advisories requiring `crass >= 1.0.7`; dependency updates
-    need separate approval.
+  - Narrow request/component specs passed. `make security` passed after the
+    `crass` advisory fix landed on main.
 - [x] 4.4 Run `make verify-fast`, recording any unrelated existing blocker
   exactly.
 - [x] 4.5 If implementation learning changes the approved admin shell, props,
