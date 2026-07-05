@@ -192,7 +192,7 @@ the host toolchain and then fall back to the container after a failure.
 | Environment | Allowed command shape | Use for |
 | --- | --- | --- |
 | Host shell | `make agent-host-search`, `make agent-host-diff-*`, `make agent-host-log`, `make agent-host-docker-logs`, `make agent-host-rtk-*`, `rtk rg`, `rtk git ...`, `rtk docker ...`, raw `rg`, `sed`, git, file reads, `apply_patch`, documented host-only `make` targets | Repository inspection, editing, git inspection, Docker orchestration, project-local OpenSpec wrappers, and token-efficient output filtering |
-| Web container | `make ...` targets backed by `APP := docker compose run --rm web`; RTK-backed `make agent-*` targets; targeted `docker compose run --rm web ...` when no Make target fits | Rails, Ruby, Bundler, RSpec, RuboCop, ERB lint, Brakeman, bundler-audit, frontend install/build/test/audit, app dependency freshness, migrations, consoles, and import tasks |
+| Web container | `make ...` targets backed by `APP := docker compose run --rm web`; RTK-backed `make agent-*` targets; targeted `docker compose run --rm web ...` when no Make target fits | Rails, Ruby, Bundler, RSpec, RuboCop, Brakeman, bundler-audit, frontend install/build/test/audit, app dependency freshness, migrations, consoles, and import tasks |
 
 Host-side runtime commands are not the discovery path. Do not run raw `bundle`,
 `rails`, `rspec`, `rubocop`, `brakeman`, `bundler-audit`, `npm`, `npx`, `vite`,
@@ -231,7 +231,6 @@ editing, and OpenSpec wrapper targets (`make openspec-install`,
 | Lint with autocorrect | `make lint` | Web container |
 | RuboCop with autocorrect | `make rubocop` | Web container |
 | RuboCop with autocorrect alias | `make rubocop-autocorrect` | Web container |
-| ERB lint | `make erb-lint` | Web container |
 | Full test suite | `make test` | Web container |
 | Security checks | `make security` | Web container |
 | Fast local verification | `make verify-fast` | Web container |
@@ -315,7 +314,7 @@ on failure. Disable RTK for one host command with `RTK_DISABLED=1` when needed.
 | --- | --- |
 | Docs only | `git diff --check` |
 | Ruby style-only | `make rubocop` |
-| ERB/view-only | `make erb-lint` plus relevant request/system spec when behavior changes |
+| ERB/view-only | `make rubocop` plus relevant request/system spec when behavior changes |
 | Model/interactor behavior | Narrow spec, then `make test` or `make verify-fast` |
 | Controller/request behavior | Narrow request spec, then `make verify-fast` |
 | Policy/authorization | Policy/request specs, then `make verify-fast` |

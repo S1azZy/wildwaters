@@ -125,7 +125,6 @@ Required checks:
 - Vite production build.
 - npm vulnerability audit.
 - RuboCop.
-- ERB lint.
 - RSpec.
 - Brakeman.
 - bundler-audit.

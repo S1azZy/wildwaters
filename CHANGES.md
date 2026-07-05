@@ -1,6 +1,8 @@
 # Changes
 
 ## 2026-07-05
+- Removed the redundant ERB lint gate and its `erb_lint`/`better_html`
+  dependencies now that application-owned UI has moved to Inertia React.
 - Added an admin-only regions directory with search, pagination, a flat
   hierarchy table, parent-path context, children counts, and localized
   navigation/copy.
