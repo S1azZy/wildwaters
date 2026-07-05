@@ -305,8 +305,19 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(missing_components).to be_empty
   end
 
+  it "routes owned CSS zones through the application stylesheet entrypoint" do
+    entrypoint = root.join("app/frontend/entrypoints/application.css").read
+
+    expect(entrypoint).to include(
+      '@import "../styles/shadcn-theme.css";',
+      '@import "../styles/shell.css";',
+      '@import "../styles/auth.css";',
+      '@import "../styles/explore.css";',
+    )
+  end
+
   it "maps shadcn semantic tokens to the Digital Naturalist vocabulary" do
-    stylesheet = root.join("app/frontend/entrypoints/application.css").read
+    stylesheet = root.join("app/frontend/styles/shadcn-theme.css").read
 
     expect(stylesheet).to include(
       "--primary: var(--color-primary-500)",
