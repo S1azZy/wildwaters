@@ -5,7 +5,7 @@ SHELL := /bin/bash
 # freshness commands run inside the web container through APP.
 COMPOSE := docker compose
 APP := $(COMPOSE) run --rm web
-RTK_FRONTEND_FORMAT_ARGS := --check 'app/frontend/**/*.{ts,tsx,css}' vite.config.ts eslint.config.mjs package.json tsconfig.json components.json
+RTK_FRONTEND_FORMAT_ARGS := --check --log-level warn 'app/frontend/**/*.{ts,tsx,css}' vite.config.ts eslint.config.mjs package.json tsconfig.json components.json
 AGENT_LOG_LIMIT ?= 20
 AGENT_DOCKER_LOG_LINES ?= 200
 AGENT_DOCKER_SERVICE ?= web
@@ -117,16 +117,16 @@ agent-frontend-format:
 	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk prettier $(RTK_FRONTEND_FORMAT_ARGS)"
 
 agent-frontend-lint:
-	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk lint ."
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk eslint . --quiet"
 
 agent-frontend-typecheck:
-	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk tsc --noEmit"
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk tsc --noEmit --pretty false"
 
 agent-frontend-test:
-	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk vitest run --coverage --passWithNoTests"
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk vitest run --coverage --reporter=minimal --passWithNoTests"
 
 agent-rubocop:
-	$(APP) env RUBOCOP_CACHE_ROOT=/app/tmp/rubocop rtk rubocop -A --config /app/.rubocop.yml
+	$(APP) env RUBOCOP_CACHE_ROOT=/app/tmp/rubocop rtk rubocop -A --format simple --config /app/.rubocop.yml
 
 agent-rspec:
 	$(APP) bash -lc "RAILS_ENV=test bin/rails db:prepare && WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec $(SPEC)"
@@ -135,7 +135,7 @@ agent-test: frontend-install
 	$(APP) bash -lc "bin/npm run frontend:build:test && RAILS_ENV=test bin/rails db:prepare && WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec"
 
 agent-verify-fast: frontend-install
-	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk prettier $(RTK_FRONTEND_FORMAT_ARGS) && PATH=/app/node_modules/.bin:$$PATH rtk lint . && PATH=/app/node_modules/.bin:$$PATH rtk tsc --noEmit && PATH=/app/node_modules/.bin:$$PATH rtk vitest run --coverage --passWithNoTests && bin/npm run frontend:build:test && RUBOCOP_CACHE_ROOT=/app/tmp/rubocop rtk rubocop -A --config /app/.rubocop.yml && RAILS_ENV=test bin/rails db:prepare && WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec"
+	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk prettier $(RTK_FRONTEND_FORMAT_ARGS) && PATH=/app/node_modules/.bin:$$PATH rtk eslint . --quiet && PATH=/app/node_modules/.bin:$$PATH rtk tsc --noEmit --pretty false && PATH=/app/node_modules/.bin:$$PATH rtk vitest run --coverage --reporter=minimal --passWithNoTests && bin/npm run frontend:build:test && RUBOCOP_CACHE_ROOT=/app/tmp/rubocop rtk rubocop -A --format simple --config /app/.rubocop.yml && RAILS_ENV=test bin/rails db:prepare && WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec"
 
 # Host Git and Docker orchestration targets.
 install-hooks:

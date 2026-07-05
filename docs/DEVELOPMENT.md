@@ -303,6 +303,11 @@ Container app/runtime commands:
   clean RSpec JSON output. Use ordinary Make targets for coverage proof.
 - Use the ordinary `make test`, `make verify-fast`, `make verify`, and CI
   targets as final proof when a task requires the canonical project gate.
+- Default quality commands should keep output compact without relying on RTK:
+  RSpec prints failures plus the final example summary, RuboCop uses its
+  simple formatter unless a caller requests another format, frontend linting
+  hides warnings by default, TypeScript disables pretty output, and Vitest uses
+  the minimal reporter with summary coverage.
 
 Do not use RTK to hide required evidence. If an RTK summary is ambiguous,
 rerun the narrow raw command or read the saved tee output path that RTK prints

@@ -10,10 +10,10 @@
     "frontend:audit": "npm audit --audit-level=high",
     "frontend:build": "RAILS_ENV=production vite build",
     "frontend:build:test": "RAILS_ENV=test bin/vite build",
-    "frontend:format": "prettier --check \"app/frontend/**/*.{ts,tsx,css}\" vite.config.ts eslint.config.mjs package.json tsconfig.json components.json",
-    "frontend:lint": "eslint .",
-    "frontend:test": "vitest run --coverage --passWithNoTests",
-    "frontend:typecheck": "tsc --noEmit",
+    "frontend:format": "prettier --check --log-level warn \"app/frontend/**/*.{ts,tsx,css}\" vite.config.ts eslint.config.mjs package.json tsconfig.json components.json",
+    "frontend:lint": "eslint . --quiet",
+    "frontend:test": "vitest run --coverage --reporter=minimal --passWithNoTests",
+    "frontend:typecheck": "tsc --noEmit --pretty false",
     "frontend:verify": "npm run frontend:format && npm run frontend:lint && npm run frontend:typecheck && npm run frontend:test && npm run frontend:build && npm run frontend:audit"
   },
   "devDependencies": {
