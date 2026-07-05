@@ -54,6 +54,10 @@ RUN case "${TARGETARCH}" in \
   && rtk --version \
   && rm -rf "${tmpdir}" /tmp/rtk.tar.gz
 
+RUN install -d /root/.config/rtk /app/tmp/rtk/tee
+
+COPY config/rtk/container.toml /root/.config/rtk/config.toml
+
 RUN gem update --system ${RUBYGEMS_VERSION}
 
 ENV BUNDLE_PATH=/usr/local/bundle \

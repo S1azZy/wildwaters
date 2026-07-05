@@ -191,7 +191,7 @@ the host toolchain and then fall back to the container after a failure.
 
 | Environment | Allowed command shape | Use for |
 | --- | --- | --- |
-| Host shell | `rtk rg`, raw `rg`, `sed`, `rtk git ...`, raw `git status/diff/log/show`, file reads, `apply_patch`, documented host-only `make` targets | Repository inspection, editing, git inspection, Docker orchestration, project-local OpenSpec wrappers, and token-efficient output filtering |
+| Host shell | `make agent-host-search`, `make agent-host-diff-*`, `make agent-host-log`, `make agent-host-docker-logs`, `make agent-host-rtk-*`, `rtk rg`, `rtk git ...`, `rtk docker ...`, raw `rg`, `sed`, git, file reads, `apply_patch`, documented host-only `make` targets | Repository inspection, editing, git inspection, Docker orchestration, project-local OpenSpec wrappers, and token-efficient output filtering |
 | Web container | `make ...` targets backed by `APP := docker compose run --rm web`; RTK-backed `make agent-*` targets; targeted `docker compose run --rm web ...` when no Make target fits | Rails, Ruby, Bundler, RSpec, RuboCop, ERB lint, Brakeman, bundler-audit, frontend install/build/test/audit, app dependency freshness, migrations, consoles, and import tasks |
 
 Host-side runtime commands are not the discovery path. Do not run raw `bundle`,
@@ -257,18 +257,34 @@ formatting, or line-level proof matters.
 
 Host-side repository inspection:
 
-- Use `rtk rg ...` for broad discovery and noisy cross-repository searches.
-  Do not run `rtk init` automatically; if host RTK prints a no-hook advisory,
-  ignore it when the compact output is still useful or switch to raw `rg`.
-- Use raw `rg -n ...`, `rg --files`, and `sed -n ...` when exact matches,
-  line numbers, or surrounding source are needed before editing.
-- Use `rtk git status`, `rtk git diff`, `rtk git log`, `rtk git show`, and
+- Use `make agent-host-search Q='pattern' SCOPE='path ...'` or `rtk rg ...`
+  for broad discovery and noisy cross-repository searches. Do not run
+  `rtk init` automatically; if host RTK prints a no-hook advisory, ignore it
+  when the compact output is still useful or switch to raw `rg` only after
+  narrowing.
+- Use raw `rg -n ...`, `rg --files`, and `sed -n ...` only after the search is
+  narrowed to exact files, line ranges, or source needed before editing. Do not
+  use broad `sed` output as discovery.
+- Use `make agent-host-diff-stat`, `make agent-host-diff-names`,
+  `make agent-host-log`, `rtk git diff`, `rtk git log`, `rtk git show`, and
   RTK-backed `gh` commands for orientation. Use raw git output for patch
-  review, staging decisions, rebases, conflict resolution, and commit details.
-- Use `rtk docker ...` for container status or logs when compact output is
-  enough; keep Make as the entrypoint for app/runtime commands.
-- Use `rtk gain`, `rtk discover`, and `rtk session` to inspect savings and
-  missed opportunities. These are advisory, not verification gates.
+  review, staging decisions, rebases, conflict resolution, and commit details
+  after the affected files are known.
+- Use `make agent-host-docker-logs`, `rtk docker ...`, or RTK-backed Docker
+  commands for container status or logs when compact output is enough; keep
+  Make as the entrypoint for app/runtime commands.
+- Use `make agent-host-rtk-gain`, `make agent-host-rtk-discover`, and
+  `make agent-host-rtk-session` to inspect host-side RTK savings and missed
+  opportunities. These are advisory, not verification gates.
+- Use `make agent-container-rtk-gain`, `make agent-container-rtk-gain-daily`,
+  and `make agent-container-rtk-gain-history` for container-side savings from
+  containerized `make agent-*` commands. Host RTK and container RTK read
+  different configurations and history databases.
+- If a command returns truncated output, an `Original token count` warning, or
+  more than a screen of unrelated matches, stop and narrow the next command.
+  Prefer path filters, `--glob`, `--max-count`, `--context 0`, exact filenames,
+  `make agent-host-diff-names`, or `make agent-host-diff-stat` before asking
+  for more raw output.
 
 Container app/runtime commands:
 

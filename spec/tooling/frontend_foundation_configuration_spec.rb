@@ -134,9 +134,25 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(dev_dockerfile).to include(
       "ARG RTK_VERSION=0.43.0",
       "github.com/rtk-ai/rtk/releases/download/v${RTK_VERSION}",
+      "COPY config/rtk/container.toml /root/.config/rtk/config.toml",
       "RTK_TELEMETRY_DISABLED=1",
       "RTK_TEE_DIR=/app/tmp/rtk/tee",
     )
+  end
+
+  it "configures persistent container RTK tracking under the workspace tmp dir" do
+    rtk_config = root.join("config/rtk/container.toml").read
+    dev_dockerfile = root.join("Dockerfile.dev").read
+
+    expect(rtk_config).to include(
+      "[tracking]",
+      'database_path = "/app/tmp/rtk/history.db"',
+      "[tee]",
+      'directory = "/app/tmp/rtk/tee"',
+      "[telemetry]",
+      "enabled = false",
+    )
+    expect(dev_dockerfile).to include("RUN install -d /root/.config/rtk /app/tmp/rtk/tee")
   end
 
   it "provides RTK-backed agent commands for compact local feedback" do
@@ -151,6 +167,83 @@ RSpec.describe FrontendFoundationConfiguration do
       "agent-rubocop:",
       "rtk rubocop -A --config /app/.rubocop.yml",
       "agent-verify-fast: frontend-install",
+    )
+  end
+
+  it "provides RTK-backed host search commands for broad agent output" do
+    makefile = root.join("Makefile").read
+
+    expect(makefile).to include(
+      "agent-search: agent-host-search",
+      "agent-host-search:",
+      "rtk rg -n \"$(Q)\" $(SCOPE)",
+    )
+  end
+
+  it "provides RTK-backed host diff and log commands for broad agent output" do
+    makefile = root.join("Makefile").read
+
+    expect(makefile).to include(
+      "agent-diff-stat: agent-host-diff-stat",
+      "agent-host-diff-stat:",
+      "rtk git diff --stat $(BASE)",
+      "agent-diff-names: agent-host-diff-names",
+      "agent-host-diff-names:",
+      "rtk git diff --name-status $(BASE)",
+      "agent-log: agent-host-log",
+      "agent-host-log:",
+      "rtk git log --oneline -$(AGENT_LOG_LIMIT)",
+    )
+  end
+
+  it "provides RTK-backed Docker log commands for agents" do
+    makefile = root.join("Makefile").read
+
+    expect(makefile).to include(
+      "agent-docker-logs: agent-host-docker-logs",
+      "agent-host-docker-logs:",
+      "rtk docker compose logs --tail=$(AGENT_DOCKER_LOG_LINES) $(AGENT_DOCKER_SERVICE)",
+    )
+  end
+
+  it "provides container RTK diagnostics commands for agent token savings" do
+    makefile = root.join("Makefile").read
+
+    expect(makefile).to include(
+      "agent-container-rtk:",
+      "agent-rtk-gain: agent-container-rtk-gain",
+      "agent-container-rtk-gain:",
+      "$(APP) rtk gain",
+      "agent-container-rtk-gain-daily:",
+      "$(APP) rtk gain --daily",
+      "agent-container-rtk-gain-history:",
+      "$(APP) rtk gain --history",
+    )
+  end
+
+  it "provides host RTK diagnostics commands for agent token savings" do
+    makefile = root.join("Makefile").read
+
+    expect(makefile).to include(
+      "agent-host-rtk-gain:",
+      "agent-host-rtk-session:",
+      "agent-host-rtk-discover:",
+    )
+  end
+
+  it "documents RTK-first broad output rules for agents" do
+    development = root.join("docs/DEVELOPMENT.md").read
+    intake_skill = root.join(".agents/skills/wildwaters-sdd-intake-gate/SKILL.md").read
+
+    expect(development).to include(
+      "Use `make agent-host-search Q='pattern' SCOPE='path ...'` or `rtk rg ...`",
+      "Use `make agent-host-diff-stat`, `make agent-host-diff-names`",
+      "Use `make agent-container-rtk-gain`, `make agent-container-rtk-gain-daily`",
+      "If a command returns truncated output, an `Original token count` warning",
+    )
+    expect(intake_skill).to include(
+      "Use documented RTK-backed host commands and `make agent-*` targets first",
+      "broad unrelated matches, stop and narrow the next command",
     )
   end
 
