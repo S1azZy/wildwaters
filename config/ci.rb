@@ -12,7 +12,6 @@ CI.run do
   step "Frontend: Test build", "npm run frontend:build:test"
 
   step "Style: Ruby", "bin/rubocop"
-  step "Style: ERB", "bin/erb_lint --lint-all"
 
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"

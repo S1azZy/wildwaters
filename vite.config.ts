@@ -14,10 +14,11 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    reporters: ["minimal"],
     setupFiles: ["./test/setup.ts"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: ["text-summary", "html"],
       reportsDirectory: "../../coverage/frontend",
       include: ["**/*.{ts,tsx}"],
       exclude: ["test/**", "**/*.d.ts", "**/*.test.{ts,tsx}"],

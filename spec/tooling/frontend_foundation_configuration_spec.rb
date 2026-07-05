@@ -40,10 +40,10 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(scripts).to include(
       "frontend:audit" => "npm audit --audit-level=high",
       "frontend:build" => "RAILS_ENV=production vite build",
-      "frontend:format" => 'prettier --check "app/frontend/**/*.{ts,tsx,css}" vite.config.ts eslint.config.mjs package.json tsconfig.json components.json',
-      "frontend:lint" => "eslint .",
-      "frontend:test" => "vitest run --coverage --passWithNoTests",
-      "frontend:typecheck" => "tsc --noEmit"
+      "frontend:format" => 'prettier --check --log-level warn "app/frontend/**/*.{ts,tsx,css}" vite.config.ts eslint.config.mjs package.json tsconfig.json components.json',
+      "frontend:lint" => "eslint . --quiet",
+      "frontend:test" => "vitest run --coverage --reporter=minimal --passWithNoTests",
+      "frontend:typecheck" => "tsc --noEmit --pretty false"
     )
   end
 
@@ -64,6 +64,7 @@ RSpec.describe FrontendFoundationConfiguration do
 
     expect(tsconfig).to include('"strict": true', '"noEmit": true')
     expect(vite_config).to include("react()", "tailwindcss()", 'setupFiles: ["./test/setup.ts"]')
+    expect(vite_config).to include('reporters: ["minimal"]')
     expect(root.join("app/frontend/test/setup.ts")).to exist
   end
 
@@ -163,9 +164,9 @@ RSpec.describe FrontendFoundationConfiguration do
       "WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec $(SPEC)",
       "rtk rspec $(SPEC)",
       "agent-frontend-test:",
-      "rtk vitest run --coverage --passWithNoTests",
+      "rtk vitest run --coverage --reporter=minimal --passWithNoTests",
       "agent-rubocop:",
-      "rtk rubocop -A --config /app/.rubocop.yml",
+      "rtk rubocop -A --format simple --config /app/.rubocop.yml",
       "agent-verify-fast: frontend-install",
     )
     expect(makefile).not_to include("agent-frontend-test: frontend-install")
