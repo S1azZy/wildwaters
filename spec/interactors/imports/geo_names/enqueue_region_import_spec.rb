@@ -2,10 +2,11 @@ require "rails_helper"
 
 RSpec.describe Imports::GeoNames::EnqueueRegionImport, type: :interactor do
   include ActiveJob::TestHelper
+  include EnvHelpers
 
-  subject(:result) { described_class.call(input:) }
+  subject(:result) { described_class.call(settings_interactor:) }
 
-  let(:input) do
+  let(:settings) do
     {
       source_key: "geonames_regions",
       countries: %w[AD FR],
@@ -14,9 +15,11 @@ RSpec.describe Imports::GeoNames::EnqueueRegionImport, type: :interactor do
       download_alternate_names: true,
       mode: Imports::Run::MODES[:full],
       download_dir: "tmp/imports/geonames",
-      initiated_by: "imports:geonames:enqueue"
+      initiated_by: "admin/service-actions/geonames-region-import#create"
     }
   end
+  let(:settings_interactor) { class_double(Imports::GeoNames::Settings, call: settings_result) }
+  let(:settings_result) { result_interactor.call(input: settings) }
   let!(:source) do
     create(
       :imports_source,
@@ -73,6 +76,36 @@ RSpec.describe Imports::GeoNames::EnqueueRegionImport, type: :interactor do
     end
   end
 
+  context "with environment-backed settings" do
+    let(:settings_interactor) { Imports::GeoNames::Settings }
+
+    around do |example|
+      with_env(
+        "GEONAMES_SOURCE_KEY" => "geonames_regions",
+        "GEONAMES_COUNTRY_CODES" => "ad, fr",
+        "GEONAMES_LANGUAGES" => "en, RU",
+        "GEONAMES_FEATURE_CODES" => "PCLI, adm1",
+        "GEONAMES_DOWNLOAD_ALTERNATE_NAMES" => "0",
+        "GEONAMES_DEFAULT_MODE" => "replay",
+        "GEONAMES_DOWNLOAD_DIR" => "tmp/imports/geonames/settings"
+      ) do
+        load Rails.root.join("config/initializers/01_settings.rb")
+        example.run
+      end
+    ensure
+      load Rails.root.join("config/initializers/01_settings.rb")
+    end
+
+    it "loads effective settings through the settings interactor" do
+      expect { result }.to change(Imports::Run, :count).by(1)
+        .and change(Imports::RunItem, :count).by(2)
+
+      run = result.value!.fetch(:run)
+
+      expect_env_settings_snapshot_to_match(run)
+    end
+  end
+
   context "when the configured source is missing" do
     before { source.destroy! }
 
@@ -88,8 +121,12 @@ RSpec.describe Imports::GeoNames::EnqueueRegionImport, type: :interactor do
     end
   end
 
-  context "when required input is missing" do
-    let(:input) { super().except(:countries) }
+  context "when effective settings are invalid" do
+    before do
+      allow(settings_interactor).to receive(:call).and_return(settings_result)
+    end
+
+    let(:settings_result) { result_interactor.call(input: settings.except(:countries)) }
 
     it "returns a validation failure before creating a run or enqueueing jobs" do
       expect { result }.not_to change(Imports::Run, :count)
@@ -102,7 +139,7 @@ RSpec.describe Imports::GeoNames::EnqueueRegionImport, type: :interactor do
   end
 
   context "when normalized item keys collide" do
-    let(:input) { super().merge(countries: %w[AD ad]) }
+    let(:settings) { super().merge(countries: %w[AD ad]) }
 
     it "returns an item conflict failure without keeping a partial run or enqueueing jobs" do
       expect { result }.not_to change(Imports::Run, :count)
@@ -120,7 +157,7 @@ RSpec.describe Imports::GeoNames::EnqueueRegionImport, type: :interactor do
     expect(run).to have_attributes(
       status: Imports::Run::STATUSES[:running],
       mode: Imports::Run::MODES[:full],
-      initiated_by: "imports:geonames:enqueue"
+      initiated_by: "admin/service-actions/geonames-region-import#create"
     )
     expect(run.params).to include(
       "countries" => %w[AD FR],
@@ -130,6 +167,19 @@ RSpec.describe Imports::GeoNames::EnqueueRegionImport, type: :interactor do
       "download_dir" => "tmp/imports/geonames"
     )
     expect(run.params).not_to have_key("queue")
+  end
+
+  def expect_env_settings_snapshot_to_match(run)
+    expect(run).to have_attributes(
+      mode: Imports::Run::MODES[:replay],
+      initiated_by: Imports::GeoNames::Settings::DEFAULT_INITIATED_BY
+    )
+    expect(run.params).to include(
+      "countries" => %w[AD FR],
+      "feature_codes" => %w[PCLI ADM1],
+      "download_alternate_names" => false,
+      "download_dir" => "tmp/imports/geonames/settings"
+    )
   end
 
   def expect_country_items_to_match(run)
@@ -145,5 +195,15 @@ RSpec.describe Imports::GeoNames::EnqueueRegionImport, type: :interactor do
       "artifact_dir" => "tmp/imports/geonames/#{run.id}/AD"
     )
     expect(run.items.find_by!(item_key: "AD").params).not_to have_key("queue")
+  end
+
+  def result_interactor
+    @result_interactor ||= Class.new(ApplicationInteractor) do
+      option :input
+
+      def call
+        Success(input)
+      end
+    end
   end
 end

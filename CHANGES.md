@@ -1,6 +1,14 @@
 # Changes
 
 ## 2026-07-05
+- Moved GeoNames region import launch into the admin Service Actions page with
+  a latest-run summary panel, ENV-backed settings snapshots, admin-only POST
+  enqueueing, and localized feedback.
+- Removed the GeoNames import rake/Make operator launch paths and updated
+  project docs to route operators through the admin UI.
+- Decomposed the region source-record apply pipeline into focused import
+  collaborators while preserving the `ApplySourceRecord.call(input:)`
+  contract.
 - Made the default quality gates quieter by switching RSpec, RuboCop, frontend
   formatting, ESLint, TypeScript, Vitest, and coverage output to compact
   success summaries while preserving failure detail.

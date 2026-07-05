@@ -10,7 +10,7 @@ AGENT_LOG_LIMIT ?= 20
 AGENT_DOCKER_LOG_LINES ?= 200
 AGENT_DOCKER_SERVICE ?= web
 
-.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify frontend-outdated agent-search agent-diff-stat agent-diff-names agent-log agent-docker-logs agent-rtk agent-rtk-gain agent-rtk-gain-daily agent-rtk-gain-history agent-rtk-session agent-rtk-discover agent-host-search agent-host-diff-stat agent-host-diff-names agent-host-log agent-host-docker-logs agent-host-rtk-gain agent-host-rtk-session agent-host-rtk-discover agent-container-rtk agent-container-rtk-gain agent-container-rtk-gain-daily agent-container-rtk-gain-history agent-frontend-format agent-frontend-lint agent-frontend-typecheck agent-frontend-test agent-rubocop agent-rspec agent-test agent-verify-fast install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated maplibre-outdated outdated
+.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify frontend-outdated agent-search agent-diff-stat agent-diff-names agent-log agent-docker-logs agent-rtk agent-rtk-gain agent-rtk-gain-daily agent-rtk-gain-history agent-rtk-session agent-rtk-discover agent-host-search agent-host-diff-stat agent-host-diff-names agent-host-log agent-host-docker-logs agent-host-rtk-gain agent-host-rtk-session agent-host-rtk-discover agent-container-rtk agent-container-rtk-gain agent-container-rtk-gain-daily agent-container-rtk-gain-history agent-frontend-format agent-frontend-lint agent-frontend-typecheck agent-frontend-test agent-rubocop agent-rspec agent-test agent-verify-fast install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect test security verify verify-fast ci migration doctor bundle-outdated maplibre-outdated outdated
 
 setup: openspec-install
 	$(COMPOSE) up --build -d
@@ -198,15 +198,6 @@ doctor:
 	@docker compose version
 	@docker info --format '{{.ServerVersion}}'
 	$(APP) bash -lc "ruby -v && bundle -v && rtk --version && bin/rails about"
-
-import_geonames:
-	$(APP) bin/rails imports:geonames:enqueue
-
-import_geonames_retry_failed:
-ifndef RUN_ID
-	$(error RUN_ID is required, for example: make import_geonames_retry_failed RUN_ID=123)
-endif
-	$(APP) bin/rails imports:geonames:retry_failed RUN_ID=$(RUN_ID)
 
 bundle-outdated:
 	$(APP) bundle outdated

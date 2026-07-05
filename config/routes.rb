@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#index"
     get "service-actions" => "service_actions#index", as: :service_actions
+    post "service-actions/geonames-region-import" => "service_actions#create_geonames_region_import", as: :service_actions_geonames_region_import
     resources :users, only: %i[index edit update] do
       patch :status, on: :member
     end
