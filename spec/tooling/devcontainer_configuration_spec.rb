@@ -76,7 +76,7 @@ RSpec.describe DevcontainerConfiguration do
   it "pins Node in the development image without apt Node packages" do
     dockerfile = dockerfile_devcontainer_path.read
 
-    expect(dockerfile).to include("ARG NODE_VERSION=24.16.0")
+    expect(dockerfile).to include("ARG NODE_VERSION=24.18.0")
     expect(dockerfile.index("ARG RUBY_VERSION=4.0.5")).to be < dockerfile.index("FROM node:")
     expect(dockerfile).to include('FROM node:${NODE_VERSION}-bookworm-slim AS node')
     expect(dockerfile).to include("COPY --from=node /usr/local/bin/node /usr/local/bin/node")
@@ -86,7 +86,7 @@ RSpec.describe DevcontainerConfiguration do
 
   it "keeps the Ruby and RubyGems versions aligned across the toolchain" do
     ruby_version = "4.0.5"
-    rubygems_version = "4.0.14"
+    rubygems_version = "4.0.15"
     dockerfiles = %w[Dockerfile Dockerfile.dev Dockerfile.devcontainer].map { |path| root.join(path).read }
     compose = root.join("docker-compose.yml").read
 
@@ -109,7 +109,7 @@ RSpec.describe DevcontainerConfiguration do
   end
 
   it "installs project Node dependencies during container creation" do
-    expect(devcontainer_compose.dig("services", "web", "build", "args", "NODE_VERSION")).to eq("24.16.0")
+    expect(devcontainer_compose.dig("services", "web", "build", "args", "NODE_VERSION")).to eq("24.18.0")
     expect(post_create).to include("npm ci")
     expect(post_create).to include("bin/openspec --version")
   end

@@ -23,15 +23,15 @@ RSpec.describe FrontendFoundationConfiguration do
 
   it "pins the approved frontend runtime and build dependencies" do
     expect(package.fetch("dependencies")).to include(
-      "@inertiajs/react" => "3.4.0",
+      "@inertiajs/react" => "3.6.0",
       "react" => "19.2.7",
       "react-dom" => "19.2.7",
     )
     expect(package.fetch("devDependencies")).to include(
-      "@tailwindcss/vite" => "4.3.1",
-      "tailwindcss" => "4.3.1",
+      "@tailwindcss/vite" => "4.3.2",
+      "tailwindcss" => "4.3.2",
       "typescript" => "6.0.3",
-      "vite" => "8.0.16",
+      "vite" => "8.1.3",
       "vitest" => "4.1.9",
     )
   end
@@ -185,9 +185,9 @@ RSpec.describe FrontendFoundationConfiguration do
     expect(package.fetch("dependencies")).to include(
       "class-variance-authority" => "^0.7.1",
       "clsx" => "^2.1.1",
-      "lucide-react" => "^1.21.0",
-      "radix-ui" => "^1.6.0",
-      "shadcn" => "^4.11.0",
+      "lucide-react" => "1.23.0",
+      "radix-ui" => "1.6.1",
+      "shadcn" => "4.13.0",
       "tailwind-merge" => "^3.6.0"
     )
   end

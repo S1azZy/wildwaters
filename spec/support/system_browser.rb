@@ -7,7 +7,11 @@ module SystemBrowser
       using: :chrome,
       screen_size:
     ) do |browser_options|
-      browser_options.binary = "/usr/bin/chromium" if File.executable?("/usr/bin/chromium")
+      if File.executable?("/usr/bin/chromium-headless-shell")
+        browser_options.binary = "/usr/bin/chromium-headless-shell"
+      elsif File.executable?("/usr/bin/chromium")
+        browser_options.binary = "/usr/bin/chromium"
+      end
       browser_options.add_argument("--headless=new")
       browser_options.add_argument("--no-sandbox")
       browser_options.add_argument("--disable-dev-shm-usage")

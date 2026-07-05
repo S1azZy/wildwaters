@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "24.16.0"
+          node-version: "24.18.0"
           cache: npm
 
       - name: Install OpenSpec
@@ -64,7 +64,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "24.16.0"
+          node-version: "24.18.0"
           cache: npm
 
       - name: Install frontend dependencies
@@ -102,7 +102,7 @@ jobs:
           bundler-cache: true
 
       - name: Prepare RuboCop cache
-        uses: actions/cache@v6
+        uses: actions/cache@v6.1.0
         env:
           DEPENDENCIES_HASH: ${{ hashFiles('.ruby-version', '**/.rubocop.yml', '**/.rubocop_todo.yml', 'Gemfile.lock') }}
         with:
@@ -156,7 +156,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "24.16.0"
+          node-version: "24.18.0"
           cache: npm
 
       - name: Install frontend dependencies

@@ -9,11 +9,12 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=4.0.5
-ARG RUBYGEMS_VERSION=4.0.14
-ARG NODE_VERSION=24.16.0
+ARG RUBYGEMS_VERSION=4.0.15
+ARG NODE_VERSION=24.18.0
 FROM docker.io/library/node:$NODE_VERSION-bookworm-slim AS node
 
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+ARG RUBYGEMS_VERSION
 
 # Rails app lives here
 WORKDIR /rails

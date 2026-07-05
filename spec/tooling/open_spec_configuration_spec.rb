@@ -36,11 +36,11 @@ RSpec.describe OpenSpecConfiguration do
   end
 
   it "pins the shared Node and OpenSpec versions" do
-    expect(root.join(".tool-versions").read).to include("nodejs 24.16.0")
+    expect(root.join(".tool-versions").read).to include("nodejs 24.18.0")
 
     package = JSON.parse(root.join("package.json").read)
-    expect(package.dig("engines", "node")).to eq("24.16.0")
-    expect(package.dig("devDependencies", "@fission-ai/openspec")).to eq("1.4.1")
+    expect(package.dig("engines", "node")).to eq("24.18.0")
+    expect(package.dig("devDependencies", "@fission-ai/openspec")).to eq("1.5.0")
   end
 
   it "routes project npm commands through the asdf Node version" do
@@ -126,7 +126,7 @@ RSpec.describe OpenSpecConfiguration do
   it "validates specifications in a dedicated CI job" do
     expect(workflow).to include("specifications:")
     expect(workflow).to include("uses: actions/setup-node@v6")
-    expect(workflow).to include('node-version: "24.16.0"')
+    expect(workflow).to include('node-version: "24.18.0"')
     expect(workflow).to include("run: npm ci")
     expect(workflow).to include("run: make openspec-validate")
   end

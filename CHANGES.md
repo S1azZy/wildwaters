@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-07-05
+- Refreshed the current dependency set by updating compatible Bundler and npm
+  packages, moving the project Node pin to `24.18.0`, aligning RubyGems/Bundler
+  with `4.0.15`, and leaving the remaining npm major/peer blockers documented
+  by the dependency freshness gate.
+
 ## 2026-07-04
 - Added the admin users directory with admin-only search, Pagy-backed
   pagination, least-data user rows, editable `display_name`/role/status fields,
