@@ -4,10 +4,7 @@ import { PageHeader, ProductCard } from "../../components/ww"
 import type { SharedPageProps } from "../../types/page"
 
 type WaterfallFactKey =
-  | "height"
-  | "flowSeasonality"
-  | "approachDifficulty"
-  | "plungePool"
+  "height" | "flowSeasonality" | "approachDifficulty" | "plungePool"
 
 interface WaterfallFact {
   key: WaterfallFactKey

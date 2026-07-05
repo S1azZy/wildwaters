@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile.dev
       args:
         RUBY_VERSION: "4.0.5"
-        NODE_VERSION: "24.16.0"
+        NODE_VERSION: "24.18.0"
     command: >
       bash -lc "npm ci &&
       bundle install &&
@@ -58,7 +58,7 @@ services:
       dockerfile: Dockerfile.dev
       args:
         RUBY_VERSION: "4.0.5"
-        NODE_VERSION: "24.16.0"
+        NODE_VERSION: "24.18.0"
     command: >
       bash -lc "bundle install &&
       bin/rails db:prepare &&
