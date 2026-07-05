@@ -1,6 +1,12 @@
 # Changes
 
 ## 2026-07-05
+- Strengthened the RTK-first agent workflow by adding compact Make targets for
+  broad search, orientation diffs, git history, Docker logs, and RTK savings
+  inspection, plus stop rules for truncated or overly broad command output.
+- Added container RTK tracking configuration so `make agent-*` command savings
+  persist under `tmp/rtk` and can be inspected through container-side gain
+  targets.
 - Refreshed the current dependency set by updating compatible Bundler and npm
   packages, moving the project Node pin to `24.18.0`, aligning RubyGems/Bundler
   with `4.0.15`, and leaving the remaining npm major/peer blockers documented

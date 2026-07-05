@@ -6,8 +6,11 @@ SHELL := /bin/bash
 COMPOSE := docker compose
 APP := $(COMPOSE) run --rm web
 RTK_FRONTEND_FORMAT_ARGS := --check 'app/frontend/**/*.{ts,tsx,css}' vite.config.ts eslint.config.mjs package.json tsconfig.json components.json
+AGENT_LOG_LIMIT ?= 20
+AGENT_DOCKER_LOG_LINES ?= 200
+AGENT_DOCKER_SERVICE ?= web
 
-.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify frontend-outdated agent-rtk agent-frontend-format agent-frontend-lint agent-frontend-typecheck agent-frontend-test agent-rubocop agent-rspec agent-test agent-verify-fast install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated maplibre-outdated outdated
+.PHONY: setup openspec-install openspec-update openspec-validate frontend-install frontend-format frontend-lint frontend-typecheck frontend-test frontend-build frontend-audit frontend-verify frontend-outdated agent-search agent-diff-stat agent-diff-names agent-log agent-docker-logs agent-rtk agent-rtk-gain agent-rtk-gain-daily agent-rtk-gain-history agent-rtk-session agent-rtk-discover agent-host-search agent-host-diff-stat agent-host-diff-names agent-host-log agent-host-docker-logs agent-host-rtk-gain agent-host-rtk-session agent-host-rtk-discover agent-container-rtk agent-container-rtk-gain agent-container-rtk-gain-daily agent-container-rtk-gain-history agent-frontend-format agent-frontend-lint agent-frontend-typecheck agent-frontend-test agent-rubocop agent-rspec agent-test agent-verify-fast install-hooks up down logs shell bash bundle lint rubocop rubocop-autocorrect erb-lint test security verify verify-fast ci migration doctor import_geonames import_geonames_retry_failed bundle-outdated maplibre-outdated outdated
 
 setup: openspec-install
 	$(COMPOSE) up --build -d
@@ -49,8 +52,66 @@ frontend-verify:
 
 # RTK-backed agent commands keep app/runtime work inside the web container while
 # filtering noisy tool output before it reaches the agent context.
-agent-rtk:
+agent-search: agent-host-search
+
+agent-host-search:
+ifndef Q
+	$(error Q is required, for example: make agent-host-search Q='render inertia' SCOPE='app spec')
+endif
+	rtk rg -n "$(Q)" $(SCOPE)
+
+agent-diff-stat: agent-host-diff-stat
+
+agent-host-diff-stat:
+	rtk git diff --stat $(BASE)
+
+agent-diff-names: agent-host-diff-names
+
+agent-host-diff-names:
+	rtk git diff --name-status $(BASE)
+
+agent-log: agent-host-log
+
+agent-host-log:
+	rtk git log --oneline -$(AGENT_LOG_LIMIT)
+
+agent-docker-logs: agent-host-docker-logs
+
+agent-host-docker-logs:
+	rtk docker compose logs --tail=$(AGENT_DOCKER_LOG_LINES) $(AGENT_DOCKER_SERVICE)
+
+agent-rtk: agent-container-rtk
+
+agent-container-rtk:
 	$(APP) rtk --version
+
+agent-rtk-gain: agent-container-rtk-gain
+
+agent-container-rtk-gain:
+	$(APP) rtk gain
+
+agent-rtk-gain-daily: agent-container-rtk-gain-daily
+
+agent-container-rtk-gain-daily:
+	$(APP) rtk gain --daily
+
+agent-rtk-gain-history: agent-container-rtk-gain-history
+
+agent-container-rtk-gain-history:
+	$(APP) rtk gain --history
+
+agent-rtk-session: agent-host-rtk-session
+
+agent-host-rtk-gain:
+	rtk gain
+
+agent-host-rtk-session:
+	rtk session
+
+agent-rtk-discover: agent-host-rtk-discover
+
+agent-host-rtk-discover:
+	rtk discover
 
 agent-frontend-format:
 	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk prettier $(RTK_FRONTEND_FORMAT_ARGS)"

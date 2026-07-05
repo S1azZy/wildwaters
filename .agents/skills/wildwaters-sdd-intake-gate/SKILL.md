@@ -123,6 +123,10 @@ Select the command environment before running task-specific commands:
 
 - Use the host shell for `rg`, `sed`, git inspection, file reads, `apply_patch`,
   Docker orchestration, and project-local OpenSpec wrappers.
+- Use documented RTK-backed host commands and `make agent-*` targets first for
+  broad discovery, noisy search, orientation diffs, git history, Docker logs,
+  and compact runtime feedback. Use raw output only after narrowing the scope or
+  when exact evidence is needed.
 - Use Make/container targets for Rails, Ruby, Bundler, RSpec, RuboCop, security
   checks, frontend install/build/test/audit, migrations, imports, and dependency
   freshness.
@@ -130,6 +134,9 @@ Select the command environment before running task-specific commands:
   checkout; do not use a bare `openspec` command.
 - Do not try raw host `bundle`, `rails`, `rspec`, `rubocop`, `brakeman`,
   `bundler-audit`, `npm`, `npx`, `vite`, or `tsc` for app work.
+- If a command returns truncated output, an `Original token count` warning, or
+  broad unrelated matches, stop and narrow the next command instead of reading
+  more raw output.
 
 If a command requires approval under the permission matrix, stop and ask before
 running it.
