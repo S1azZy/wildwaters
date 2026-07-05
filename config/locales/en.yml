@@ -43,8 +43,40 @@ en:
     navigation:
       dashboard: "Dashboard"
       models: "Models"
+      regions: "Regions"
       service_actions: "Service actions"
       users: "Users"
+    regions:
+      index:
+        children_count:
+          one: "1 child"
+          other: "%{count} children"
+          zero: "No children"
+        columns:
+          children: "Children"
+          country_code: "Country"
+          created_at: "Created"
+          kind: "Kind"
+          parent_path: "Parent path"
+          region: "Region"
+          status: "Status"
+        description: "Inspect the region hierarchy used by discovery and imports."
+        empty_country_code: "None"
+        empty_description: "Try another search term."
+        empty_parent_path: "Root"
+        empty_title: "No regions found"
+        heading: "Regions"
+        level_label: "Level"
+        pagination:
+          label: "Regions pages"
+          next: "Next"
+          previous: "Previous"
+          summary: "Showing %{from}-%{to} of %{count} regions"
+        search_label: "Search regions"
+        search_placeholder: "Name, slug, or country code"
+        search_submit: "Search"
+        table_caption: "Region hierarchy"
+        title: "Regions"
     service_actions:
       index:
         description: "A quiet workspace for operational commands that need explicit admin access."

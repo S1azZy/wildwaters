@@ -1,6 +1,11 @@
 # Changes
 
 ## 2026-07-05
+- Added an admin-only regions directory with search, pagination, a flat
+  hierarchy table, parent-path context, children counts, and localized
+  navigation/copy.
+- Stopped `make agent-frontend-test` from running `npm ci` so focused
+  agent frontend gates can run in parallel without `node_modules` churn.
 - Strengthened the RTK-first agent workflow by adding compact Make targets for
   broad search, orientation diffs, git history, Docker logs, and RTK savings
   inspection, plus stop rules for truncated or overly broad command output.

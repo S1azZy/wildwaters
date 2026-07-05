@@ -14,8 +14,40 @@ ru:
     navigation:
       dashboard: "Дашборд"
       models: "Models"
+      regions: "Регионы"
       service_actions: "Сервисные действия"
       users: "Пользователи"
+    regions:
+      index:
+        children_count:
+          one: "1 дочерний"
+          other: "%{count} дочерних"
+          zero: "Нет дочерних"
+        columns:
+          children: "Дочерние"
+          country_code: "Страна"
+          created_at: "Создан"
+          kind: "Тип"
+          parent_path: "Путь родителей"
+          region: "Регион"
+          status: "Статус"
+        description: "Просмотр иерархии регионов, используемой в discovery и импортах."
+        empty_country_code: "Нет"
+        empty_description: "Попробуйте другой поисковый запрос."
+        empty_parent_path: "Корень"
+        empty_title: "Регионы не найдены"
+        heading: "Регионы"
+        level_label: "Уровень"
+        pagination:
+          label: "Страницы регионов"
+          next: "Вперёд"
+          previous: "Назад"
+          summary: "Показаны %{from}-%{to} из %{count} регионов"
+        search_label: "Поиск регионов"
+        search_placeholder: "Название, slug или код страны"
+        search_submit: "Найти"
+        table_caption: "Иерархия регионов"
+        title: "Регионы"
     service_actions:
       index:
         description: "Спокойное рабочее место для операционных команд, требующих явного доступа администратора."

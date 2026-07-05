@@ -21,6 +21,7 @@ RSpec.describe OpenSpecConfiguration do
   let(:expected_spec_names) do
     %w[
       admin-job-operations
+      admin-regions-directory
       admin-service-actions
       admin-users-directory
       authentication

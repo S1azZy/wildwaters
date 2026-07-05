@@ -293,6 +293,10 @@ Container app/runtime commands:
 - Use `make agent-frontend-format`, `make agent-frontend-lint`,
   `make agent-frontend-typecheck`, and `make agent-frontend-test` for focused
   frontend gates.
+- Do not parallelize targets that run `frontend-install` with focused frontend
+  gates, because `npm ci` rewrites the shared `node_modules` tree. Focused
+  `agent-frontend-*` targets assume dependencies are already installed; use
+  `make agent-verify-fast` for a serial install-plus-check loop.
 - Use `make agent-rubocop` for compact RuboCop autocorrect output.
 - Use `make agent-verify-fast` while iterating with an agent when compact
   output is more useful than full logs.

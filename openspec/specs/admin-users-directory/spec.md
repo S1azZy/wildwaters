@@ -24,6 +24,7 @@ dashboard shell instead of a service-actions page.
 - **AND** the second navigation item is Service Actions with its own icon
 - **AND** a non-clickable `Models` section label appears after a visual spacer
 - **AND** Users appears inside the `Models` section with its own icon
+- **AND** Regions appears inside the `Models` section with its own icon
 
 ### Requirement: Protected admin users directory
 The system SHALL provide an application-owned users directory inside the admin
