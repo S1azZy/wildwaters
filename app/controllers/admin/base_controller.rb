@@ -36,6 +36,13 @@ module Admin
                 label: t("admin.navigation.users"),
                 url: admin_users_path,
                 current: current == "users"
+              ),
+              admin_navigation_item(
+                key: "regions",
+                icon: "regions",
+                label: t("admin.navigation.regions"),
+                url: admin_regions_path,
+                current: current == "regions"
               )
             ]
           }

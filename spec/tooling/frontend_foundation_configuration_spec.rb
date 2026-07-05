@@ -162,12 +162,13 @@ RSpec.describe FrontendFoundationConfiguration do
       "agent-rspec:",
       "WW_SKIP_SIMPLECOV=1 RAILS_ENV=test rtk rspec $(SPEC)",
       "rtk rspec $(SPEC)",
-      "agent-frontend-test: frontend-install",
+      "agent-frontend-test:",
       "rtk vitest run --coverage --passWithNoTests",
       "agent-rubocop:",
       "rtk rubocop -A --config /app/.rubocop.yml",
       "agent-verify-fast: frontend-install",
     )
+    expect(makefile).not_to include("agent-frontend-test: frontend-install")
   end
 
   it "provides RTK-backed host search commands for broad agent output" do

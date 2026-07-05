@@ -122,7 +122,7 @@ agent-frontend-lint:
 agent-frontend-typecheck:
 	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk tsc --noEmit"
 
-agent-frontend-test: frontend-install
+agent-frontend-test:
 	$(APP) bash -lc "PATH=/app/node_modules/.bin:$$PATH rtk vitest run --coverage --passWithNoTests"
 
 agent-rubocop:

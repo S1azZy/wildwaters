@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import {
   LayoutDashboardIcon,
+  MapPinnedIcon,
   UsersRoundIcon,
   WrenchIcon,
   type LucideIcon,
@@ -13,7 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import AppShell from "../../components/AppShell"
 import type { SharedPageProps } from "../../types/page"
 
-type AdminNavigationIcon = "dashboard" | "users" | "wrench"
+type AdminNavigationIcon = "dashboard" | "regions" | "users" | "wrench"
 
 export interface AdminNavigationItem {
   icon: AdminNavigationIcon
@@ -42,6 +43,7 @@ interface AdminLayoutProps extends Pick<SharedPageProps, "shell"> {
 
 const NAVIGATION_ICONS = {
   dashboard: LayoutDashboardIcon,
+  regions: MapPinnedIcon,
   users: UsersRoundIcon,
   wrench: WrenchIcon,
 } satisfies Record<AdminNavigationIcon, LucideIcon>

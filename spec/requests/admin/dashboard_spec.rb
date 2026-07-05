@@ -85,6 +85,13 @@ RSpec.describe "Admin dashboard", type: :request do
             label: I18n.t("admin.navigation.users", locale:),
             url: admin_users_path,
             current: current == "users"
+          },
+          {
+            key: "regions",
+            icon: "regions",
+            label: I18n.t("admin.navigation.regions", locale:),
+            url: admin_regions_path,
+            current: current == "regions"
           }
         ]
       }

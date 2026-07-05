@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[index edit update] do
       patch :status, on: :member
     end
+    resources :regions, only: %i[index]
   end
 
   get "dashboard" => "dashboard#show", as: :dashboard
