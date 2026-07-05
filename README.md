@@ -80,18 +80,10 @@ make openspec-update
 
 ## GeoNames Import
 
-The recommended operator flow enqueues one GeoNames import run with one queued
-item per country:
-
-```bash
-GEONAMES_COUNTRY_CODES=AD GEONAMES_LANGUAGES=en,ru make import_geonames
-```
-
-Retry failed country items for an existing run:
-
-```bash
-make import_geonames_retry_failed RUN_ID=123
-```
+Operators start GeoNames region import from the admin Service Actions page.
+The admin action enqueues one GeoNames import run with one queued item per
+country. There is no supported rake, Make, or CLI launch path for starting or
+retrying GeoNames imports.
 
 `bin/rails db:prepare` only prepares the schema. It does not load demo seeds.
 
@@ -114,7 +106,7 @@ Useful environment variables:
 - `GEONAMES_DOWNLOAD_ALTERNATE_NAMES=0` - skip alternate names download
 - `GEONAMES_DEFAULT_MODE=full` - run mode
 
-The rake task name supplies the run's `initiated_by` audit label.
+The admin service action supplies the run's `initiated_by` audit label.
 
 ## Notes
 

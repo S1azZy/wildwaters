@@ -52,9 +52,39 @@ ru:
       index:
         description: "Спокойное рабочее место для операционных команд, требующих явного доступа администратора."
         heading: "Сервисные действия"
-        placeholder_description: "Управление импортами и другие сервисные команды появятся здесь после отдельного описания их поведения."
-        placeholder_title: "Здесь будут сервисные команды"
         title: "Сервисные действия"
+      import_regions:
+        button: "Запустить импорт"
+        description: "Поставить импорт регионов GeoNames в очередь с текущими настройками из окружения."
+        empty_description: "Запускайте импорт после настройки GEONAMES_COUNTRY_CODES и связанных переменных окружения."
+        empty_title: "Импортов GeoNames ещё не было"
+        failure_title: "Ошибка"
+        fields:
+          countries: "Страны"
+          feature_codes: "Feature codes"
+          finished_at: "Завершён"
+          initiated_by: "Инициатор"
+          item_counts: "Элементы"
+          languages: "Языки"
+          mode: "Режим"
+          started_at: "Запущен"
+          status: "Статус"
+        flash:
+          enqueued: "Импорт регионов GeoNames поставлен в очередь."
+          failed: "Не удалось поставить импорт регионов GeoNames в очередь."
+          run_already_active: "Импорт регионов GeoNames уже выполняется."
+          source_not_found: "Источник импорта GeoNames не настроен."
+        latest_run_title: "Последний запуск"
+        results_title: "Результаты"
+        settings_title: "Снимок настроек"
+        statuses:
+          cancelled: "Отменён"
+          failed: "Ошибка"
+          partially_failed: "Частично с ошибками"
+          queued: "В очереди"
+          running: "Выполняется"
+          succeeded: "Успешно"
+        title: "Импорт регионов GeoNames"
     shell:
       toolbar_label: "Админская область"
     users:

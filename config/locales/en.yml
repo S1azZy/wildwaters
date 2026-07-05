@@ -81,9 +81,39 @@ en:
       index:
         description: "A quiet workspace for operational commands that need explicit admin access."
         heading: "Service actions"
-        placeholder_description: "Import controls and other service commands will appear here after their operational behavior is specified."
-        placeholder_title: "Service commands will live here"
         title: "Service actions"
+      import_regions:
+        button: "Start import"
+        description: "Queue GeoNames region import from the current environment-backed settings."
+        empty_description: "Start an import after GEONAMES_COUNTRY_CODES and related environment settings are ready."
+        empty_title: "No GeoNames import runs yet"
+        failure_title: "Failure"
+        fields:
+          countries: "Countries"
+          feature_codes: "Feature codes"
+          finished_at: "Finished"
+          initiated_by: "Initiated by"
+          item_counts: "Items"
+          languages: "Languages"
+          mode: "Mode"
+          started_at: "Started"
+          status: "Status"
+        flash:
+          enqueued: "GeoNames region import was queued."
+          failed: "GeoNames region import could not be queued."
+          run_already_active: "A GeoNames region import is already running."
+          source_not_found: "GeoNames import source is not configured."
+        latest_run_title: "Latest run"
+        results_title: "Results"
+        settings_title: "Settings snapshot"
+        statuses:
+          cancelled: "Cancelled"
+          failed: "Failed"
+          partially_failed: "Partially failed"
+          queued: "Queued"
+          running: "Running"
+          succeeded: "Succeeded"
+        title: "GeoNames region import"
     shell:
       toolbar_label: "Admin workspace"
     users:

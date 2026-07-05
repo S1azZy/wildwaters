@@ -237,8 +237,7 @@ editing, and OpenSpec wrapper targets (`make openspec-install`,
 | Full local verification | `make verify` | Mixed: host OpenSpec validation plus container gates |
 | CI entrypoint | `make ci` | Web container |
 | Migration skeleton | `make migration NAME=MigrationName` | Web container |
-| Enqueue GeoNames import | `make import_geonames` | Web container |
-| Retry failed GeoNames import items | `make import_geonames_retry_failed RUN_ID=123` | Web container |
+| Start GeoNames region import | Admin Service Actions page | Web container jobs after admin enqueue |
 | Ruby dependency freshness | `make bundle-outdated` | Web container |
 | Frontend dependency freshness | `make frontend-outdated` | Web container |
 | MapLibre dependency freshness | `make maplibre-outdated` | Web container |
